@@ -13,6 +13,6 @@ public class SessionUtil {
     private MultivaluedMap<String, String> context;
 
     public Long getUserId(){
-        return Long.parseLong(this.context.get("userId").getFirst());
+        return Long.parseLong(this.context.get("x-user-id").getFirst());
     }
 }

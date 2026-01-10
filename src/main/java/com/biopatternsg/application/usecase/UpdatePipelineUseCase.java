@@ -15,11 +15,13 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     @Override
     public PipelineConfig execute(PipelineConfig pipelineConfig) {
 
-        var pipelineModel = pipelineRepository.findById(pipelineConfig.getId());
-        if(pipelineModel == null){
-            pipelineModel = pipelineRepository.update(pipelineConfig);
+        var pipelineCurrentConfig = pipelineRepository.findById(pipelineConfig.getId());
+        if(pipelineCurrentConfig == null){
+            //TODO Agregar excepción
+            return null;
         }
 
-        return pipelineModel;
+        //pipelineCurrentConfig.set
+        return pipelineRepository.save(pipelineCurrentConfig);
     }
 }

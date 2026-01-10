@@ -15,11 +15,16 @@ public class UpdateNetworkUseCase implements UpdateNetwork {
     @Override
     public NetworkConfig execute(NetworkConfig networkConfig) {
 
-        var networkModel = networkRepository.findById(networkConfig.getId());
-        if(networkModel == null){
-            networkModel = networkRepository.update(networkConfig);
+        var networkConfigCurrent = networkRepository.findById(networkConfig.getId());
+        if(networkConfigCurrent == null){
+            //TODO Agregar excepción
+            return null;
         }
 
-        return networkModel;
+        //networkRepository.findByName(networkConfig.getName());
+
+        networkConfigCurrent.setName(networkConfig.getName());
+        networkConfigCurrent.setDescription(networkConfig.getDescription());
+        return networkRepository.save(networkConfigCurrent);
     }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 public interface PipelineRepository {
 
     PipelineConfig save(PipelineConfig pipelineConfig);
-    PipelineConfig update(PipelineConfig pipelineConfig);
     PipelineConfig findById(String id);
     PipelineConfig findByName(String name);
     List<PipelineConfig> findByNetworkId(String networkId);

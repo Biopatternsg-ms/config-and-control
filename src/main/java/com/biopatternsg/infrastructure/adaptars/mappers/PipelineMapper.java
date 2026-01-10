@@ -1,4 +1,4 @@
-package com.biopatternsg.infrastructure.mongo_db.mappers;
+package com.biopatternsg.infrastructure.adaptars.mappers;
 
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;

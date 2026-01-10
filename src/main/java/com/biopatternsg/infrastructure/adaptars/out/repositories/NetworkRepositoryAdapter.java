@@ -3,46 +3,26 @@ package com.biopatternsg.infrastructure.adaptars.out.repositories;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
-import com.biopatternsg.infrastructure.mongo_db.mappers.NetworkMapper;
+import com.biopatternsg.infrastructure.adaptars.mappers.NetworkMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor
 public class NetworkRepositoryAdapter implements NetworkRepository {
 
     @Inject
-    SessionUtil sessionUtil;
+    private SessionUtil sessionUtil;
+    @Inject
     private NetworkRepositoryDB networkRepositoryDB;
 
     @Override
     public NetworkConfig save(NetworkConfig networkConfig) {
 
-        var getNetworkConfig = findByName(networkConfig.getName());
-        if(getNetworkConfig != null){
-            return getNetworkConfig;
-        }
-
-        var networkObject = saveObject(networkConfig);
-        return NetworkMapper.toNetworkConfig(networkObject);
-    }
-
-    @Override
-    public NetworkConfig update(NetworkConfig networkConfig) {
-
-        var networkObject = networkRepositoryDB.findByIdAndIdUser(networkConfig.getId(), sessionUtil.getUserId());
-        if(networkObject == null){
-            return null;
-        }
-
-        networkObject.setName(networkConfig.getName());
-        networkObject.setDescription(networkConfig.getDescription());
-        networkObject.update();
-
-        return NetworkMapper.toNetworkConfig(networkObject);
+        var networkCollection = NetworkMapper.toNetworkCollection(networkConfig, sessionUtil.getUserId());
+        networkCollection.persistOrUpdate();
+        return NetworkMapper.toNetworkConfig(networkCollection);
     }
 
     @Override

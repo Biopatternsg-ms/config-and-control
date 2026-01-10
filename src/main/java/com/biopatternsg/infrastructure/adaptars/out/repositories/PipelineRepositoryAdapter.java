@@ -3,7 +3,7 @@ package com.biopatternsg.infrastructure.adaptars.out.repositories;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
-import com.biopatternsg.infrastructure.mongo_db.mappers.PipelineMapper;
+import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.PipelineRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,27 +23,7 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     @Override
     public PipelineConfig save(PipelineConfig pipelineConfig) {
 
-        var getPipelineConfig = findByName(pipelineConfig.getName());
-        if(getPipelineConfig != null){
-            return getPipelineConfig;
-        }
-
         var pipelineObject = saveObject(pipelineConfig);
-        return PipelineMapper.toPipelineConfig(pipelineObject);
-    }
-
-    @Override
-    public PipelineConfig update(PipelineConfig pipelineConfig) {
-
-        var pipelineObject = pipelineRepositoryDB.findByIdAndUser(pipelineConfig.getId(), sessionUtil.getUserId());
-        if(pipelineObject == null){
-            return null;
-        }
-
-        pipelineObject.setName(pipelineConfig.getName());
-        pipelineObject.setDescription(pipelineConfig.getDescription());
-        pipelineObject.update();
-
         return PipelineMapper.toPipelineConfig(pipelineObject);
     }
 

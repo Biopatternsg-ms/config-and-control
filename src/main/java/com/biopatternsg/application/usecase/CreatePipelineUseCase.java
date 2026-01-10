@@ -20,15 +20,17 @@ public class CreatePipelineUseCase implements CreatePipeline {
         //Network don't exists
         var networkConfig = networkRepository.findById(pipelineConfig.getNetworkId());
         if(networkConfig == null){
+            //TODO Agregar excepción
             return null;
         }
 
         //Build pipelineConfig
         var pipelineModel = pipelineRepository.findByName(networkConfig.getName());
-        if(pipelineModel == null){
-            pipelineModel = pipelineRepository.save(pipelineConfig);
+        if(pipelineModel != null){
+            //TODO agregar excepción
+            return null;
         }
 
-        return pipelineModel;
+        return pipelineRepository.save(pipelineConfig);
     }
 }
