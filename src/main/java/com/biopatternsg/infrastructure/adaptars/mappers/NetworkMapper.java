@@ -8,6 +8,10 @@ public class NetworkMapper {
 
     public static NetworkConfig toNetworkConfig(NetworkCollection networkCollection){
 
+        if(networkCollection == null){
+            return null;
+        }
+
         return NetworkConfig.builder()
                 .id(networkCollection.id.toString())
                 .userId(networkCollection.getUserId())
@@ -17,6 +21,10 @@ public class NetworkMapper {
     }
 
     public static NetworkCollection toNetworkCollection(NetworkConfig networkConfig, Long userId){
+
+        if(networkConfig == null){
+            return null;
+        }
 
         var networkCollection = NetworkCollection.builder()
                 .userId(userId)

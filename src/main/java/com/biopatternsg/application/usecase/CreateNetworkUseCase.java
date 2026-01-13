@@ -1,6 +1,5 @@
 package com.biopatternsg.application.usecase;
 
-import com.biopatternsg.domain.exceptions.UnauthorizedServiceException;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.in.CreateNetwork;

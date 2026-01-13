@@ -28,35 +28,21 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
     @Override
     public NetworkConfig findById(String id) {
 
-        var networkObject = networkRepositoryDB.findByIdAndIdUser(id, sessionUtil.getUserId());
-        if(networkObject != null){
-            return NetworkMapper.toNetworkConfig(networkObject);
-        }
-
-        return null;
+        var networkCollection = networkRepositoryDB.findByIdAndIdUser(id, sessionUtil.getUserId());
+        return NetworkMapper.toNetworkConfig(networkCollection);
     }
 
     @Override
     public NetworkConfig findByName(String name) {
 
-        var networkObject = networkRepositoryDB.findByUserAndName(name, sessionUtil.getUserId());
-        if(networkObject != null){
-            return NetworkMapper.toNetworkConfig(networkObject);
-        }
-
-        return null;
+        var networkCollection = networkRepositoryDB.findByUserAndName(name, sessionUtil.getUserId());
+        return NetworkMapper.toNetworkConfig(networkCollection);
     }
 
-    private NetworkCollection saveObject(NetworkConfig networkConfig){
+    @Override
+    public NetworkConfig findByNameExists(String id, String name) {
 
-        NetworkCollection object = new NetworkCollection();
-
-        object.setName(networkConfig.getName());
-        object.setDescription(networkConfig.getDescription());
-        object.setUserId(sessionUtil.getUserId());
-
-        object.persist();
-
-        return object;
+        var networkCollection = networkRepositoryDB.findByUserAndNameExists(id, name, sessionUtil.getUserId());
+        return NetworkMapper.toNetworkConfig(networkCollection);
     }
 }

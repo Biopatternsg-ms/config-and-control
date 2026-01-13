@@ -12,14 +12,21 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
     public NetworkCollection findByIdAndIdUser(String id, Long userId){
 
         return find("{'_id': :id, 'userId': :userId}",
-                Parameters.with("id", new ObjectId(id))
-                        .and("userId", userId))
+                Parameters.with("id", new ObjectId(id)).and("userId", userId))
                 .firstResult();
     }
 
     public NetworkCollection findByUserAndName(String name, Long userId){
 
-        return find("{'name': :name, 'userId': :userId}", Parameters.with("name", name).and("userId", userId))
+        return find("{'name': :name, 'userId': :userId}",
+                Parameters.with("name", name).and("userId", userId))
+                .firstResult();
+    }
+
+    public NetworkCollection findByUserAndNameExists(String id, String name, Long userId){
+
+        return find("{'_id': {'$ne': :id}, 'name': :name, 'userId': :userId}",
+                Parameters.with("id", new ObjectId(id)).and("userId", userId).and("name", name))
                 .firstResult();
     }
 }

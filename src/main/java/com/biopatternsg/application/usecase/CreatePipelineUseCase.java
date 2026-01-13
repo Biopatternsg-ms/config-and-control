@@ -1,5 +1,6 @@
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
@@ -20,15 +21,13 @@ public class CreatePipelineUseCase implements CreatePipeline {
         //Network don't exists
         var networkConfig = networkRepository.findById(pipelineConfig.getNetworkId());
         if(networkConfig == null){
-            //TODO Agregar excepción
-            return null;
+            throw new UnprocessableEntityException("The network don't exists");
         }
 
         //Build pipelineConfig
         var pipelineModel = pipelineRepository.findByName(networkConfig.getName());
         if(pipelineModel != null){
-            //TODO agregar excepción
-            return null;
+            throw new UnprocessableEntityException("The pipeline already exists");
         }
 
         return pipelineRepository.save(pipelineConfig);

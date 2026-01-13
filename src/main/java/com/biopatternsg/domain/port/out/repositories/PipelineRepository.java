@@ -9,5 +9,6 @@ public interface PipelineRepository {
     PipelineConfig save(PipelineConfig pipelineConfig);
     PipelineConfig findById(String id);
     PipelineConfig findByName(String name);
+    PipelineConfig findByNameExists(String id, String name);
     List<PipelineConfig> findByNetworkId(String networkId);
 }

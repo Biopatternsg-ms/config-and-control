@@ -1,5 +1,6 @@
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.in.UpdateNetwork;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
@@ -15,16 +16,20 @@ public class UpdateNetworkUseCase implements UpdateNetwork {
     @Override
     public NetworkConfig execute(NetworkConfig networkConfig) {
 
-        var networkConfigCurrent = networkRepository.findById(networkConfig.getId());
-        if(networkConfigCurrent == null){
-            //TODO Agregar excepción
-            return null;
+
+        var networkConfigCurrent = networkRepository.findByNameExists(networkConfig.getId(), networkConfig.getName());
+        if(networkConfigCurrent != null){
+            throw new UnprocessableEntityException("The network already exists");
         }
 
-        //networkRepository.findByName(networkConfig.getName());
+        networkConfigCurrent = networkRepository.findById(networkConfig.getId());
+        if(networkConfigCurrent == null){
+            throw new UnprocessableEntityException("The network don't exists");
+        }
 
         networkConfigCurrent.setName(networkConfig.getName());
         networkConfigCurrent.setDescription(networkConfig.getDescription());
+
         return networkRepository.save(networkConfigCurrent);
     }
 }
