@@ -6,6 +6,8 @@ import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
 
+import java.util.List;
+
 @ApplicationScoped
 public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkCollection>{
 
@@ -28,5 +30,12 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
         return find("{'_id': {'$ne': :id}, 'name': :name, 'userId': :userId}",
                 Parameters.with("id", new ObjectId(id)).and("userId", userId).and("name", name))
                 .firstResult();
+    }
+
+    public List<NetworkCollection> findByUser(Long userId){
+
+        return find("{'userId': :userId}",
+                Parameters.with("userId", userId))
+                .list();
     }
 }

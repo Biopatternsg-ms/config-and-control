@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@MongoEntity(collection = "net")
+@MongoEntity(collection = "pipeline")
 public class PipelineCollection extends PanacheMongoEntity {
 
     private String name;

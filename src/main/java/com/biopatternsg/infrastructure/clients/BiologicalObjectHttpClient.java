@@ -1,15 +1,16 @@
 package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.infrastructure.dtos.LaunchPipelineRequest;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient(configKey = "ontologies-api")
+@RegisterRestClient(configKey = "biological-object-api")
 public interface BiologicalObjectHttpClient {
 
     @POST
     @Path("/biological-object/launch-pipeline")
-    void launch(@RequestBody PipelineConfig pipelineConfig);
+    String launch(@RequestBody LaunchPipelineRequest pipelineRequest, @HeaderParam("x-user-id") Long userId);
 }

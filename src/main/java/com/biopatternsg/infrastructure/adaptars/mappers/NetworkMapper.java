@@ -4,6 +4,8 @@ import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
 import org.bson.types.ObjectId;
 
+import java.util.List;
+
 public class NetworkMapper {
 
     public static NetworkConfig toNetworkConfig(NetworkCollection networkCollection){
@@ -36,5 +38,10 @@ public class NetworkMapper {
             networkCollection.id = new ObjectId(networkConfig.getId());
         }
         return networkCollection;
+    }
+
+    public static List<NetworkConfig> toNetworkConfigList(List<NetworkCollection> collectionList){
+
+        return collectionList.stream().map(NetworkMapper::toNetworkConfig).toList();
     }
 }

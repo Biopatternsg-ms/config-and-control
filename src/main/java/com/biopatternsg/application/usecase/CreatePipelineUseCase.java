@@ -20,13 +20,13 @@ public class CreatePipelineUseCase implements CreatePipeline {
 
         //Network don't exists
         var networkConfig = networkRepository.findById(pipelineConfig.getNetworkId());
-        if(networkConfig == null){
+        if (networkConfig == null) {
             throw new UnprocessableEntityException("The network don't exists");
         }
 
         //Build pipelineConfig
-        var pipelineModel = pipelineRepository.findByName(networkConfig.getName());
-        if(pipelineModel != null){
+        var findPipeline = pipelineRepository.findByName(pipelineConfig.getName());
+        if(findPipeline != null){
             throw new UnprocessableEntityException("The pipeline already exists");
         }
 

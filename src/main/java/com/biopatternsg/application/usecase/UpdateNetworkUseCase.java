@@ -16,7 +16,6 @@ public class UpdateNetworkUseCase implements UpdateNetwork {
     @Override
     public NetworkConfig execute(NetworkConfig networkConfig) {
 
-
         var networkConfigCurrent = networkRepository.findByNameExists(networkConfig.getId(), networkConfig.getName());
         if(networkConfigCurrent != null){
             throw new UnprocessableEntityException("The network already exists");

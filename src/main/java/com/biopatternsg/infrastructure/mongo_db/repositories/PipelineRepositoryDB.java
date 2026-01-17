@@ -11,31 +11,38 @@ import java.util.List;
 @ApplicationScoped
 public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineCollection> {
 
-    public PipelineCollection findByIdAndUser(String id, Long userId){
+    public PipelineCollection findByIdAndNetwork(String id, String networkId){
 
-        return find("{'_id': :id, 'userId': :userId}",
-                Parameters.with("id", new ObjectId(id)).and("userId", userId))
+        return find("{'_id': :id, 'networkId': :networkId}",
+                Parameters.with("id", new ObjectId(id)).and("networkId", networkId))
                 .firstResult();
     }
 
-    public PipelineCollection findByNameAndUser(String name, Long userId){
+    public PipelineCollection findByName(String name, List<String> networkIdList){
 
-        return find("{'name': :name, 'userId': :userId}",
-                Parameters.with("name", name).and("userId", userId))
+        return find("{'name': :name, 'networkId': {'$in': :networkIdList}}",
+                Parameters.with("name", name).and("networkIdList", networkIdList))
                 .firstResult();
     }
 
-    public PipelineCollection findByNameAndUserExists(String id, String name, Long userId){
+    public PipelineCollection findByNameIfExists(String id, String name, List<String> networkIdList){
 
-        return find("{'_id': {'$ne': :id}, 'name': :name, 'userId': :userId}",
-                Parameters.with("id", new ObjectId(id)).and("userId", userId).and("name", name))
+        return find("{'_id': {'$ne': :id}, 'name': :name, 'networkId': {'$in': :networkIdList}}",
+                Parameters.with("id", new ObjectId(id)).and("networkIdList", networkIdList).and("name", name))
                 .firstResult();
     }
 
-    public List<PipelineCollection> findByNetworkIdAndUser(String networkId, Long userId){
+    public List<PipelineCollection> findByNetwork(String networkId){
 
-        return find("{'networkId': :networkId, 'userId': :userId}",
-                Parameters.with("networkId", networkId).and("userId", userId))
+        return find("{'networkId': :networkId",
+                Parameters.with("networkId", networkId))
+                .list();
+    }
+
+    public List<PipelineCollection> findByNetworkList(List<String> networkIdList){
+
+        return find("{'networkId': {'$in': :networkIdList}",
+                Parameters.with("networkId", networkIdList))
                 .list();
     }
 }

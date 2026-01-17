@@ -1,14 +1,10 @@
 package com.biopatternsg.domain.models.pipeline_config;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@Builder
 public class ExpertObjectConfig {
 
     private String uniprotId;

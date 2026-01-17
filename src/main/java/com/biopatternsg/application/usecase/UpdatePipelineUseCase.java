@@ -18,7 +18,7 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
 
         var pipelineConfigCurrent = pipelineRepository.findByNameExists(pipelineConfig.getId(), pipelineConfig.getName());
         if(pipelineConfigCurrent != null){
-            throw new UnprocessableEntityException("The pipeline already exists");
+            throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
         pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
