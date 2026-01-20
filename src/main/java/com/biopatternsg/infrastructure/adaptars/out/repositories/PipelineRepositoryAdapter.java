@@ -9,7 +9,6 @@ import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -35,15 +34,14 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     @Override
     public PipelineConfig findById(String id) {
 
-        var pipelineObject = pipelineRepositoryDB.findById(new ObjectId(id));
+        var pipelineObject = pipelineRepositoryDB.findByIdAndUser(id, networkIdList());
         return PipelineMapper.toPipelineConfig(pipelineObject);
     }
 
     @Override
     public PipelineConfig findByName(String name) {
 
-        var networkList = networkIdList();
-        var pipelineObject = pipelineRepositoryDB.findByName(name, networkList);
+        var pipelineObject = pipelineRepositoryDB.findByName(name, networkIdList());
         return PipelineMapper.toPipelineConfig(pipelineObject);
     }
 
