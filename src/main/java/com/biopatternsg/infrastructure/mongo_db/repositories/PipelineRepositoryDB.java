@@ -11,10 +11,10 @@ import java.util.List;
 @ApplicationScoped
 public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineCollection> {
 
-    public PipelineCollection findByIdAndNetwork(String id, String networkId){
+    public PipelineCollection findByIdAndUser(String id, List<String> networkIdList){
 
-        return find("{'_id': :id, 'networkId': :networkId}",
-                Parameters.with("id", new ObjectId(id)).and("networkId", networkId))
+        return find("{'_id': :id, 'networkId': {'$in': :networkIdList}}",
+                Parameters.with("id", new ObjectId(id)).and("networkIdList", networkIdList))
                 .firstResult();
     }
 
