@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 @ApplicationScoped
-@Path("/networks")
+@Path("/config-and-control/networks")
 @RequiredArgsConstructor
 public class NetworkController {
 
