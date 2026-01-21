@@ -99,7 +99,7 @@ pipeline {
                         docker run -d \\
                             -e DB_USER='${MONGO_USER}' \\
                             -e DB_PASSWORD='${MONGO_PASSWORD}' \\
-                            -e DB_URL='${MONGO_HOST}' \\
+                            -e DB_URL='${MONGO_DB_URL}' \\
                             -e DB_NAME='${CONFIG_AND_CONTROL_DATABASE}' \\
                             --name ${CONTAINER_NAME} \\
                             -p ${CONFIG_AND_CONTROL_PORT}:8080 \\
