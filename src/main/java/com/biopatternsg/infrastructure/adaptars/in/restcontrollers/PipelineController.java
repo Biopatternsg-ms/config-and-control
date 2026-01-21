@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
-@Path("/pipelines")
+@Path("/config-and-control/pipelines")
 @RequiredArgsConstructor
 public class PipelineController {
 
@@ -31,7 +31,7 @@ public class PipelineController {
     }
 
 
-    @GET
+    @POST
     @Path("/launch")
     public Response launch(@QueryParam("id") String pipelineId){
 
