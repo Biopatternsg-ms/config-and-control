@@ -1,5 +1,6 @@
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
@@ -30,6 +31,7 @@ public class CreatePipelineUseCase implements CreatePipeline {
             throw new UnprocessableEntityException("The pipeline already exists");
         }
 
+        pipelineConfig.setStep(PipelineSteps.CONFIG);
         return pipelineRepository.save(pipelineConfig);
     }
 }

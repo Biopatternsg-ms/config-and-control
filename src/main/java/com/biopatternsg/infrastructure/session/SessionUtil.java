@@ -12,7 +12,7 @@ public class SessionUtil {
 
     private MultivaluedMap<String, String> context;
 
-    public Long getUserId(){
-        return Long.parseLong(this.context.get("x-user-id").getFirst());
+    public String getUserId(){
+        return this.context.get("x-user-id").getFirst();
     }
 }

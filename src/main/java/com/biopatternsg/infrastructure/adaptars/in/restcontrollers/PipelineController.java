@@ -1,9 +1,11 @@
 package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.CreatePipeline;
 import com.biopatternsg.domain.port.in.LaunchPipeline;
 import com.biopatternsg.domain.port.in.UpdatePipeline;
+import com.biopatternsg.domain.port.in.UpdatePipelineStep;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -17,6 +19,7 @@ public class PipelineController {
     private final CreatePipeline createPipeline;
     private final LaunchPipeline launchPipeline;
     private final UpdatePipeline updatePipeline;
+    private final UpdatePipelineStep updatePipelineStep;
 
     @POST
     public PipelineConfig create(PipelineConfig pipelineConfig){
@@ -34,8 +37,15 @@ public class PipelineController {
     @POST
     @Path("/launch")
     public Response launch(@QueryParam("id") String pipelineId){
+        launchPipeline.execute(pipelineId);
+        return Response.accepted().entity("Pipeline launched: " + pipelineId).build();
+    }
 
-        var response = launchPipeline.execute(pipelineId);
-        return Response.accepted().entity("Biological object result: " + response).build();
+    @PATCH
+    @Path("/update-step/{id}")
+    public Response updateStep(@PathParam("id") String pipelineId, PipelineSteps step){
+        updatePipelineStep.execute(pipelineId, step);
+
+        return Response.accepted().entity("updated").build();
     }
 }

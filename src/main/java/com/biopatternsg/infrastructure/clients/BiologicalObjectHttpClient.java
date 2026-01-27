@@ -12,5 +12,5 @@ public interface BiologicalObjectHttpClient {
 
     @POST
     @Path("/biological-object/launch-pipeline")
-    String launch(@RequestBody LaunchPipelineRequest pipelineRequest, @HeaderParam("x-user-id") Long userId);
+    String launch(@RequestBody LaunchPipelineRequest pipelineRequest, @HeaderParam("x-user-id") String userId);
 }

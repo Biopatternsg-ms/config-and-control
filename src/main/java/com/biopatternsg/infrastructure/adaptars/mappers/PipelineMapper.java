@@ -17,11 +17,12 @@ public class PipelineMapper {
         return PipelineConfig.builder()
                 .id(pipelineCollection.id.toString())
                 .name(pipelineCollection.getName())
-                .description(pipelineCollection.getDescription())
                 .networkId(pipelineCollection.getNetworkId())
+                .description(pipelineCollection.getDescription())
+                .step(pipelineCollection.getStep())
+                .levels(pipelineCollection.getLevels())
                 .expertObjects(pipelineCollection.getExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
-                .levels(pipelineCollection.getLevels())
                 .build();
     }
 
@@ -33,11 +34,12 @@ public class PipelineMapper {
 
         var pipelineCollection = PipelineCollection.builder()
                 .name(pipelineConfig.getName())
-                .description(pipelineConfig.getDescription())
                 .networkId(pipelineConfig.getNetworkId())
+                .description(pipelineConfig.getDescription())
+                .step(pipelineConfig.getStep())
+                .levels(pipelineConfig.getLevels())
                 .expertObjects(pipelineConfig.getExpertObjects())
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
-                .levels(pipelineConfig.getLevels())
                 .build();
 
         if(pipelineConfig.getId() != null){

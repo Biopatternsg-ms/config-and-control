@@ -8,6 +8,7 @@ import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @ApplicationScoped
@@ -21,6 +22,7 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
     private BiologicalObjectHttpClient biologicalObjectHttpClient;
 
     @Override
+    @Retry
     public String launch(PipelineConfig pipelineConfig) {
 
         var pipelineBiologicalObject = new LaunchPipelineRequest(
