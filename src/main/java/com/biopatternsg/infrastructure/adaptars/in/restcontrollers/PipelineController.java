@@ -1,11 +1,11 @@
 package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.CreatePipeline;
 import com.biopatternsg.domain.port.in.LaunchPipeline;
 import com.biopatternsg.domain.port.in.UpdatePipeline;
 import com.biopatternsg.domain.port.in.UpdatePipelineStep;
+import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -43,8 +43,8 @@ public class PipelineController {
 
     @PATCH
     @Path("/update-step/{id}")
-    public Response updateStep(@PathParam("id") String pipelineId, PipelineSteps step){
-        updatePipelineStep.execute(pipelineId, step);
+    public Response updateStep(@PathParam("id") String pipelineId, PipelineStepRequest stepRequest){
+        updatePipelineStep.execute(pipelineId, stepRequest.step());
 
         return Response.accepted().entity("updated").build();
     }
