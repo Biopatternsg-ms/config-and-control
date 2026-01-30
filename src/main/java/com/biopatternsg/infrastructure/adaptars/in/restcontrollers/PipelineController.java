@@ -44,7 +44,7 @@ public class PipelineController {
     @PATCH
     @Path("/update-step/{id}")
     public Response updateStep(@PathParam("id") String pipelineId, PipelineStepRequest stepRequest){
-        updatePipelineStep.execute(pipelineId, stepRequest.step());
+        updatePipelineStep.execute(pipelineId, stepRequest);
 
         return Response.accepted().entity("updated").build();
     }

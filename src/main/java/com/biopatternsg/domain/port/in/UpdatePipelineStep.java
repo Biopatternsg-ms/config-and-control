@@ -1,8 +1,8 @@
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
 
 public interface UpdatePipelineStep {
 
-    void execute(String pipelineId, PipelineSteps step);
+    void execute(String pipelineId, PipelineStepRequest stepRequest);
 }
