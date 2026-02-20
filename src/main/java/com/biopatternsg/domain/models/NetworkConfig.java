@@ -12,7 +12,7 @@ import lombok.Setter;
 public class NetworkConfig {
 
     private String id;
-    private Long userId;
+    private String userId;
     private String name;
     private String description;
 }

@@ -12,7 +12,7 @@ import lombok.*;
 @MongoEntity(collection = "network")
 public class NetworkCollection extends PanacheMongoEntity {
 
-    Long userId;
+    String userId;
     String name;
     String description;
 }

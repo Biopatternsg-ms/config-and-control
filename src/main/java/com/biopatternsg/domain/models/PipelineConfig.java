@@ -1,5 +1,6 @@
 package com.biopatternsg.domain.models;
 
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
 import lombok.*;
@@ -17,6 +18,7 @@ public class PipelineConfig {
     private String description;
     private String networkId;
     private Integer levels;
+    private PipelineSteps step;
     private List<ExpertObjectConfig> expertObjects;
     private TranscriptionFactorConfig transcriptionFactorConfig;
 }

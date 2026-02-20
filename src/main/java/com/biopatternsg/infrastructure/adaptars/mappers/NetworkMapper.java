@@ -22,7 +22,7 @@ public class NetworkMapper {
                 .build();
     }
 
-    public static NetworkCollection toNetworkCollection(NetworkConfig networkConfig, Long userId){
+    public static NetworkCollection toNetworkCollection(NetworkConfig networkConfig, String userId){
 
         if(networkConfig == null){
             return null;
