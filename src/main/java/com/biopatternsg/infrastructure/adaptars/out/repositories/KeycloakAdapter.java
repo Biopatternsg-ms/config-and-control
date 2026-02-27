@@ -15,12 +15,11 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.util.List;
 
 @ApplicationScoped
-@RequiredArgsConstructor
 public class KeycloakAdapter implements KeycloakRepository {
 
     @Inject
     @RestClient
-    private KeycloakHttpClient keycloakHttpClient;
+    KeycloakHttpClient keycloakHttpClient;
 
     @ConfigProperty(name = "keycloak.client.id")
     String clientId;
