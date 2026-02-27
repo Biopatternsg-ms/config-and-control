@@ -17,8 +17,14 @@ public class ContextInterceptor implements ContainerRequestFilter {
     private final SessionUtil sessionUtil;
 
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        var context = containerRequestContext.getHeaders();
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+
+        String path = requestContext.getUriInfo().getPath();
+        if (path.contains("/auth") || path.contains("/user/recover") || path.contains("/user/register")) {
+            return;
+        }
+
+        var context = requestContext.getHeaders();
         validateContext(context);
 
         sessionUtil.setContext(context);
