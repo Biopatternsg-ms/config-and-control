@@ -9,9 +9,24 @@ import lombok.ToString;
 @Getter
 public enum HttpCode {
 
-    INTERNAL_SERVER_ERROR(500),
+    UNAUTHORIZED(401),
+    FORBIDDEN(403),
+    CONFLICTS(409),
     UNPROCESSABLE_ENTITY(422),
-    UNAUTHORIZED(401);
+    INTERNAL_SERVER_ERROR(500);
 
     private final Integer code;
+
+    HttpCode(int code) {
+        this.code = code;
+    }
+
+    public static HttpCode getValue(int value) {
+        for (HttpCode status : HttpCode.values()) {
+            if (status.code == value) {
+                return status;
+            }
+        }
+        return INTERNAL_SERVER_ERROR;
+    }
 }
