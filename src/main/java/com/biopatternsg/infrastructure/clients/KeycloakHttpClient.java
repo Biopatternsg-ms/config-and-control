@@ -13,22 +13,20 @@ import java.util.List;
 public interface KeycloakHttpClient {
 
     @POST
-    @Path("/realms/{realmName}/protocol/openid-connect/token")
+    @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     com.biopatternsg.infrastructure.dtos.keycloak.Response loginClient(
-            @PathParam("realmName") String realmName,
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret
     );
 
     @POST
-    @Path("/realms/{realmName}/protocol/openid-connect/token")
+    @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     Response loginUser(
-            @PathParam("realmName") String realmName,
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
@@ -38,30 +36,27 @@ public interface KeycloakHttpClient {
     );
 
     @POST
-    @Path("/admin/realms/{realmName}/users")
+    @Path("/admin/realms/biopatternsg/users")
     @Produces(MediaType.APPLICATION_JSON)
     Response register(
-            @PathParam("realmName") String realmName,
             @HeaderParam("Authorization") String token,
             UserRegistration user
     );
 
     @PUT
-    @Path("/admin/realms/{realm}/users/{userId}/execute-actions-email")
+    @Path("/admin/realms/biopatternsg/users/{userId}/execute-actions-email")
     @Consumes(MediaType.APPLICATION_JSON)
     void sendEmail(
             @HeaderParam("Authorization") String token,
-            @PathParam("realm") String realm,
             @PathParam("userId") String userId,
             List<String> actions
     );
 
     @POST
-    @Path("/realms/{realmName}/protocol/openid-connect/token")
+    @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     Response refreshToken(
-            @PathParam("realmName") String realmName,
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
@@ -69,21 +64,19 @@ public interface KeycloakHttpClient {
     );
 
     @POST
-    @Path("/realms/{realmName}/protocol/openid-connect/logout")
+    @Path("/realms/biopatternsg/protocol/openid-connect/logout")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     void logout(
-            @PathParam("realmName") String realmName,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
             @FormParam("refresh_token") String refreshToken
     );
 
     @POST
-    @Path("/realms/{realmName}/protocol/openid-connect/token/introspect")
+    @Path("/realms/biopatternsg/protocol/openid-connect/token/introspect")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     IntrospectResponse introspectToken(
-            @PathParam("realmName") String realmName,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
             @FormParam("token") String token

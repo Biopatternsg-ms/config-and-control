@@ -8,13 +8,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 
 @ApplicationScoped
+@Slf4j
 public class KeycloakAdapter implements KeycloakRepository {
 
     @Inject
@@ -27,8 +28,6 @@ public class KeycloakAdapter implements KeycloakRepository {
     String clientSecret;
     @ConfigProperty(name = "keycloak.scope")
     String scope;
-    @ConfigProperty(name = "keycloak.realm-name")
-    String realmName;
     @ConfigProperty(name = "keycloak.grant-type")
     String grantType;
     @ConfigProperty(name = "keycloak.grant-type-client")
@@ -36,8 +35,9 @@ public class KeycloakAdapter implements KeycloakRepository {
 
     public Response login(String user, String pass) {
 
+        log.info("ClientId: " + clientId);
         try{
-            return keycloakHttpClient.loginUser(realmName, grantType, clientId, clientSecret, user, pass, scope);
+            return keycloakHttpClient.loginUser(grantType, clientId, clientSecret, user, pass, scope);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
@@ -45,11 +45,11 @@ public class KeycloakAdapter implements KeycloakRepository {
 
     public Response register(UserRegistration newUser) {
 
-        var credentials = keycloakHttpClient.loginClient(realmName, grantTypeClient, clientId, clientSecret);
+        var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
 
         try{
-            return keycloakHttpClient.register(realmName, accessToken, newUser);
+            return keycloakHttpClient.register( accessToken, newUser);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
@@ -57,12 +57,12 @@ public class KeycloakAdapter implements KeycloakRepository {
 
     public void verifyEmail(String userId){
 
-        var credentials = keycloakHttpClient.loginClient(realmName, grantTypeClient, clientId, clientSecret);
+        var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
         List<String> actions = List.of("VERIFY_EMAIL", "UPDATE_PASSWORD");
 
         try{
-            keycloakHttpClient.sendEmail(realmName, accessToken, userId, actions);
+            keycloakHttpClient.sendEmail(accessToken, userId, actions);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
@@ -70,12 +70,12 @@ public class KeycloakAdapter implements KeycloakRepository {
 
     public void recoveryPassword(String userId) {
 
-        var credentials = keycloakHttpClient.loginClient(realmName, grantTypeClient, clientId, clientSecret);
+        var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
         List<String> actions = List.of("UPDATE_PASSWORD");
 
         try{
-            keycloakHttpClient.sendEmail(realmName, accessToken, userId, actions);
+            keycloakHttpClient.sendEmail(accessToken, userId, actions);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
