@@ -1,7 +1,7 @@
 package com.biopatternsg.infrastructure.clients;
 
+import com.biopatternsg.domain.models.UserRegister;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRegistration;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -40,7 +40,7 @@ public interface KeycloakHttpClient {
     @Produces(MediaType.APPLICATION_JSON)
     Response register(
             @HeaderParam("Authorization") String token,
-            UserRegistration user
+            UserRegister userRegister
     );
 
     @PUT

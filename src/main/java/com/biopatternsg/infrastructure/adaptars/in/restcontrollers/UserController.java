@@ -1,7 +1,7 @@
 package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserManagement;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRegistration;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -18,7 +18,7 @@ public class UserController {
 
     @POST
     @Path("/register")
-    public Response register(UserRegistration request) {
+    public Response register(UserRequest request) {
 
         userManagement.register(request);
         return Response.status(Response.Status.CREATED).build();

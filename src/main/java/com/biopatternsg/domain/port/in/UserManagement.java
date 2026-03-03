@@ -1,9 +1,9 @@
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRegistration;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
 
 public interface UserManagement {
 
-    void register(UserRegistration request);
+    void register(UserRequest request);
     void recover(String userId);
 }

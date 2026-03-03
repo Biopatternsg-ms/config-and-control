@@ -7,11 +7,13 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Provider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
 @Provider
 @RequiredArgsConstructor
+@Slf4j
 public class ContextInterceptor implements ContainerRequestFilter {
 
     private final SessionUtil sessionUtil;
@@ -33,6 +35,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
     private void validateContext(MultivaluedMap<String, String> context){
 
         var userId = context.get("x-user-id");
+        log.info("userId: " + userId);
         if(userId == null){
             throw new UnauthorizedServiceException();
         }

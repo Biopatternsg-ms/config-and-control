@@ -1,21 +1,19 @@
 package com.biopatternsg.infrastructure.adaptars.out.repositories;
 
 import com.biopatternsg.domain.exceptions.KeycloakServiceException;
+import com.biopatternsg.domain.models.UserRegister;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRegistration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 
 @ApplicationScoped
-@Slf4j
 public class KeycloakAdapter implements KeycloakRepository {
 
     @Inject
@@ -35,7 +33,6 @@ public class KeycloakAdapter implements KeycloakRepository {
 
     public Response login(String user, String pass) {
 
-        log.info("ClientId: " + clientId);
         try{
             return keycloakHttpClient.loginUser(grantType, clientId, clientSecret, user, pass, scope);
         } catch (WebApplicationException e) {
@@ -43,13 +40,13 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
-    public Response register(UserRegistration newUser) {
+    public Response register(UserRegister userRegister) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
 
         try{
-            return keycloakHttpClient.register( accessToken, newUser);
+            return keycloakHttpClient.register( accessToken, userRegister);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
