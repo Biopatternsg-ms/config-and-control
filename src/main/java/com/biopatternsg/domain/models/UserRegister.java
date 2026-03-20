@@ -21,4 +21,5 @@ public class UserRegister {
     boolean emailVerified;
     List<String> realmRoles;
     List<UserCredentials> credentials;
+    List<String> requiredActions;
 }

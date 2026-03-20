@@ -26,13 +26,14 @@ public class UserManagementUseCase implements UserManagement {
                 .build();
 
         var newUser = UserRegister.builder()
-                .email(request.email())
-                .username(request.email())
+                .email(request.username())
+                .username(request.username())
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .enabled(true)
                 .emailVerified(false)
                 .credentials(List.of(credentials))
+                .requiredActions(List.of("VERIFY_EMAIL"))
                 .build();
 
         var response = keycloakRepository.register(newUser);

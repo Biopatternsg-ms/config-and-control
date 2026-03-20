@@ -56,7 +56,7 @@ public class KeycloakAdapter implements KeycloakRepository {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
-        List<String> actions = List.of("VERIFY_EMAIL", "UPDATE_PASSWORD");
+        List<String> actions = List.of("VERIFY_EMAIL");
 
         try{
             keycloakHttpClient.sendEmail(accessToken, userId, actions);

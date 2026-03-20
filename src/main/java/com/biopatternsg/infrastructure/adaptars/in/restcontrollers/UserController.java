@@ -3,6 +3,7 @@ package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -18,7 +19,7 @@ public class UserController {
 
     @POST
     @Path("/register")
-    public Response register(UserRequest request) {
+    public Response register(@Valid UserRequest request) {
 
         userManagement.register(request);
         return Response.status(Response.Status.CREATED).build();
