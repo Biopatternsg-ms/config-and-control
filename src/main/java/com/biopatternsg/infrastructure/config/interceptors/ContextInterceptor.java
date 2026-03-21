@@ -23,6 +23,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
 
         String path = requestContext.getUriInfo().getPath();
         if (path.contains("/auth") || path.contains("/user/recover") || path.contains("/user/register")) {
+            log.info("userId no needed");
             return;
         }
 
@@ -35,7 +36,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
     private void validateContext(MultivaluedMap<String, String> context){
 
         var userId = context.get("x-user-id");
-        log.info("userId: " + userId);
+        log.info("userId: {}", userId);
         if(userId == null){
             throw new UnauthorizedServiceException();
         }
