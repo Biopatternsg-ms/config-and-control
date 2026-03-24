@@ -65,39 +65,6 @@ public class UserController {
                     description = "Recovery confirmation"
                 )
             )
-        ),
-        @APIResponse(
-            responseCode = "400",
-            description = "Invalid user ID provided",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(
-                    type = SchemaType.STRING,
-                    description = "Error message"
-                )
-            )
-        ),
-        @APIResponse(
-            responseCode = "404",
-            description = "User not found",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(
-                    type = SchemaType.STRING,
-                    description = "Error message"
-                )
-            )
-        ),
-        @APIResponse(
-            responseCode = "500",
-            description = "Internal server error occurred while initiating account recovery",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(
-                    type = SchemaType.STRING,
-                    description = "Error message"
-                )
-            )
         )
     })
     public Response recover(@PathParam("id") String userId) {
