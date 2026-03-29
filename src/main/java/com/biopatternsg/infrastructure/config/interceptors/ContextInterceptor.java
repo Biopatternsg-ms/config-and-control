@@ -22,7 +22,9 @@ public class ContextInterceptor implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
         String path = requestContext.getUriInfo().getPath();
-        if (path.contains("/auth") || path.contains("/user/recover") || path.contains("/user/register")) {
+        log.info("Path: {}", path);
+
+        if (path.contains("/users")) {
             log.info("userId no needed");
             return;
         }

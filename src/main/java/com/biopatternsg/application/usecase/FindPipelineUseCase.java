@@ -3,6 +3,7 @@ package com.biopatternsg.application.usecase;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.FindPipeline;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
+import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class FindPipelineUseCase implements FindPipeline {
     }
 
     @Override
-    public List<PipelineConfig> byNetwork(String networkId) {
-        return pipelineRepository.findByNetworkId(networkId);
+    public List<PipelineConfig> byFilters(FindPipelineRequest findPipelineRequest) {
+        return pipelineRepository.findByFilters(findPipelineRequest);
     }
 }

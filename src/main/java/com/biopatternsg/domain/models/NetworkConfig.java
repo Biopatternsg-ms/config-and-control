@@ -15,4 +15,5 @@ public class NetworkConfig {
     private String userId;
     private String name;
     private String description;
+    private int createdAt;
 }

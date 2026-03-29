@@ -1,12 +1,12 @@
 package com.biopatternsg.infrastructure.dtos.keycloak;
 
 import jakarta.validation.constraints.Email;
-import lombok.NonNull;
+import jakarta.validation.constraints.NotNull;
 
 public record UserRequest(
-        @NonNull @Email String username,
-        @NonNull String firstName,
-        @NonNull String lastName,
-        @NonNull String password
+        @NotNull @Email String username,
+        @NotNull String firstName,
+        @NotNull String lastName,
+        @NotNull String password
 ) {
 }

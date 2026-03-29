@@ -23,6 +23,7 @@ public class PipelineMapper {
                 .levels(pipelineCollection.getLevels())
                 .expertObjects(pipelineCollection.getExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
+                .createdAt(pipelineCollection.id.getTimestamp())
                 .build();
     }
 

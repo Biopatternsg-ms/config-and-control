@@ -1,9 +1,11 @@
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -32,10 +34,29 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
                 .firstResult();
     }
 
-    public List<NetworkCollection> findByUser(String userId){
+    public List<NetworkCollection> findByUserAndFilters(FindNetworkRequest findNetwork, String userId){
 
-        return find("{'userId': :userId}",
-                Parameters.with("userId", userId))
+        Document query = new Document();
+        query.append("userId", userId);
+
+        if(findNetwork == null){
+            return find(query).list();
+        }
+
+        if (findNetwork.id() != null && !findNetwork.id().isEmpty()) {
+            query.append("_id", new ObjectId(findNetwork.id()));
+        }
+
+        if (findNetwork.name() != null) {
+            query.append("name", new Document("$regex", findNetwork.name()).append("$options", "i"));
+        }
+
+        if (findNetwork.description() != null) {
+            query.append("description", new Document("$regex", findNetwork.description()).append("$options", "i"));
+        }
+
+        return find(query)
+                .page(findNetwork.page(), findNetwork.size())
                 .list();
     }
 }

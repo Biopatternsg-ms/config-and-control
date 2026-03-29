@@ -19,6 +19,7 @@ public class NetworkMapper {
                 .userId(networkCollection.getUserId())
                 .name(networkCollection.getName())
                 .description(networkCollection.getDescription())
+                .createdAt(networkCollection.id.getTimestamp())
                 .build();
     }
 

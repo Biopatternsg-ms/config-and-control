@@ -1,6 +1,7 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
 
 import java.util.List;
 
@@ -10,5 +11,5 @@ public interface NetworkRepository {
     NetworkConfig findById(String id);
     NetworkConfig findByName(String name);
     NetworkConfig findByNameExists(String id, String name);
-    List<NetworkConfig> findByIdUser();
+    List<NetworkConfig> findByFilters(FindNetworkRequest findNetworkRequest);
 }

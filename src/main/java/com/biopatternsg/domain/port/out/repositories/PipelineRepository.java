@@ -1,6 +1,7 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 
 import java.util.List;
 
@@ -10,6 +11,5 @@ public interface PipelineRepository {
     PipelineConfig findById(String id);
     PipelineConfig findByName(String name);
     PipelineConfig findByNameExists(String id, String name);
-    List<PipelineConfig> findByUserId();
-    List<PipelineConfig> findByNetworkId(String networkId);
+    List<PipelineConfig> findByFilters(FindPipelineRequest findPipelineRequest);
 }

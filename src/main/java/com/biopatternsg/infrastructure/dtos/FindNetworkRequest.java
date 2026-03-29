@@ -4,12 +4,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 
-public record FindPipelineRequest(
+public record FindNetworkRequest(
 
         @QueryParam("id")
         String id,
-        @QueryParam("networkId")
-        String networkId,
         @QueryParam("name")
         String name,
         @QueryParam("description")

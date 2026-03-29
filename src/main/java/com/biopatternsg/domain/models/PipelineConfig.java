@@ -21,4 +21,5 @@ public class PipelineConfig {
     private PipelineSteps step;
     private List<ExpertObjectConfig> expertObjects;
     private TranscriptionFactorConfig transcriptionFactorConfig;
+    private int createdAt;
 }

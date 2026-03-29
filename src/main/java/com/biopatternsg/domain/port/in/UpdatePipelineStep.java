@@ -4,5 +4,5 @@ import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
 
 public interface UpdatePipelineStep {
 
-    void execute(String pipelineId, PipelineStepRequest stepRequest);
+    void execute(PipelineStepRequest stepRequest);
 }
