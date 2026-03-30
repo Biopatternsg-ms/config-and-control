@@ -4,6 +4,8 @@ import com.biopatternsg.domain.exceptions.KeycloakServiceException;
 import com.biopatternsg.domain.models.UserRegister;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
@@ -47,6 +49,19 @@ public class KeycloakAdapter implements KeycloakRepository {
 
         try{
             return keycloakHttpClient.register( accessToken, userRegister);
+        } catch (WebApplicationException e) {
+            throw new KeycloakServiceException(e.getResponse().getStatus());
+        }
+    }
+
+    @Override
+    public List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters) {
+
+        var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
+        var accessToken = "Bearer " + credentials.access_token();
+
+        try{
+            return keycloakHttpClient.usersList(accessToken, usersKeycloakFilters);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }

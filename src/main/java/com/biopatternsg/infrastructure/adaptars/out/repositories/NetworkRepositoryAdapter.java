@@ -3,6 +3,7 @@ package com.biopatternsg.infrastructure.adaptars.out.repositories;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.infrastructure.adaptars.mappers.NetworkMapper;
+import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -48,9 +49,9 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
     }
 
     @Override
-    public List<NetworkConfig> findByIdUser() {
+    public List<NetworkConfig> findByFilters(FindNetworkRequest findNetworkRequest) {
 
-        var networkCollectionList = networkRepositoryDB.findByUser(sessionUtil.getUserId());
+        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetworkRequest, sessionUtil.getUserId());
         return NetworkMapper.toNetworkConfigList(networkCollectionList);
     }
 }

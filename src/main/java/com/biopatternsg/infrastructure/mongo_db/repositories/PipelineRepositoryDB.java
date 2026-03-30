@@ -1,9 +1,11 @@
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -13,8 +15,8 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
 
     public PipelineCollection findByIdAndUser(String id, List<String> networkIdList){
 
-        return find("{'_id': :id, 'networkId': {'$in': :networkIdList}}",
-                Parameters.with("id", new ObjectId(id)).and("networkIdList", networkIdList))
+        return find("{'_id': :id, 'networkId': {'$in': :networkList}}",
+                Parameters.with("id", new ObjectId(id)).and("networkList", networkIdList))
                 .firstResult();
     }
 
@@ -27,22 +29,38 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
 
     public PipelineCollection findByNameIfExists(String id, String name, List<String> networkIdList){
 
-        return find("{'_id': {'$ne': :id}, 'name': :name, 'networkId': {'$in': :networkIdList}}",
-                Parameters.with("id", new ObjectId(id)).and("networkIdList", networkIdList).and("name", name))
+        return find("{'_id': {'$ne': :id}, 'name': :name, 'networkId': {'$in': :networkList}}",
+                Parameters.with("id", new ObjectId(id)).and("networkList", networkIdList).and("name", name))
                 .firstResult();
     }
 
-    public List<PipelineCollection> findByNetwork(String networkId){
+    public List<PipelineCollection> findByUserAndFilters(FindPipelineRequest pipelineRequest, List<String> networkIdList){
 
-        return find("{'networkId': :networkId",
-                Parameters.with("networkId", networkId))
-                .list();
-    }
+        Document query = new Document();
+        query.append("networkId", new Document("$in", networkIdList));
 
-    public List<PipelineCollection> findByNetworkList(List<String> networkIdList){
+        if(pipelineRequest == null){
+            return find(query).list();
+        }
 
-        return find("{'networkId': {'$in': :networkIdList}",
-                Parameters.with("networkId", networkIdList))
+        if (pipelineRequest.id() != null && !pipelineRequest.id().isEmpty()) {
+            query.append("_id", new ObjectId(pipelineRequest.id()));
+        }
+
+        if (pipelineRequest.networkId() != null && !pipelineRequest.networkId().isEmpty()) {
+            query.append("networkId", pipelineRequest.networkId());
+        }
+
+        if (pipelineRequest.name() != null) {
+            query.append("name", new Document("$regex", pipelineRequest.name()).append("$options", "i"));
+        }
+
+        if (pipelineRequest.description() != null) {
+            query.append("description", new Document("$regex", pipelineRequest.description()).append("$options", "i"));
+        }
+
+        return find(query)
+                .page(pipelineRequest.page(), pipelineRequest.size())
                 .list();
     }
 }

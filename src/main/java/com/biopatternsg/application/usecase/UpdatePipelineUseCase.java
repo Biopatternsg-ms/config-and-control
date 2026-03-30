@@ -4,6 +4,7 @@ import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.UpdatePipeline;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
+import com.biopatternsg.infrastructure.dtos.UpdatePipelineRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -14,8 +15,9 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private final PipelineRepository pipelineRepository;
 
     @Override
-    public PipelineConfig execute(PipelineConfig pipelineConfig) {
+    public PipelineConfig execute(UpdatePipelineRequest pipelineRequest) {
 
+        var pipelineConfig = requestToConfig(pipelineRequest);
         var pipelineConfigCurrent = pipelineRepository.findByNameExists(pipelineConfig.getId(), pipelineConfig.getName());
         if(pipelineConfigCurrent != null){
             throw new UnprocessableEntityException("The pipeline name already exists");
@@ -28,11 +30,22 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
 
         pipelineConfigCurrent.setName(pipelineConfig.getName());
         pipelineConfigCurrent.setDescription(pipelineConfig.getDescription());
-        pipelineConfigCurrent.setNetworkId(pipelineConfig.getNetworkId());
+        pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
         pipelineConfigCurrent.setExpertObjects(pipelineConfig.getExpertObjects());
         pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
-        pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
 
         return pipelineRepository.save(pipelineConfigCurrent);
+    }
+
+    private PipelineConfig requestToConfig(UpdatePipelineRequest pipelineRequest){
+
+        return PipelineConfig.builder()
+                .id(pipelineRequest.id())
+                .name(pipelineRequest.name())
+                .description(pipelineRequest.description())
+                .levels(pipelineRequest.levels())
+                .expertObjects(pipelineRequest.expertObjects())
+                .transcriptionFactorConfig(pipelineRequest.transcriptionFactorConfig())
+                .build();
     }
 }

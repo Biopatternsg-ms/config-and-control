@@ -1,6 +1,6 @@
 package com.biopatternsg.infrastructure.dtos.keycloak;
 
-public record Response(
+public record LoginClientResponse(
 
         String access_token,
         String refresh_token,

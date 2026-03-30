@@ -3,6 +3,7 @@ package com.biopatternsg.infrastructure.adaptars.out.repositories;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
+import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.mongo_db.repositories.PipelineRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
@@ -53,22 +54,14 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     }
 
     @Override
-    public List<PipelineConfig> findByNetworkId(String networkId) {
-
-        var pipelineList = pipelineRepositoryDB.findByNetwork(networkId);
-        return PipelineMapper.toPipelineConfigList(pipelineList);
-    }
-
-    @Override
-    public List<PipelineConfig> findByUserId() {
-
-        var pipelineObject = pipelineRepositoryDB.findByNetworkList(networkIdList());
+    public List<PipelineConfig> findByFilters(FindPipelineRequest findPipelineRequest) {
+        var pipelineObject = pipelineRepositoryDB.findByUserAndFilters(findPipelineRequest, networkIdList());
         return PipelineMapper.toPipelineConfigList(pipelineObject);
     }
 
     private List<String> networkIdList(){
 
-        var networkList = networkRepositoryDB.findByUser(sessionUtil.getUserId());
+        var networkList = networkRepositoryDB.findByUserAndFilters(null, sessionUtil.getUserId());
         return networkList.stream()
                 .map(network -> network.id.toString())
                 .toList();

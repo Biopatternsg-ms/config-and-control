@@ -4,7 +4,9 @@ import com.biopatternsg.domain.models.UserRegister;
 import com.biopatternsg.domain.models.user_registration.UserCredentials;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
+import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +47,11 @@ public class UserManagementUseCase implements UserManagement {
 
     @Override
     public void recover(String userId) {
-
         keycloakRepository.recoveryPassword(userId);
+    }
+
+    @Override
+    public List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters) {
+        return keycloakRepository.listUsers(usersKeycloakFilters);
     }
 }
