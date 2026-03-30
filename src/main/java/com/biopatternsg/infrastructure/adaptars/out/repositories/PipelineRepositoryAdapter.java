@@ -47,9 +47,9 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     }
 
     @Override
-    public PipelineConfig findByNameExists(String id, String name) {
+    public PipelineConfig findByNameExists(String networkId, String name) {
 
-        var pipelineObject = pipelineRepositoryDB.findByNameIfExists(id, name, networkIdList());
+        var pipelineObject = pipelineRepositoryDB.findByNameIfExists(networkId, name);
         return PipelineMapper.toPipelineConfig(pipelineObject);
     }
 
