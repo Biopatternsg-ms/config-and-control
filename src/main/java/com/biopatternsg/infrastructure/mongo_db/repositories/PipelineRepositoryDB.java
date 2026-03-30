@@ -22,15 +22,15 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
 
     public PipelineCollection findByName(String name, List<String> networkIdList){
 
-        return find("{'name': :name, 'networkId': {'$in': :networkIdList}}",
-                Parameters.with("name", name).and("networkIdList", networkIdList))
+        return find("{'name': :name, 'networkId': {'$in': :networkList}}",
+                Parameters.with("name", name).and("networkList", networkIdList))
                 .firstResult();
     }
 
-    public PipelineCollection findByNameIfExists(String id, String name, List<String> networkIdList){
+    public PipelineCollection findByNameIfExists(String networkId, String name){
 
-        return find("{'_id': {'$ne': :id}, 'name': :name, 'networkId': {'$in': :networkList}}",
-                Parameters.with("id", new ObjectId(id)).and("networkList", networkIdList).and("name", name))
+        return find("{'name': :name, 'networkId': :networkId}",
+                Parameters.with("networkId", networkId).and("name", name))
                 .firstResult();
     }
 

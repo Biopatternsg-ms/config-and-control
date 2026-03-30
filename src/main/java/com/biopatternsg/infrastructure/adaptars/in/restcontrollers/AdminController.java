@@ -1,6 +1,5 @@
 package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
-import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
@@ -38,7 +37,7 @@ public class AdminController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = NetworkConfig.class,
+                                    implementation = UserResponse.class,
                                     description = "Users list obtained"
                             )
                     )

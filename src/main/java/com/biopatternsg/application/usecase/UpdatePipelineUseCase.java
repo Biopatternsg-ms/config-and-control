@@ -18,14 +18,15 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     public PipelineConfig execute(UpdatePipelineRequest pipelineRequest) {
 
         var pipelineConfig = requestToConfig(pipelineRequest);
-        var pipelineConfigCurrent = pipelineRepository.findByNameExists(pipelineConfig.getId(), pipelineConfig.getName());
-        if(pipelineConfigCurrent != null){
-            throw new UnprocessableEntityException("The pipeline name already exists");
-        }
-
-        pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
+        //Pipeline don't exists
+        var pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
         if(pipelineConfigCurrent == null){
             throw new UnprocessableEntityException("The pipeline don't exists");
+        }
+        //Pipeline exists in network
+        var findPipelineName = pipelineRepository.findByNameExists(pipelineConfigCurrent.getNetworkId(), pipelineConfig.getName());
+        if(findPipelineName != null){
+            throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
         pipelineConfigCurrent.setName(pipelineConfig.getName());
