@@ -2,7 +2,7 @@ package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.Response;
+import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
 import jakarta.validation.Valid;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -36,7 +36,7 @@ public class AuthController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = Response.class,
+                    implementation = LoginClientResponse.class,
                     description = "Authentication token response"
                 )
             )
@@ -44,7 +44,7 @@ public class AuthController {
     })
     public jakarta.ws.rs.core.Response login(@Valid LoginRequest request) {
 
-        Response token = userAuthentication.login(request.username(), request.password());
+        LoginClientResponse token = userAuthentication.login(request.username(), request.password());
         return jakarta.ws.rs.core.Response.ok(token).build();
     }
 

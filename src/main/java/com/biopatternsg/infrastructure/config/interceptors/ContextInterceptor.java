@@ -24,7 +24,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
         String path = requestContext.getUriInfo().getPath();
         log.info("Path: {}", path);
 
-        if (path.contains("/users")) {
+        if (path.contains("config-and-control/users")) {
             log.info("userId no needed");
             return;
         }

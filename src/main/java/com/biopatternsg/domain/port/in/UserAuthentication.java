@@ -1,8 +1,8 @@
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.infrastructure.dtos.keycloak.Response;
+import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
 
 public interface UserAuthentication {
 
-    Response login(String user, String pass);
+    LoginClientResponse login(String user, String pass);
 }
