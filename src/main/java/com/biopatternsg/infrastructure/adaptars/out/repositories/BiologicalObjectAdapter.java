@@ -3,7 +3,7 @@ package com.biopatternsg.infrastructure.adaptars.out.repositories;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.infrastructure.clients.BiologicalObjectHttpClient;
-import com.biopatternsg.infrastructure.dtos.LaunchPipelineRequest;
+import com.biopatternsg.infrastructure.dtos.LaunchPipelineInternalRequest;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -25,7 +25,7 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
     @Retry
     public String launch(PipelineConfig pipelineConfig) {
 
-        var pipelineBiologicalObject = new LaunchPipelineRequest(
+        var pipelineBiologicalObject = new LaunchPipelineInternalRequest(
                 pipelineConfig.getId(),
                 pipelineConfig.getLevels(),
                 pipelineConfig.getExpertObjects(),

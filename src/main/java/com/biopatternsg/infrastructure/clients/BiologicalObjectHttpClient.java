@@ -1,6 +1,6 @@
 package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.infrastructure.dtos.LaunchPipelineRequest;
+import com.biopatternsg.infrastructure.dtos.LaunchPipelineInternalRequest;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -12,5 +12,5 @@ public interface BiologicalObjectHttpClient {
 
     @POST
     @Path("/biological-object/launch-pipeline")
-    String launch(@RequestBody LaunchPipelineRequest pipelineRequest, @HeaderParam("x-user-id") String userId);
+    String launch(@RequestBody LaunchPipelineInternalRequest pipelineRequest, @HeaderParam("x-user-id") String userId);
 }
