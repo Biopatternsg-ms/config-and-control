@@ -79,7 +79,7 @@ public class PipelineController {
         return updatePipeline.execute(pipelineRequest);
     }
 
-    @GET
+    @POST
     @Path("/launch")
     @Operation(
         summary = "Launch pipeline execution",
@@ -98,9 +98,9 @@ public class PipelineController {
             )
         )
     })
-    public Response launch(@QueryParam("id") String pipelineId){
-        launchPipeline.execute(pipelineId);
-        return Response.accepted().entity("Pipeline launched: " + pipelineId).build();
+    public Response launch(LaunchPipelineRequest pipelineRequest){
+        launchPipeline.execute(pipelineRequest);
+        return Response.accepted().entity("Pipeline launched: " + pipelineRequest).build();
     }
 
     @PATCH
