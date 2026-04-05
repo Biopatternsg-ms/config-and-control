@@ -166,13 +166,13 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = NetworkConfig.class,
+                                    implementation = PipelineResponse.class,
                                     description = "User pipelines obtained"
                             )
                     )
             )
     })
-    public List<PipelineConfig> findList(FindPipelineRequest findPipelineRequest){
+    public List<PipelineResponse> findList(FindPipelineRequest findPipelineRequest){
 
         return findPipeline.byFilters(findPipelineRequest);
     }

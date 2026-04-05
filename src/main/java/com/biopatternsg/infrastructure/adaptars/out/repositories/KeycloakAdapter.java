@@ -10,11 +10,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 
+@Slf4j
 @ApplicationScoped
 public class KeycloakAdapter implements KeycloakRepository {
 
@@ -38,6 +40,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         try{
             return keycloakHttpClient.loginUser(grantType, clientId, clientSecret, user, pass, scope);
         } catch (WebApplicationException e) {
+            log.info("Problemas con Keycloak: {}", e.getMessage());
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
     }
