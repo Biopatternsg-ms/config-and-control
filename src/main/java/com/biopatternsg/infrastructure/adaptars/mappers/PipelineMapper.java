@@ -38,7 +38,7 @@ public class PipelineMapper {
                 .id(pipelineCollection.id.toString())
                 .name(pipelineCollection.getName())
                 .description(pipelineCollection.getDescription())
-                .levels(pipelineCollection.getLevels())
+                .step(pipelineCollection.getStep())
                 .createdAt(pipelineCollection.id.getTimestamp())
                 .build();
     }
