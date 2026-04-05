@@ -141,7 +141,7 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = NetworkConfig.class,
+                                    implementation = PipelineConfig.class,
                                     description = "Pipeline information obtained"
                             )
                     )
