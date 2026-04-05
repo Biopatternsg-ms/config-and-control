@@ -1,6 +1,7 @@
 package com.biopatternsg.infrastructure.adaptars.mappers;
 
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.infrastructure.dtos.PipelineResponse;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import org.bson.types.ObjectId;
 
@@ -23,6 +24,21 @@ public class PipelineMapper {
                 .levels(pipelineCollection.getLevels())
                 .expertObjects(pipelineCollection.getExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
+                .createdAt(pipelineCollection.id.getTimestamp())
+                .build();
+    }
+
+    public static PipelineResponse toPipelineResponse(PipelineCollection pipelineCollection){
+
+        if(pipelineCollection == null){
+            return null;
+        }
+
+        return PipelineResponse.builder()
+                .id(pipelineCollection.id.toString())
+                .name(pipelineCollection.getName())
+                .description(pipelineCollection.getDescription())
+                .levels(pipelineCollection.getLevels())
                 .createdAt(pipelineCollection.id.getTimestamp())
                 .build();
     }
@@ -53,5 +69,10 @@ public class PipelineMapper {
     public static List<PipelineConfig> toPipelineConfigList(List<PipelineCollection> pipelineCollectionList){
 
         return pipelineCollectionList.stream().map(PipelineMapper::toPipelineConfig).toList();
+    }
+
+    public static List<PipelineResponse> toPipelineResponseList(List<PipelineCollection> pipelineCollectionList){
+
+        return pipelineCollectionList.stream().map(PipelineMapper::toPipelineResponse).toList();
     }
 }

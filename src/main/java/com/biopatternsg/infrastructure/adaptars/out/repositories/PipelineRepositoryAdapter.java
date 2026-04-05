@@ -4,6 +4,7 @@ import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
+import com.biopatternsg.infrastructure.dtos.PipelineResponse;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.mongo_db.repositories.PipelineRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
@@ -54,9 +55,9 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     }
 
     @Override
-    public List<PipelineConfig> findByFilters(FindPipelineRequest findPipelineRequest) {
+    public List<PipelineResponse> findByFilters(FindPipelineRequest findPipelineRequest) {
         var pipelineObject = pipelineRepositoryDB.findByUserAndFilters(findPipelineRequest, networkIdList());
-        return PipelineMapper.toPipelineConfigList(pipelineObject);
+        return PipelineMapper.toPipelineResponseList(pipelineObject);
     }
 
     private List<String> networkIdList(){

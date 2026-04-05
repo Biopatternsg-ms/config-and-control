@@ -4,6 +4,7 @@ import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.FindPipeline;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
+import com.biopatternsg.infrastructure.dtos.PipelineResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +27,7 @@ public class FindPipelineUseCase implements FindPipeline {
     }
 
     @Override
-    public List<PipelineConfig> byFilters(FindPipelineRequest findPipelineRequest) {
+    public List<PipelineResponse> byFilters(FindPipelineRequest findPipelineRequest) {
         return pipelineRepository.findByFilters(findPipelineRequest);
     }
 }
