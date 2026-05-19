@@ -1,6 +1,7 @@
 package com.biopatternsg.infrastructure.mongo_db.collections;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
@@ -22,6 +23,7 @@ public class PipelineCollection extends PanacheMongoEntity {
     private String networkId;
     private Integer levels;
     private PipelineSteps step;
+    private List<PipelineStatus> statuses;
     private List<ExpertObjectConfig> expertObjects;
     private TranscriptionFactorConfig transcriptionFactorConfig;
 }
