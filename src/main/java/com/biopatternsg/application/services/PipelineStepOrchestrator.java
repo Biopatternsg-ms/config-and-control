@@ -15,7 +15,6 @@ public class PipelineStepOrchestrator {
     private final TriggerPubmedIntegration triggerPubmedIntegration;
 
     public void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step) {
-        log.info("Checking step orchestrations for step: {}", step);
         if (step == PipelineSteps.SEARCH_LEVELS) {
             log.info("Step is SEARCH_LEVELS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
             triggerPubmedIntegration.execute(pipelineConfig);

@@ -1,7 +1,7 @@
 package com.biopatternsg.application.usecase;
 
-import com.biopatternsg.application.services.PipelineService;
 import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.port.in.UpdatePipelineStep;
 import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
