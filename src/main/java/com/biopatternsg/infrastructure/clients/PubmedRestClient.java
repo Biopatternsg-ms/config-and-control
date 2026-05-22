@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
-import jakarta.validation.constraints.NotNull;
+import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-public record PipelineStepRequest(
-       @NotNull String id,
-       @NotNull PipelineSteps step,
-       @NotNull Status status
-) {
+@RegisterRestClient(configKey = "pubmed-integration-api")
+public interface PubmedRestClient {
+
+    @POST
+    @Path("/pubmed/build-pairs")
+    void buildPairs(BuildPairsRequest request);
 }

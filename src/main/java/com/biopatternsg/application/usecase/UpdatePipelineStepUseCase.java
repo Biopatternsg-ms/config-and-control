@@ -15,9 +15,10 @@
  */
 package com.biopatternsg.application.usecase;
 
-import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
+import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.domain.services.PipelineService;
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.port.in.UpdatePipelineStep;
-import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +29,22 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UpdatePipelineStepUseCase implements UpdatePipelineStep {
 
-    private final PipelineRepository pipelineRepository;
+    private final PipelineService pipelineService;
+    private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     @Override
     public void execute(PipelineStepRequest stepRequest) {
 
-        var pipelineConfig = pipelineRepository.findById(stepRequest.id());
-        if(pipelineConfig == null){
-            throw new UnprocessableEntityException("The pipeline don't exists");
+        var pipelineConfig = pipelineService.updateStep(
+                stepRequest.id(),
+                stepRequest.step(),
+                stepRequest.status()
+        );
+
+        if (stepRequest.status() == Status.COMPLETED) {
+            pipelineStepOrchestrator.orchestrate(pipelineConfig, stepRequest.step());
         }
 
-        pipelineConfig.setStep(stepRequest.step());
-        pipelineRepository.save(pipelineConfig);
         log.info("Pipeline {}, step {} updated",stepRequest.id(), stepRequest.step().getValue());
     }
 }
