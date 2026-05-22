@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.domain.enums;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
-import jakarta.validation.constraints.NotNull;
-
-public record PipelineStepRequest(
-       @NotNull String id,
-       @NotNull PipelineSteps step,
-       @NotNull Status status
-) {
+public enum Status {
+    PENDING,
+    IN_PROGRESS,
+    COMPLETED,
+    FAILED
 }

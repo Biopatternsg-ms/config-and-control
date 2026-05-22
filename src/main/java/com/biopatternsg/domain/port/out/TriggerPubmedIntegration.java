@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.domain.port.out;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
-import jakarta.validation.constraints.NotNull;
+import com.biopatternsg.domain.models.PipelineConfig;
 
-public record PipelineStepRequest(
-       @NotNull String id,
-       @NotNull PipelineSteps step,
-       @NotNull Status status
-) {
+public interface TriggerPubmedIntegration {
+    void execute(PipelineConfig pipelineConfig);
 }
