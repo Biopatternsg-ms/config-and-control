@@ -16,11 +16,13 @@
 package com.biopatternsg.infrastructure.dtos;
 
 import jakarta.ws.rs.QueryParam;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class UsersKeycloakFiltersRequest{
 
     @QueryParam("username")
