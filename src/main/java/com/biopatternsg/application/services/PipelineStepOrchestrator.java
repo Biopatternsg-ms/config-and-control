@@ -32,7 +32,11 @@ public class PipelineStepOrchestrator {
     public void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step) {
         if (step == PipelineSteps.SEARCH_LEVELS) {
             log.info("Step is SEARCH_LEVELS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
-            triggerPubmedIntegration.execute(pipelineConfig);
+            triggerPubmedIntegration.executeBuildsPairs(pipelineConfig);
+        }
+        if (step == PipelineSteps.COMBINATIONS) {
+            log.info("Step is COMBINATIONS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
+            triggerPubmedIntegration.executeSearchPubmedIds(pipelineConfig);
         }
     }
 }

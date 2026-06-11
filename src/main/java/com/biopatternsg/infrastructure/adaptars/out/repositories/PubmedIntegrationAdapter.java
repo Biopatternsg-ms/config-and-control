@@ -22,6 +22,8 @@ import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.infrastructure.clients.PubmedRestClient;
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
+import com.biopatternsg.infrastructure.dtos.SearchPubmedIdsRequest;
+import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +37,16 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
     @Inject
     private final PubmedRestClient pubmedRestClient;
     private final PipelineService pipelineService;
+    private final SessionUtil sessionUtil;
 
-    public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineService pipelineService) {
+    public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineService pipelineService, SessionUtil sessionUtil) {
         this.pubmedRestClient = pubmedRestClient;
         this.pipelineService = pipelineService;
+        this.sessionUtil = sessionUtil;
     }
 
     @Override
-    public void execute(PipelineConfig pipelineConfig) {
+    public void executeBuildsPairs(PipelineConfig pipelineConfig) {
         int levels = pipelineConfig.getLevels() != null ? pipelineConfig.getLevels() : 1;
         BuildPairsRequest request = new BuildPairsRequest(
                 pipelineConfig.getId(),
@@ -50,12 +54,31 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
                 levels
         );
         try {
-            pubmedRestClient.buildPairs(request);
+            String userId = sessionUtil.getUserId();
+            pubmedRestClient.buildPairs(request, userId);
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.IN_PROGRESS);
             log.info("Pubmed API buildPairs called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.FAILED);
             log.error("Error calling Pubmed API buildPairs for pipeline {}", pipelineConfig.getId(), e);
+        }
+    }
+
+    @Override
+    public void executeSearchPubmedIds(PipelineConfig pipelineConfig) {
+        SearchPubmedIdsRequest request = new SearchPubmedIdsRequest(
+                pipelineConfig.getId(),
+                pipelineConfig.getRetMax() != 0 ? pipelineConfig.getRetMax() : 10
+        );
+
+        try {
+            String userId = sessionUtil.getUserId();
+            pubmedRestClient.searchPubmedIds(request, userId);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.IN_PROGRESS);
+            log.info("Pubmed API searchPubmedIds called successfully for pipeline {}", pipelineConfig.getId());
+        } catch (Exception e) {
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.FAILED);
+            log.error("Error calling Pubmed API searchPubmedIds for pipeline {}", pipelineConfig.getId(), e);
         }
     }
 }

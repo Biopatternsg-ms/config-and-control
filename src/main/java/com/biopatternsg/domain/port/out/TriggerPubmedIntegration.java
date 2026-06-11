@@ -18,5 +18,6 @@ package com.biopatternsg.domain.port.out;
 import com.biopatternsg.domain.models.PipelineConfig;
 
 public interface TriggerPubmedIntegration {
-    void execute(PipelineConfig pipelineConfig);
+    void executeBuildsPairs(PipelineConfig pipelineConfig);
+    void executeSearchPubmedIds(PipelineConfig pipelineConfig);
 }
