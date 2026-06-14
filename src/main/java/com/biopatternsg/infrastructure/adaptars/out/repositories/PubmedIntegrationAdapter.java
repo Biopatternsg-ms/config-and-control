@@ -38,6 +38,8 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
     private final PubmedRestClient pubmedRestClient;
     private final PipelineService pipelineService;
     private final SessionUtil sessionUtil;
+    private static final int DEFAULT_LEVEL = 1;
+    private static final int DEFAULT_RETMAX = 10;
 
     public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineService pipelineService, SessionUtil sessionUtil) {
         this.pubmedRestClient = pubmedRestClient;
@@ -47,7 +49,7 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
 
     @Override
     public void executeBuildsPairs(PipelineConfig pipelineConfig) {
-        int levels = pipelineConfig.getLevels() != null ? pipelineConfig.getLevels() : 1;
+        int levels = pipelineConfig.getLevels() != null ? pipelineConfig.getLevels() : DEFAULT_LEVEL;
         BuildPairsRequest request = new BuildPairsRequest(
                 pipelineConfig.getId(),
                 pipelineConfig.isUseOnlyPrincipalName(),
@@ -68,7 +70,7 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
     public void executeSearchPubmedIds(PipelineConfig pipelineConfig) {
         SearchPubmedIdsRequest request = new SearchPubmedIdsRequest(
                 pipelineConfig.getId(),
-                pipelineConfig.getRetMax() != 0 ? pipelineConfig.getRetMax() : 10
+                pipelineConfig.getRetMax() != 0 ? pipelineConfig.getRetMax() : DEFAULT_RETMAX
         );
 
         try {

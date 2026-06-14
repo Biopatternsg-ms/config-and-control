@@ -30,13 +30,18 @@ public class PipelineStepOrchestrator {
     private final TriggerPubmedIntegration triggerPubmedIntegration;
 
     public void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step) {
-        if (step == PipelineSteps.SEARCH_LEVELS) {
-            log.info("Step is SEARCH_LEVELS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
-            triggerPubmedIntegration.executeBuildsPairs(pipelineConfig);
-        }
-        if (step == PipelineSteps.COMBINATIONS) {
-            log.info("Step is COMBINATIONS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
-            triggerPubmedIntegration.executeSearchPubmedIds(pipelineConfig);
+        switch (step) {
+            case SEARCH_LEVELS -> {
+                log.info("Step is SEARCH_LEVELS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
+                triggerPubmedIntegration.executeBuildsPairs(pipelineConfig);
+            }
+            case COMBINATIONS -> {
+                log.info("Step is COMBINATIONS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
+                triggerPubmedIntegration.executeSearchPubmedIds(pipelineConfig);
+            }
+            default -> {
+                log.info("Step is unknown, doing nothing");
+            }
         }
     }
 }
