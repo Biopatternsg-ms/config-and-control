@@ -23,6 +23,7 @@ import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.infrastructure.clients.PubmedRestClient;
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubmedIdsRequest;
+import com.biopatternsg.infrastructure.dtos.SearchPubtatorRequest;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -81,6 +82,23 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         } catch (Exception e) {
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.FAILED);
             log.error("Error calling Pubmed API searchPubmedIds for pipeline {}", pipelineConfig.getId(), e);
+        }
+    }
+
+    @Override
+    public void executeSearchPubtator(PipelineConfig pipelineConfig) {
+        SearchPubtatorRequest request = new SearchPubtatorRequest(
+                pipelineConfig.getId()
+        );
+
+        try {
+            String userId = sessionUtil.getUserId();
+            pubmedRestClient.searchPubtator(request, userId);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.IN_PROGRESS);
+            log.info("Pubmed API searchPubtator called successfully for pipeline {}", pipelineConfig.getId());
+        } catch (Exception e) {
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.FAILED);
+            log.error("Error calling Pubmed API searchPubtator for pipeline {}", pipelineConfig.getId(), e);
         }
     }
 }

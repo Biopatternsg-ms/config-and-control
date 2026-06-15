@@ -39,6 +39,10 @@ public class PipelineStepOrchestrator {
                 log.info("Step is COMBINATIONS, triggering PubMed integration for pipeline {}", pipelineConfig.getId());
                 triggerPubmedIntegration.executeSearchPubmedIds(pipelineConfig);
             }
+            case SEARCH_PUBMED_IDS -> {
+                log.info("Step is SEARCH_PUBMED_IDS, triggering PubTator integration for pipeline {}", pipelineConfig.getId());
+                triggerPubmedIntegration.executeSearchPubtator(pipelineConfig);
+            }
             default -> {
                 log.info("Step is unknown, doing nothing");
             }
