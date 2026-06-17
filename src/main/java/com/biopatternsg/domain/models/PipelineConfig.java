@@ -42,6 +42,7 @@ public class PipelineConfig {
     private TranscriptionFactorConfig transcriptionFactorConfig;
     private boolean useOnlyPrincipalName;
     private int createdAt;
+    private int retMax;
 
     public void addStatus(Status status) {
         if(this.statuses == null) {

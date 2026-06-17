@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.out;
+package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.domain.models.PipelineConfig;
-
-public interface TriggerPubmedIntegration {
-    void executeBuildsPairs(PipelineConfig pipelineConfig);
-    void executeSearchPubmedIds(PipelineConfig pipelineConfig);
-    void executeSearchPubtator(PipelineConfig pipelineConfig);
+public record SearchPubtatorRequest(
+        String pipelineId
+) {
 }

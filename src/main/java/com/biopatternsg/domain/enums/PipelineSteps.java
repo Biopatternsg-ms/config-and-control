@@ -25,7 +25,9 @@ public enum PipelineSteps {
     TRANSCRIPTION_FACTOR("transcription_factor", PipelineStage.BIOLOGICAL_OBJECT),
     EXPERT_OBJECTS("expert_objects", PipelineStage.BIOLOGICAL_OBJECT),
     SEARCH_LEVELS("search_levels", PipelineStage.BIOLOGICAL_OBJECT),
-    COMBINATIONS("combinations", PipelineStage.PUBMED_INTEGRATION);
+    COMBINATIONS("combinations", PipelineStage.PUBMED_INTEGRATION),
+    SEARCH_PUBMED_IDS("search_pubmed_ids", PipelineStage.PUBMED_INTEGRATION),
+    SEARCH_PUBTATOR("search_pubtator", PipelineStage.PUBMED_INTEGRATION);
 
     private final String value;
     private final PipelineStage stage;
