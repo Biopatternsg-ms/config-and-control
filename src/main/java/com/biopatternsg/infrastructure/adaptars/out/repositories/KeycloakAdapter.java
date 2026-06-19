@@ -72,6 +72,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
+    @Override
     public Response refreshToken(String refreshToken) {
 
         try{
@@ -108,6 +109,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
+    @Override
     public void recoveryPassword(String username) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
