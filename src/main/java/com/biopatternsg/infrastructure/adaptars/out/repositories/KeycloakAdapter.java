@@ -73,6 +73,17 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
+    public Response refreshToken(String refreshToken) {
+
+        try{
+            return keycloakHttpClient.refreshToken("refresh_token", clientId, clientSecret, refreshToken);
+        } catch (WebApplicationException e) {
+            log.info("Problemas con Keycloak: {}", e.getMessage());
+            throw new KeycloakServiceException(e.getResponse().getStatus());
+        }
+    }
+
+    @Override
     public List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
@@ -98,14 +109,22 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
-    public void recoveryPassword(String userId) {
+    @Override
+    public void recoveryPassword(String username) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
         List<String> actions = List.of("UPDATE_PASSWORD");
 
         try{
-            keycloakHttpClient.sendEmail(accessToken, userId, actions);
+            var filters = UsersKeycloakFiltersRequest.builder().username(username).build();
+            var users = keycloakHttpClient.usersList(accessToken, filters);
+            if (users != null && !users.isEmpty()) {
+                var firstUser = users.getFirst();
+                if (firstUser != null && firstUser.id() != null && !firstUser.id().isBlank()) {
+                    keycloakHttpClient.sendEmail(accessToken, firstUser.id(), actions);
+                }
+            }
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }

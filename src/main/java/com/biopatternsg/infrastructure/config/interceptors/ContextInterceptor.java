@@ -36,6 +36,10 @@ public class ContextInterceptor implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(requestContext.getMethod())) {
+            return;
+        }
+
         String path = requestContext.getUriInfo().getPath();
         log.info("Path: {}", path);
 

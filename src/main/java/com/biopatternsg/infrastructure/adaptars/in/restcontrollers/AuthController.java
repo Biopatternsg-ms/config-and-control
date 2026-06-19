@@ -17,8 +17,12 @@ package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
+import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
+import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.RefreshTokenResponse;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -57,10 +61,61 @@ public class AuthController {
             )
         )
     })
-    public jakarta.ws.rs.core.Response login(@Valid LoginRequest request) {
+    public Response login(@Valid LoginRequest request) {
 
         LoginClientResponse token = userAuthentication.login(request.username(), request.password());
-        return jakarta.ws.rs.core.Response.ok(token).build();
+        return Response.ok(token).build();
+    }
+
+    @POST
+    @Path("/refresh-token")
+    @Operation(
+            summary = "Refresh user authentication",
+            description = "Refresh token and provided credentials to update and returns an authentication token."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "User successfully authenticated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = RefreshTokenResponse.class,
+                                    description = "Authentication token response"
+                            )
+                    )
+            )
+    })
+    public Response refreshToken(@Valid RefreshTokenRequest refreshTokenRequest){
+
+        RefreshTokenResponse token = userAuthentication.refreshPassword(refreshTokenRequest.getRefreshToken());
+        return Response.ok(token).build();
+    }
+
+    @POST
+    @Path("/recovery-password")
+    @Operation(
+            summary = "Recovery password process",
+            description = "Receive email to recovery password process sending an email"
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "User successfully authenticated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = Response.class,
+                                    description = "Recovery password process"
+                            )
+                    )
+            )
+    })
+    public Response recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
+
+        return userAuthentication.recoveryPassword(recoveryPasswordRequest.getUsername());
     }
 
 }

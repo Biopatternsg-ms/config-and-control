@@ -18,7 +18,9 @@ package com.biopatternsg.application.usecase;
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.RefreshTokenResponse;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
@@ -32,5 +34,19 @@ public class UserAuthenticationUseCase implements UserAuthentication {
 
         var response = keycloakRepository.login(user, pass);
         return response.readEntity(LoginClientResponse.class);
+    }
+
+    @Override
+    public RefreshTokenResponse refreshPassword(String refreshToken) {
+
+        var response = keycloakRepository.refreshToken(refreshToken);
+        return response.readEntity(RefreshTokenResponse.class);
+    }
+
+    @Override
+    public Response recoveryPassword(String email) {
+
+        keycloakRepository.recoveryPassword(email);
+        return Response.ok().build();
     }
 }

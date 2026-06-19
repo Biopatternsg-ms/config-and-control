@@ -26,7 +26,8 @@ public interface KeycloakRepository {
 
     Response login(String user, String pass);
     Response register(UserRegister userRegister);
+    Response refreshToken(String refreshToken);
     List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters);
     void verifyEmail(String userId);
-    void recoveryPassword(String userId);
+    void recoveryPassword(String email);
 }

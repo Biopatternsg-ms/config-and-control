@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.in;
+package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.RefreshTokenResponse;
-import jakarta.ws.rs.core.Response;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
-public interface UserAuthentication {
-
-    LoginClientResponse login(String user, String pass);
-    RefreshTokenResponse refreshPassword(String refreshToken);
-    Response recoveryPassword(String email);
+@Getter
+public class RecoveryPasswordRequest {
+    @NotNull String username;
 }
