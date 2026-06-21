@@ -64,7 +64,7 @@ public class KeycloakAdapter implements KeycloakRepository {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.access_token();
-
+        
         try{
             return keycloakHttpClient.register( accessToken, userRegister);
         } catch (WebApplicationException e) {
