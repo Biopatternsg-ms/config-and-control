@@ -24,10 +24,10 @@ import java.util.List;
 public record UpdatePipelineRequest(
 
         @NotNull String id,
-        @NotNull String name,
-        @NotNull String description,
-        @NotNull Integer levels,
-        @NotNull List<ExpertObjectConfig> expertObjects,
-        @NotNull TranscriptionFactorConfig transcriptionFactorConfig
+        String name,
+        String description,
+        Integer levels,
+        List<ExpertObjectConfig> expertObjects,
+        TranscriptionFactorConfig transcriptionFactorConfig
 ) {
 }

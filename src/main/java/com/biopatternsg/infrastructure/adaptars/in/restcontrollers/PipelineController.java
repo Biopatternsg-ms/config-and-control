@@ -89,7 +89,7 @@ public class PipelineController {
             )
         )
     })
-    public PipelineConfig update(UpdatePipelineRequest pipelineRequest){
+    public PipelineConfig update(@Valid UpdatePipelineRequest pipelineRequest){
 
         return updatePipeline.execute(pipelineRequest);
     }

@@ -26,8 +26,8 @@ public record CreatePipelineRequest(
         @NotNull String name,
         @NotNull String description,
         @NotNull String networkId,
-        @NotNull Integer levels,
-        @NotNull List<ExpertObjectConfig> expertObjects,
-        @NotNull TranscriptionFactorConfig transcriptionFactorConfig
+        Integer levels,
+        List<ExpertObjectConfig> expertObjects,
+        TranscriptionFactorConfig transcriptionFactorConfig
 ) {
 }

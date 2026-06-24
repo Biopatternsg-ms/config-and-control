@@ -44,11 +44,16 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
-        pipelineConfigCurrent.setName(pipelineConfig.getName());
-        pipelineConfigCurrent.setDescription(pipelineConfig.getDescription());
-        pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
-        pipelineConfigCurrent.setExpertObjects(pipelineConfig.getExpertObjects());
-        pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
+        if (pipelineConfig.getName() != null)
+            pipelineConfigCurrent.setName(pipelineConfig.getName());
+        if (pipelineConfig.getDescription() != null)
+            pipelineConfigCurrent.setDescription(pipelineConfig.getDescription());
+        if (pipelineConfig.getLevels() != null)
+            pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
+        if (pipelineConfig.getExpertObjects() != null)
+            pipelineConfigCurrent.setExpertObjects(pipelineConfig.getExpertObjects());
+        if (pipelineConfig.getTranscriptionFactorConfig() != null)
+            pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
 
         return pipelineRepository.save(pipelineConfigCurrent);
     }
