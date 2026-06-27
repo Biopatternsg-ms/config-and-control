@@ -40,7 +40,7 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
         }
         //Pipeline exists in network
         var findPipelineName = pipelineRepository.findByNameExists(pipelineConfigCurrent.getNetworkId(), pipelineConfig.getName());
-        if(findPipelineName != null){
+        if(findPipelineName != null && pipelineConfig.getName() != null){
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 

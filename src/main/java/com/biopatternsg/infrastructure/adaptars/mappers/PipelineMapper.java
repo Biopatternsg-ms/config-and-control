@@ -52,6 +52,7 @@ public class PipelineMapper {
 
         return PipelineResponse.builder()
                 .id(pipelineCollection.id.toString())
+                .networkId(pipelineCollection.getNetworkId())
                 .name(pipelineCollection.getName())
                 .description(pipelineCollection.getDescription())
                 .step(pipelineCollection.getStep())

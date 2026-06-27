@@ -22,6 +22,7 @@ import lombok.Builder;
 public record PipelineResponse(
 
         String id,
+        String networkId,
         String name,
         String description,
         PipelineSteps step,
