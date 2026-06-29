@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.clients;
 
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
+import com.biopatternsg.infrastructure.dtos.GenerateKbRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubmedIdsRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubtatorRequest;
 import jakarta.ws.rs.HeaderParam;
@@ -37,4 +38,8 @@ public interface PubmedRestClient {
     @POST
     @Path("/pubmed/search-pubtator-by-pmids")
     void searchPubtator(SearchPubtatorRequest request, @HeaderParam("x-user-id") String userId);
+
+    @POST
+    @Path("/pubmed/generate-kb")
+    void generateKb(GenerateKbRequest request, @HeaderParam("x-user-id") String userId);
 }
