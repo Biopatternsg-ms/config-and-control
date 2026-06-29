@@ -92,9 +92,9 @@ public class NetworkController {
             )
         )
     })
-    public NetworkConfig update(@Valid UpdateNetworkRequest updateNetwork){
+    public NetworkConfig update(@Valid UpdateNetworkRequest updateNetworkRequest){
 
-        return this.updateNetwork.execute(NetworkMapper.requestToModel(updateNetwork));
+        return updateNetwork.execute(NetworkMapper.requestToModel(updateNetworkRequest));
     }
 
     @GET
@@ -143,8 +143,8 @@ public class NetworkController {
     })
     public List<NetworkResponse> findList(FindNetworkRequest networkFilters){
 
-        var NetworkConfigList = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
+        var networkConfigList = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
                 networkFilters.page(), networkFilters.size());
-        return NetworkMapper.toNetworkResponseList(NetworkConfigList);
+        return NetworkMapper.toNetworkResponseList(networkConfigList);
     }
 }
