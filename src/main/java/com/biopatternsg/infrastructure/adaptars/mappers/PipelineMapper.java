@@ -16,7 +16,8 @@
 package com.biopatternsg.infrastructure.adaptars.mappers;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.infrastructure.dtos.PipelineResponse;
+import com.biopatternsg.domain.models.PipelineStatus;
+import com.biopatternsg.infrastructure.dtos.*;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import org.bson.types.ObjectId;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 public class PipelineMapper {
 
-    public static PipelineConfig toPipelineConfig(PipelineCollection pipelineCollection){
+    public static PipelineConfig collectionToConfig(PipelineCollection pipelineCollection){
 
         if(pipelineCollection == null){
             return null;
@@ -44,23 +45,23 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineResponse toPipelineResponse(PipelineCollection pipelineCollection){
+    public static PipelineResponse configToResponse(PipelineConfig pipelineConfig){
 
-        if(pipelineCollection == null){
+        if(pipelineConfig == null){
             return null;
         }
 
         return PipelineResponse.builder()
-                .id(pipelineCollection.id.toString())
-                .networkId(pipelineCollection.getNetworkId())
-                .name(pipelineCollection.getName())
-                .description(pipelineCollection.getDescription())
-                .step(pipelineCollection.getStep())
-                .createdAt(pipelineCollection.id.getTimestamp())
+                .id(pipelineConfig.getId())
+                .networkId(pipelineConfig.getNetworkId())
+                .name(pipelineConfig.getName())
+                .description(pipelineConfig.getDescription())
+                .step(pipelineConfig.getStep())
+                .createdAt(pipelineConfig.getCreatedAt())
                 .build();
     }
 
-    public static PipelineCollection toPipelineCollection(PipelineConfig pipelineConfig){
+    public static PipelineCollection configToCollection(PipelineConfig pipelineConfig){
 
         if(pipelineConfig == null){
             return null;
@@ -84,13 +85,55 @@ public class PipelineMapper {
         return pipelineCollection;
     }
 
-    public static List<PipelineConfig> toPipelineConfigList(List<PipelineCollection> pipelineCollectionList){
+    public static List<PipelineConfig> collectionToConfigList(List<PipelineCollection> pipelineCollectionList){
 
-        return pipelineCollectionList.stream().map(PipelineMapper::toPipelineConfig).toList();
+        return pipelineCollectionList.stream().map(PipelineMapper::collectionToConfig).toList();
     }
 
-    public static List<PipelineResponse> toPipelineResponseList(List<PipelineCollection> pipelineCollectionList){
+    public static List<PipelineResponse> collectionToResponseList(List<PipelineConfig> pipelineCollectionList){
 
-        return pipelineCollectionList.stream().map(PipelineMapper::toPipelineResponse).toList();
+        return pipelineCollectionList.stream().map(PipelineMapper::configToResponse).toList();
+    }
+
+    public static PipelineConfig requestToConfig(CreatePipelineRequest createPipeline){
+
+        return PipelineConfig.builder()
+                .name(createPipeline.name())
+                .description(createPipeline.description())
+                .networkId(createPipeline.networkId())
+                .levels(createPipeline.levels())
+                .expertObjects(createPipeline.expertObjects())
+                .transcriptionFactorConfig(createPipeline.transcriptionFactorConfig())
+                .build();
+    }
+
+    public static PipelineConfig requestToConfig(UpdatePipelineRequest updatePipeline){
+
+        return PipelineConfig.builder()
+                .id(updatePipeline.id())
+                .name(updatePipeline.name())
+                .description(updatePipeline.description())
+                .levels(updatePipeline.levels())
+                .expertObjects(updatePipeline.expertObjects())
+                .transcriptionFactorConfig(updatePipeline.transcriptionFactorConfig())
+                .build();
+    }
+
+    public static PipelineConfig requestToConfig(FindPipelineRequest findPipeline){
+
+        return PipelineConfig.builder()
+                .id(findPipeline.id())
+                .networkId(findPipeline.networkId())
+                .name(findPipeline.name())
+                .description(findPipeline.description())
+                .build();
+    }
+
+    public static PipelineStatus requestToStatus(PipelineStepRequest pipelineStepRequest){
+
+        return PipelineStatus.builder()
+                .step(pipelineStepRequest.step())
+                .status(pipelineStepRequest.status())
+                .build();
     }
 }

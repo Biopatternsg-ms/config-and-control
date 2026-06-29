@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.models.user_registration;
+package com.biopatternsg.infrastructure.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
-public class UserCredentials {
-    String type;
-    String value;
-    boolean temporary;
+public record UserRequest(
+        @NotNull @Email String username,
+        @NotNull String firstName,
+        @NotNull String lastName,
+        @NotNull String password
+) {
 }

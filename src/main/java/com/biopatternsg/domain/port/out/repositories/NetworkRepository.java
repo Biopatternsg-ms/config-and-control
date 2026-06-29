@@ -26,5 +26,5 @@ public interface NetworkRepository {
     NetworkConfig findById(String id);
     NetworkConfig findByName(String name);
     NetworkConfig findByNameExists(String id, String name);
-    List<NetworkConfig> findByFilters(FindNetworkRequest findNetworkRequest);
+    List<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size);
 }

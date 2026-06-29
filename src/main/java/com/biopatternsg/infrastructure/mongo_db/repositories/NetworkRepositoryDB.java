@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
-import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
+import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
@@ -49,7 +49,8 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
                 .firstResult();
     }
 
-    public List<NetworkCollection> findByUserAndFilters(FindNetworkRequest findNetwork, String userId){
+    public List<NetworkCollection> findByUserAndFilters(NetworkConfig findNetwork,
+                                                        String userId, int page, int size){
 
         Document query = new Document();
         query.append("userId", userId);
@@ -58,20 +59,21 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
             return find(query).list();
         }
 
-        if (findNetwork.id() != null && !findNetwork.id().isEmpty()) {
-            query.append("_id", new ObjectId(findNetwork.id()));
+        if (findNetwork.getId() != null && !findNetwork.getId().isEmpty()) {
+            query.append("_id", new ObjectId(findNetwork.getId()));
         }
 
-        if (findNetwork.name() != null) {
-            query.append("name", new Document("$regex", findNetwork.name()).append("$options", "i"));
+        if (findNetwork.getName() != null) {
+            query.append("name", new Document("$regex", findNetwork.getName()).append("$options", "i"));
         }
 
-        if (findNetwork.description() != null) {
-            query.append("description", new Document("$regex", findNetwork.description()).append("$options", "i"));
+        if (findNetwork.getDescription() != null) {
+            query.append("description", new Document("$regex", findNetwork.getDescription()).append("$options", "i"));
         }
 
-        return find(query)
-                .page(findNetwork.page(), findNetwork.size())
-                .list();
+        if(page <= 0 || size <= 0)
+            return find(query).list();
+
+        return find(query).page(page, size).list();
     }
 }

@@ -16,10 +16,10 @@
 package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.port.in.UpdatePipelineStep;
-import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,18 +33,15 @@ public class UpdatePipelineStepUseCase implements UpdatePipelineStep {
     private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     @Override
-    public void execute(PipelineStepRequest stepRequest) {
+    public void execute(String pipelineId, PipelineStatus pipelineStatus) {
 
         var pipelineConfig = pipelineService.updateStep(
-                stepRequest.id(),
-                stepRequest.step(),
-                stepRequest.status()
-        );
+                pipelineId, pipelineStatus.getStep(), pipelineStatus.getStatus());
 
-        if (stepRequest.status() == Status.COMPLETED) {
-            pipelineStepOrchestrator.orchestrate(pipelineConfig, stepRequest.step());
+        if (pipelineStatus.getStatus() == Status.COMPLETED) {
+            pipelineStepOrchestrator.orchestrate(pipelineConfig, pipelineStatus.getStep());
         }
 
-        log.info("Pipeline {}, step {} updated",stepRequest.id(), stepRequest.step().getValue());
+        log.info("Pipeline {}, step {} updated",pipelineId, pipelineStatus.getStep().getValue());
     }
 }

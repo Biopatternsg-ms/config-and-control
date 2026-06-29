@@ -16,7 +16,9 @@
 package com.biopatternsg.infrastructure.dtos.keycloak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
+@Builder
 public record UserResponse(
 
         @JsonProperty("id")
@@ -34,6 +36,6 @@ public record UserResponse(
         @JsonProperty("emailVerified")
         String emailVerified,
         @JsonProperty("createdTimestamp")
-        Long createdAt
+        int createdAt
 ) {
 }

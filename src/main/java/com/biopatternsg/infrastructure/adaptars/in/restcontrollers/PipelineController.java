@@ -17,6 +17,7 @@ package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
 
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.*;
+import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.*;
 import jakarta.validation.Valid;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -65,7 +66,7 @@ public class PipelineController {
     public Response create(@Valid CreatePipelineRequest newPipeline){
 
         return Response.status(Response.Status.CREATED)
-                .entity(createPipeline.execute(newPipeline))
+                .entity(createPipeline.execute(PipelineMapper.requestToConfig(newPipeline)))
                 .build();
     }
 
@@ -88,9 +89,9 @@ public class PipelineController {
             )
         )
     })
-    public PipelineConfig update(@Valid UpdatePipelineRequest pipelineRequest){
+    public PipelineConfig update(@Valid UpdatePipelineRequest updatePipeline){
 
-        return updatePipeline.execute(pipelineRequest);
+        return this.updatePipeline.execute(PipelineMapper.requestToConfig(updatePipeline));
     }
 
     @POST
@@ -112,9 +113,9 @@ public class PipelineController {
             )
         )
     })
-    public Response launch(LaunchPipelineRequest pipelineRequest){
-        launchPipeline.execute(pipelineRequest);
-        return Response.accepted().entity("Pipeline launched: " + pipelineRequest).build();
+    public Response launch(@PathParam("id") String pipelineId){
+        launchPipeline.execute(pipelineId);
+        return Response.accepted().entity("Pipeline launched: " + pipelineId).build();
     }
 
     @PATCH
@@ -137,7 +138,7 @@ public class PipelineController {
         )
     })
     public Response updateStep(@Valid PipelineStepRequest stepRequest){
-        updatePipelineStep.execute(stepRequest);
+        updatePipelineStep.execute(stepRequest.id(), PipelineMapper.requestToStatus(stepRequest));
 
         return Response.accepted().entity("updated").build();
     }
@@ -186,8 +187,10 @@ public class PipelineController {
                     )
             )
     })
-    public List<PipelineResponse> findList(FindPipelineRequest findPipelineRequest){
+    public List<PipelineResponse> findList(FindPipelineRequest pipelineFilters){
 
-        return findPipeline.byFilters(findPipelineRequest);
+        var pipelineConfigList = findPipeline.byFilters(PipelineMapper.requestToConfig(pipelineFilters),
+                pipelineFilters.page(), pipelineFilters.size());
+        return PipelineMapper.collectionToResponseList(pipelineConfigList);
     }
 }

@@ -20,7 +20,6 @@ import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.infrastructure.dtos.CreatePipelineRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import com.biopatternsg.domain.port.in.CreatePipeline;
@@ -33,9 +32,8 @@ public class CreatePipelineUseCase implements CreatePipeline {
     private final PipelineRepository pipelineRepository;
 
     @Override
-    public PipelineConfig execute(CreatePipelineRequest newPipeline) {
+    public PipelineConfig execute(PipelineConfig pipelineConfig) {
 
-        var pipelineConfig = requestToConfig(newPipeline);
         //Network don't exists
         var networkConfig = networkRepository.findById(pipelineConfig.getNetworkId());
         if (networkConfig == null) {
@@ -50,17 +48,5 @@ public class CreatePipelineUseCase implements CreatePipeline {
         //Build pipelineConfig
         pipelineConfig.setStep(PipelineSteps.CONFIG);
         return pipelineRepository.save(pipelineConfig);
-    }
-
-    private PipelineConfig requestToConfig(CreatePipelineRequest newPipeline){
-
-        return PipelineConfig.builder()
-                .name(newPipeline.name())
-                .description(newPipeline.description())
-                .networkId(newPipeline.networkId())
-                .levels(newPipeline.levels())
-                .expertObjects(newPipeline.expertObjects())
-                .transcriptionFactorConfig(newPipeline.transcriptionFactorConfig())
-                .build();
     }
 }

@@ -15,11 +15,11 @@
  */
 package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.domain.models.UserRegister;
-import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
+import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
+import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -34,7 +34,7 @@ public interface KeycloakHttpClient {
     @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    LoginClientResponse loginClient(
+    UserAuth loginClient(
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret
@@ -44,7 +44,7 @@ public interface KeycloakHttpClient {
     @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    Response loginUser(
+    UserAuth loginUser(
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
@@ -57,7 +57,7 @@ public interface KeycloakHttpClient {
     @Path("/realms/biopatternsg/protocol/openid-connect/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    Response refreshToken(
+    UserAuth refreshToken(
             @FormParam("grant_type") String grantType,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
@@ -88,14 +88,14 @@ public interface KeycloakHttpClient {
     @Produces(MediaType.APPLICATION_JSON)
     Response register(
             @HeaderParam("Authorization") String token,
-            UserRegister userRegister
+            UserRegisterRequest userRegister
     );
 
     @GET
     @Path("admin/realms/biopatternsg/users")
-    List<UserResponse> usersList(
+    List<UserConfig> usersList(
             @HeaderParam("Authorization") String token,
-            @BeanParam UsersKeycloakFiltersRequest usersKeycloakFilters
+            @BeanParam UserFilters usersKeycloakFilters
     );
 
     @PUT

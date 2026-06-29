@@ -64,9 +64,10 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
     }
 
     @Override
-    public List<NetworkConfig> findByFilters(FindNetworkRequest findNetworkRequest) {
+    public List<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size) {
 
-        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetworkRequest, sessionUtil.getUserId());
+        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetwork,
+                sessionUtil.getUserId(), page, size);
         return NetworkMapper.toNetworkConfigList(networkCollectionList);
     }
 }
