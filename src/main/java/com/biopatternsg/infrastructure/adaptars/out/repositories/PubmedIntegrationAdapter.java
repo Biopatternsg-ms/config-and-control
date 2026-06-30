@@ -130,8 +130,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.generateAlignedObjects(request, userId);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
             log.info("Pubmed API generateAlignedObjects called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.FAILED);
             log.error("Error calling Pubmed API generateAlignedObjects for pipeline {}", pipelineConfig.getId(), e);
         }
     }
