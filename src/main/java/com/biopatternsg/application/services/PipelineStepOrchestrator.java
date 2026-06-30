@@ -47,6 +47,10 @@ public class PipelineStepOrchestrator {
                 log.info("Step is BUILD_KNOWLEDGE_BASE, triggering knowledge base build for pipeline {}", pipelineConfig.getId());
                 triggerPubmedIntegration.executeBuildKnowledgeBase(pipelineConfig);
             }
+            case BUILD_KNOWLEDGE_BASE -> {
+                log.info("Step is BUILD_KNOWLEDGE_BASE completed, triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
+                triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
+            }
             default -> {
                 log.info("Step is unknown, doing nothing");
             }

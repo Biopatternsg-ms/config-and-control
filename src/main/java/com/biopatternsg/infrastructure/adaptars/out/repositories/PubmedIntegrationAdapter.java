@@ -25,6 +25,7 @@ import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
 import com.biopatternsg.infrastructure.dtos.GenerateKbRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubmedIdsRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubtatorRequest;
+import com.biopatternsg.infrastructure.dtos.GenerateAlignedObjectsRequest;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -117,6 +118,21 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         } catch (Exception e) {
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.BUILD_KNOWLEDGE_BASE, Status.FAILED);
             log.error("Error calling Pubmed API generateKb for pipeline {}", pipelineConfig.getId(), e);
+        }
+    }
+
+    @Override
+    public void executeGenerateAlignedObjects(PipelineConfig pipelineConfig) {
+        GenerateAlignedObjectsRequest request = new GenerateAlignedObjectsRequest(
+                pipelineConfig.getId()
+        );
+
+        try {
+            String userId = sessionUtil.getUserId();
+            pubmedRestClient.generateAlignedObjects(request, userId);
+            log.info("Pubmed API generateAlignedObjects called successfully for pipeline {}", pipelineConfig.getId());
+        } catch (Exception e) {
+            log.error("Error calling Pubmed API generateAlignedObjects for pipeline {}", pipelineConfig.getId(), e);
         }
     }
 }

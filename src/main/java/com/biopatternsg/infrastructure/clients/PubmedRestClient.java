@@ -19,6 +19,7 @@ import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
 import com.biopatternsg.infrastructure.dtos.GenerateKbRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubmedIdsRequest;
 import com.biopatternsg.infrastructure.dtos.SearchPubtatorRequest;
+import com.biopatternsg.infrastructure.dtos.GenerateAlignedObjectsRequest;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -42,4 +43,8 @@ public interface PubmedRestClient {
     @POST
     @Path("/pubmed/generate-kb")
     void generateKb(GenerateKbRequest request, @HeaderParam("x-user-id") String userId);
+
+    @POST
+    @Path("/pubmed/generate-aligned-objects")
+    void generateAlignedObjects(GenerateAlignedObjectsRequest request, @HeaderParam("x-user-id") String userId);
 }
