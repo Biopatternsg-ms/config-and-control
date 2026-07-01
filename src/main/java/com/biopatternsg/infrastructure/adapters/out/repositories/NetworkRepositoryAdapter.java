@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.out.repositories;
+package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
-import com.biopatternsg.infrastructure.adaptars.mappers.NetworkMapper;
-import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
+import com.biopatternsg.infrastructure.adapters.mappers.NetworkMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;

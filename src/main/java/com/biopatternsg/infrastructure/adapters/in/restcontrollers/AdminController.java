@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserManagement;
-import com.biopatternsg.infrastructure.adaptars.mappers.UserMapper;
+import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;

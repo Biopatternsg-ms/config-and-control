@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;

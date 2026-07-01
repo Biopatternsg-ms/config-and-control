@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.*;
-import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
+import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.*;
 import jakarta.validation.Valid;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -70,6 +70,8 @@ public class PipelineController {
                 .build();
     }
 
+    //Segmentar la función para recibir los datos en dtos diferentes, todos llaman al mismo caso de uso y se
+    //define un switch dentro de él
     @PUT
     @Operation(
         summary = "Update pipeline configuration",
@@ -89,7 +91,7 @@ public class PipelineController {
             )
         )
     })
-    public PipelineConfig update(@Valid UpdatePipelineRequest updatePipeline){
+    public PipelineConfig updateInit(@Valid UpdatePipelineRequest updatePipeline){
 
         return this.updatePipeline.execute(PipelineMapper.requestToConfig(updatePipeline));
     }

@@ -1,4 +1,4 @@
-package com.biopatternsg.infrastructure.adaptars.mappers;
+package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;

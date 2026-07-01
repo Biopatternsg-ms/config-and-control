@@ -15,9 +15,10 @@
  */
 package com.biopatternsg.domain.port.in;
 
+import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.models.PipelineConfig;
 
 public interface UpdatePipeline {
 
-    PipelineConfig execute(PipelineConfig updatePipeline);
+    PipelineConfig execute(PipelineConfig updatePipeline, UpdatePipelineEnum pipelineEnum);
 }

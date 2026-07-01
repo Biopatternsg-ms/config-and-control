@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.out.repositories;
+package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.enums.PipelineSteps;

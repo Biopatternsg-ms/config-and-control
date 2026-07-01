@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.out.repositories;
+package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
+import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.mongo_db.repositories.PipelineRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;

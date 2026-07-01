@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.mappers;
+package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.infrastructure.dtos.CreateNetworkRequest;

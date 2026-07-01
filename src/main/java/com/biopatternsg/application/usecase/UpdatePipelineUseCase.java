@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.UpdatePipeline;
@@ -29,7 +30,7 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private final PipelineRepository pipelineRepository;
 
     @Override
-    public PipelineConfig execute(PipelineConfig pipelineConfig) {
+    public PipelineConfig execute(PipelineConfig pipelineConfig, UpdatePipelineEnum pipelineEnum) {
 
         //Pipeline don't exists
         var pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
@@ -42,6 +43,11 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
+        switch (pipelineEnum){
+            case INIT -> updateDescription(pipelineConfig, pipelineConfigCurrent);
+            case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineConfigCurrent);
+            case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineConfigCurrent);
+        }
         if (pipelineConfig.getName() != null)
             pipelineConfigCurrent.setName(pipelineConfig.getName());
         if (pipelineConfig.getDescription() != null)
@@ -54,5 +60,17 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
 
         return pipelineRepository.save(pipelineConfigCurrent);
+    }
+
+    private void updateDescription(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setDescription(pipelineRequest.getDescription());
+    }
+
+    private void updateTranscriptionFactor(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setTranscriptionFactorConfig(pipelineRequest.getTranscriptionFactorConfig());
+    }
+
+    private void updateExportObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setExpertObjects(pipelineRequest.getExpertObjects());
     }
 }
