@@ -171,7 +171,7 @@ public class PipelineController {
     })
     public Response launch(@PathParam("id") String pipelineId){
         launchPipeline.execute(pipelineId);
-        return Response.accepted().entity("Pipeline launched: " + pipelineId).build();
+        return Response.accepted().entity("Pipeline launched").build();
     }
 
     @PATCH
