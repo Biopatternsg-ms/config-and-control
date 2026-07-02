@@ -23,6 +23,8 @@ import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+
 @ApplicationScoped
 @RequiredArgsConstructor
 public class UpdatePipelineUseCase implements UpdatePipeline {
@@ -33,33 +35,23 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     public PipelineConfig execute(PipelineConfig pipelineConfig, UpdatePipelineEnum pipelineEnum) {
 
         //Pipeline don't exists
-        var pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
-        if(pipelineConfigCurrent == null){
+        var pipelineCurrent = pipelineRepository.findById(pipelineConfig.getId());
+        if(pipelineCurrent == null){
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
         //Pipeline exists in network
-        var findPipelineName = pipelineRepository.findByNameExists(pipelineConfigCurrent.getNetworkId(), pipelineConfig.getName());
-        if(findPipelineName != null && pipelineConfig.getName() != null){
+        var findPipelineName = pipelineRepository.findByNameExists(pipelineCurrent.getNetworkId(), pipelineCurrent.getName());
+        if(findPipelineName != null && !Objects.equals(findPipelineName.getId(), pipelineCurrent.getId())){
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
         switch (pipelineEnum){
-            case INIT -> updateDescription(pipelineConfig, pipelineConfigCurrent);
-            case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineConfigCurrent);
-            case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineConfigCurrent);
+            case DESCRIPTION -> updateDescription(pipelineConfig, pipelineCurrent);
+            case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineCurrent);
+            case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineCurrent);
         }
-        if (pipelineConfig.getName() != null)
-            pipelineConfigCurrent.setName(pipelineConfig.getName());
-        if (pipelineConfig.getDescription() != null)
-            pipelineConfigCurrent.setDescription(pipelineConfig.getDescription());
-        if (pipelineConfig.getLevels() != null)
-            pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
-        if (pipelineConfig.getExpertObjects() != null)
-            pipelineConfigCurrent.setExpertObjects(pipelineConfig.getExpertObjects());
-        if (pipelineConfig.getTranscriptionFactorConfig() != null)
-            pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
 
-        return pipelineRepository.save(pipelineConfigCurrent);
+        return pipelineRepository.save(pipelineCurrent);
     }
 
     private void updateDescription(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){

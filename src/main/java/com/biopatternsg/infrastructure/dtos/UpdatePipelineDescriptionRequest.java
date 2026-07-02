@@ -15,12 +15,16 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
 import jakarta.validation.constraints.NotNull;
 
-public record RefreshTokenRequest (
-        @NotNull
-        @JsonProperty("refresh_token")
-        String refreshToken
+import java.util.List;
+
+public record UpdatePipelineDescriptionRequest(
+
+        @NotNull String id,
+        @NotNull String name,
+        @NotNull String description
 ) {
 }

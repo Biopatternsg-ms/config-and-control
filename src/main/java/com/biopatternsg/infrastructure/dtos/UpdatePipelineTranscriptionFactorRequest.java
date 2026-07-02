@@ -21,13 +21,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record UpdatePipelineRequest(
+public record UpdatePipelineTranscriptionFactorRequest(
 
         @NotNull String id,
-        String name,
-        String description,
-        Integer levels,
-        List<ExpertObjectConfig> expertObjects,
-        TranscriptionFactorConfig transcriptionFactorConfig
+        @NotNull TranscriptionFactorConfig transcriptionFactorConfig
 ) {
 }

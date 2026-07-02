@@ -95,31 +95,41 @@ public class PipelineMapper {
         return pipelineCollectionList.stream().map(PipelineMapper::configToResponse).toList();
     }
 
-    public static PipelineConfig requestToConfig(CreatePipelineRequest createPipeline){
+    public static PipelineConfig requestToCreate(CreatePipelineRequest createPipeline){
 
         return PipelineConfig.builder()
                 .name(createPipeline.name())
                 .description(createPipeline.description())
                 .networkId(createPipeline.networkId())
-                .levels(createPipeline.levels())
-                .expertObjects(createPipeline.expertObjects())
-                .transcriptionFactorConfig(createPipeline.transcriptionFactorConfig())
                 .build();
     }
 
-    public static PipelineConfig requestToConfig(UpdatePipelineRequest updatePipeline){
+    public static PipelineConfig requestToUpdate(UpdatePipelineDescriptionRequest updatePipeline){
 
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .name(updatePipeline.name())
                 .description(updatePipeline.description())
-                .levels(updatePipeline.levels())
-                .expertObjects(updatePipeline.expertObjects())
+                .build();
+    }
+
+    public static PipelineConfig requestToUpdate(UpdatePipelineTranscriptionFactorRequest updatePipeline){
+
+        return PipelineConfig.builder()
+                .id(updatePipeline.id())
                 .transcriptionFactorConfig(updatePipeline.transcriptionFactorConfig())
                 .build();
     }
 
-    public static PipelineConfig requestToConfig(FindPipelineRequest findPipeline){
+    public static PipelineConfig requestToUpdate(UpdatePipelineExpertObjectsRequest updatePipeline){
+
+        return PipelineConfig.builder()
+                .id(updatePipeline.id())
+                .expertObjects(updatePipeline.expertObjects())
+                .build();
+    }
+
+    public static PipelineConfig requestToUpdate(FindPipelineRequest findPipeline){
 
         return PipelineConfig.builder()
                 .id(findPipeline.id())

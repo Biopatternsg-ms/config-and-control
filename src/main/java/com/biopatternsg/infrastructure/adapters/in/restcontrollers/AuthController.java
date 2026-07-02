@@ -88,7 +88,7 @@ public class AuthController {
     })
     public Response refreshToken(@Valid RefreshTokenRequest refreshTokenRequest){
 
-        UserAuth token = userAuthentication.refreshToken(refreshTokenRequest.getRefreshToken());
+        UserAuth token = userAuthentication.refreshToken(refreshTokenRequest.refreshToken());
         return Response.ok(token).build();
     }
 
@@ -114,7 +114,7 @@ public class AuthController {
     })
     public Response recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
 
-        return userAuthentication.recoveryPassword(recoveryPasswordRequest.getUsername());
+        return userAuthentication.recoveryPassword(recoveryPasswordRequest.username());
     }
 
 }
