@@ -63,6 +63,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
+    @Override
     public Response register(UserConfig userConfig) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
