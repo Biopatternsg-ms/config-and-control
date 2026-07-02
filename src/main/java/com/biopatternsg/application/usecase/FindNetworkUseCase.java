@@ -18,7 +18,6 @@ package com.biopatternsg.application.usecase;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.in.FindNetwork;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
-import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +40,7 @@ public class FindNetworkUseCase implements FindNetwork {
     }
 
     @Override
-    public List<NetworkConfig> byFilters(FindNetworkRequest findNetworkRequest) {
-        return networkRepository.findByFilters(findNetworkRequest);
+    public List<NetworkConfig> byFilters(NetworkConfig findNetwork, int page, int size) {
+        return networkRepository.findByFilters(findNetwork, page, size);
     }
 }

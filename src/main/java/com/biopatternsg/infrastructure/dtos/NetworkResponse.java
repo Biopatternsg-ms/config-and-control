@@ -15,17 +15,14 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
 import lombok.Builder;
 
 @Builder
-public record PipelineResponse(
-
+public record NetworkResponse(
         String id,
-        String networkId,
+        String userId,
         String name,
         String description,
-        PipelineSteps step,
         int createdAt
 ) {
 }

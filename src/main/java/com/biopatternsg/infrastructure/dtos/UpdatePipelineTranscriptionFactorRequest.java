@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.models.user_registration;
+package com.biopatternsg.infrastructure.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
+import jakarta.validation.constraints.NotNull;
 
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
-public class UserCredentials {
-    String type;
-    String value;
-    boolean temporary;
+import java.util.List;
+
+public record UpdatePipelineTranscriptionFactorRequest(
+
+        @NotNull String id,
+        @NotNull TranscriptionFactorConfig transcriptionFactorConfig
+) {
 }

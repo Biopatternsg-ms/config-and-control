@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.in.CreateNetwork;
 import com.biopatternsg.domain.port.in.FindNetwork;
 import com.biopatternsg.domain.port.in.UpdateNetwork;
+import com.biopatternsg.infrastructure.adapters.mappers.NetworkMapper;
 import com.biopatternsg.infrastructure.dtos.CreateNetworkRequest;
 import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
+import com.biopatternsg.infrastructure.dtos.NetworkResponse;
 import com.biopatternsg.infrastructure.dtos.UpdateNetworkRequest;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -67,7 +69,7 @@ public class NetworkController {
     public Response create(@Valid CreateNetworkRequest newNetwork){
 
         return Response.status(Response.Status.CREATED)
-                .entity(createNetwork.execute(newNetwork))
+                .entity(createNetwork.execute(NetworkMapper.requestToModel(newNetwork)))
                 .build();
     }
 
@@ -90,9 +92,9 @@ public class NetworkController {
             )
         )
     })
-    public NetworkConfig update(@Valid UpdateNetworkRequest networkRequest){
+    public NetworkConfig update(@Valid UpdateNetworkRequest updateNetworkRequest){
 
-        return updateNetwork.execute(networkRequest);
+        return updateNetwork.execute(NetworkMapper.requestToModel(updateNetworkRequest));
     }
 
     @GET
@@ -139,8 +141,10 @@ public class NetworkController {
                     )
             )
     })
-    public List<NetworkConfig> findList(FindNetworkRequest findNetworkRequest){
+    public List<NetworkResponse> findList(FindNetworkRequest networkFilters){
 
-        return findNetwork.byFilters(findNetworkRequest);
+        var networkConfigList = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
+                networkFilters.page(), networkFilters.size());
+        return NetworkMapper.toNetworkResponseList(networkConfigList);
     }
 }

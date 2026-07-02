@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos.keycloak;
+package com.biopatternsg.domain.models;
 
-public record LoginClientResponse(
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-        String access_token,
-        String refresh_token,
-        String token_type,
-        String id_token,
-        long expires_in
-) {
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+public class UserAuth {
+    String access_token;
+    String refresh_token;
+    String token_type;
+    String id_token;
+    long expires_in;
 }

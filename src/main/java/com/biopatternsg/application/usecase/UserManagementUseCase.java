@@ -15,13 +15,10 @@
  */
 package com.biopatternsg.application.usecase;
 
-import com.biopatternsg.domain.models.UserRegister;
-import com.biopatternsg.domain.models.user_registration.UserCredentials;
+import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
-import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -34,26 +31,9 @@ public class UserManagementUseCase implements UserManagement {
     private final KeycloakRepository keycloakRepository;
 
     @Override
-    public void register(UserRequest request) {
+    public void register(UserConfig userConfig) {
 
-        var credentials = UserCredentials.builder()
-                .value(request.password())
-                .type("password")
-                .temporary(false)
-                .build();
-
-        var newUser = UserRegister.builder()
-                .email(request.username())
-                .username(request.username())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .enabled(true)
-                .emailVerified(false)
-                .credentials(List.of(credentials))
-                .requiredActions(List.of("VERIFY_EMAIL"))
-                .build();
-
-        var response = keycloakRepository.register(newUser);
+        var response = keycloakRepository.register(userConfig);
         java.net.URI location = response.getLocation();
         String path = location.getPath();
         String userId = path.substring(path.lastIndexOf('/') + 1);
@@ -66,7 +46,7 @@ public class UserManagementUseCase implements UserManagement {
     }
 
     @Override
-    public List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters) {
-        return keycloakRepository.listUsers(usersKeycloakFilters);
+    public List<UserConfig> listUsers(UserFilters userFilters) {
+        return keycloakRepository.listUsers(userFilters);
     }
 }

@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.mappers;
+package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.infrastructure.dtos.CreateNetworkRequest;
+import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
+import com.biopatternsg.infrastructure.dtos.NetworkResponse;
+import com.biopatternsg.infrastructure.dtos.UpdateNetworkRequest;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
 import org.bson.types.ObjectId;
 
@@ -35,6 +39,21 @@ public class NetworkMapper {
                 .name(networkCollection.getName())
                 .description(networkCollection.getDescription())
                 .createdAt(networkCollection.id.getTimestamp())
+                .build();
+    }
+
+    public static NetworkResponse toNetworkResponse(NetworkConfig networkConfig){
+
+        if(networkConfig == null){
+            return null;
+        }
+
+        return NetworkResponse.builder()
+                .id(networkConfig.getId())
+                .userId(networkConfig.getUserId())
+                .name(networkConfig.getName())
+                .description(networkConfig.getDescription())
+                .createdAt(networkConfig.getCreatedAt())
                 .build();
     }
 
@@ -59,5 +78,36 @@ public class NetworkMapper {
     public static List<NetworkConfig> toNetworkConfigList(List<NetworkCollection> collectionList){
 
         return collectionList.stream().map(NetworkMapper::toNetworkConfig).toList();
+    }
+
+    public static List<NetworkResponse> toNetworkResponseList(List<NetworkConfig> networkConfigList){
+
+        return networkConfigList.stream().map(NetworkMapper::toNetworkResponse).toList();
+    }
+
+    public static NetworkConfig requestToModel(CreateNetworkRequest createNetwork){
+
+        return NetworkConfig.builder()
+                .name(createNetwork.name())
+                .description(createNetwork.description())
+                .build();
+    }
+
+    public static NetworkConfig requestToModel(UpdateNetworkRequest updateNetwork){
+
+        return NetworkConfig.builder()
+                .id(updateNetwork.id())
+                .name(updateNetwork.name())
+                .description(updateNetwork.description())
+                .build();
+    }
+
+    public static NetworkConfig requestToModel(FindNetworkRequest findNetwork){
+
+        return NetworkConfig.builder()
+                .id(findNetwork.id())
+                .name(findNetwork.name())
+                .description(findNetwork.description())
+                .build();
     }
 }

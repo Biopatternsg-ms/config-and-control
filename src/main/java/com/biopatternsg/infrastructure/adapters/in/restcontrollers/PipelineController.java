@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
-import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.*;
+import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.*;
 import jakarta.validation.Valid;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -66,13 +67,15 @@ public class PipelineController {
     public Response create(@Valid CreatePipelineRequest newPipeline){
 
         return Response.status(Response.Status.CREATED)
-                .entity(createPipeline.execute(newPipeline))
+                .entity(createPipeline.execute(PipelineMapper.requestToCreate(newPipeline)))
                 .build();
     }
 
+
     @PUT
+    @Path("/description")
     @Operation(
-        summary = "Update pipeline configuration",
+        summary = "Update pipeline description",
         description = "Updates an existing pipeline configuration for biological data processing workflows."
     )
     @APIResponses({
@@ -83,15 +86,68 @@ public class PipelineController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = PipelineConfig.class,
+                    implementation = UpdatePipelineDescriptionRequest.class,
                     description = "Updated pipeline configuration"
                 )
             )
         )
     })
-    public PipelineConfig update(UpdatePipelineRequest pipelineRequest){
+    public PipelineConfig updateDescription(@Valid UpdatePipelineDescriptionRequest updatePipeline){
 
-        return updatePipeline.execute(pipelineRequest);
+        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+                UpdatePipelineEnum.DESCRIPTION);
+    }
+
+    @PUT
+    @Path("/transcription-factor")
+    @Operation(
+            summary = "Update pipeline transcription factor",
+            description = "Updates an existing pipeline configuration for biological data processing workflows."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipeline configuration successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UpdatePipelineTranscriptionFactorRequest.class,
+                                    description = "Updated pipeline configuration"
+                            )
+                    )
+            )
+    })
+    public PipelineConfig updateTranscriptionFactor(@Valid UpdatePipelineTranscriptionFactorRequest updatePipeline){
+
+        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+                UpdatePipelineEnum.TRANSCRIPTION_FACTOR);
+    }
+
+    @PUT
+    @Path("/expert-objects")
+    @Operation(
+            summary = "Update pipeline expert objects",
+            description = "Updates an existing pipeline configuration for biological data processing workflows."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipeline configuration successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UpdatePipelineExpertObjectsRequest.class,
+                                    description = "Updated pipeline configuration"
+                            )
+                    )
+            )
+    })
+    public PipelineConfig updateExpertObjects(@Valid UpdatePipelineExpertObjectsRequest updatePipeline){
+
+        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+                UpdatePipelineEnum.EXPERT_OBJETS);
     }
 
     @POST
@@ -113,9 +169,9 @@ public class PipelineController {
             )
         )
     })
-    public Response launch(LaunchPipelineRequest pipelineRequest){
-        launchPipeline.execute(pipelineRequest);
-        return Response.accepted().entity("Pipeline launched: " + pipelineRequest).build();
+    public Response launch(@PathParam("id") String pipelineId){
+        launchPipeline.execute(pipelineId);
+        return Response.accepted().entity("Pipeline launched").build();
     }
 
     @PATCH
@@ -138,7 +194,7 @@ public class PipelineController {
         )
     })
     public Response updateStep(@Valid PipelineStepRequest stepRequest){
-        updatePipelineStep.execute(stepRequest);
+        updatePipelineStep.execute(stepRequest.id(), PipelineMapper.requestToStatus(stepRequest));
 
         return Response.accepted().entity("updated").build();
     }
@@ -187,8 +243,10 @@ public class PipelineController {
                     )
             )
     })
-    public List<PipelineResponse> findList(FindPipelineRequest findPipelineRequest){
+    public List<PipelineResponse> findList(FindPipelineRequest pipelineFilters){
 
-        return findPipeline.byFilters(findPipelineRequest);
+        var pipelineConfigList = findPipeline.byFilters(PipelineMapper.requestToUpdate(pipelineFilters),
+                pipelineFilters.page(), pipelineFilters.size());
+        return PipelineMapper.collectionToResponseList(pipelineConfigList);
     }
 }

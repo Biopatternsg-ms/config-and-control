@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.domain.models;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@AllArgsConstructor
+@Setter
+@Getter
 @Builder
-public record PipelineResponse(
+public class UserFilters {
 
-        String id,
-        String networkId,
-        String name,
-        String description,
-        PipelineSteps step,
-        int createdAt
-) {
+    String username;
+    String email;
+    String search;
+    Boolean enable;
 }

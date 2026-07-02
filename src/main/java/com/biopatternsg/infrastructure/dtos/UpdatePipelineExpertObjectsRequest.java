@@ -15,17 +15,14 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import lombok.Builder;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import jakarta.validation.constraints.NotNull;
 
-@Builder
-public record PipelineResponse(
+import java.util.List;
 
-        String id,
-        String networkId,
-        String name,
-        String description,
-        PipelineSteps step,
-        int createdAt
+public record UpdatePipelineExpertObjectsRequest(
+
+        @NotNull String id,
+        @NotNull List<ExpertObjectConfig> expertObjects
 ) {
 }

@@ -15,9 +15,9 @@
  */
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.infrastructure.dtos.PipelineStepRequest;
+import com.biopatternsg.domain.models.PipelineStatus;
 
 public interface UpdatePipelineStep {
 
-    void execute(PipelineStepRequest stepRequest);
+    void execute(String pipelineId, PipelineStatus pipelineStatus);
 }

@@ -15,22 +15,16 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
-import jakarta.ws.rs.QueryParam;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-@Setter
-@Builder
-public class UsersKeycloakFiltersRequest{
+import java.util.List;
 
-    @QueryParam("username")
-    String username;
-    @QueryParam("email")
-    String email;
-    @QueryParam("search")
-    String search;
-    @QueryParam("enabled")
-    Boolean enable;
+public record UpdatePipelineDescriptionRequest(
+
+        @NotNull String id,
+        @NotNull String name,
+        @NotNull String description
+) {
 }

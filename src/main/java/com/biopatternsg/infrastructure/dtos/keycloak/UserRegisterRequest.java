@@ -15,13 +15,20 @@
  */
 package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
-public record UserRequest(
-        @NotNull @Email String username,
-        @NotNull String firstName,
-        @NotNull String lastName,
-        @NotNull String password
+import java.util.List;
+
+@Builder
+public record UserRegisterRequest(
+        String username,
+        String email,
+        String firstName,
+        String lastName,
+        boolean enabled,
+        boolean emailVerified,
+        List<String>realmRoles,
+        List<UserCredentialsRequest> credentials,
+        List<String> requiredActions
 ) {
 }

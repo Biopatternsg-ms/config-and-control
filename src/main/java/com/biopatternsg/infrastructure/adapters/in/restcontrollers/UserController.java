@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserManagement;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserRequest;
+import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
+import com.biopatternsg.infrastructure.dtos.UserRequest;
 import jakarta.ws.rs.GET;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -57,9 +58,9 @@ public class UserController {
             )
         )
     })
-    public Response register(@Valid UserRequest request) {
+    public Response register(@Valid UserRequest newUser) {
 
-        userManagement.register(request);
+        userManagement.register(UserMapper.userRequestToModel(newUser));
         return Response.status(Response.Status.CREATED).build();
     }
 

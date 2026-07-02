@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.domain.enums;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import lombok.Builder;
-
-@Builder
-public record PipelineResponse(
-
-        String id,
-        String networkId,
-        String name,
-        String description,
-        PipelineSteps step,
-        int createdAt
-) {
+public enum UpdatePipelineEnum {
+    DESCRIPTION, TRANSCRIPTION_FACTOR, EXPERT_OBJETS
 }

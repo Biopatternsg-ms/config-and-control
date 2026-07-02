@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserManagement;
-import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
+import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
+import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
@@ -58,7 +59,9 @@ public class AdminController {
                     )
             )
     })
-    public List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters){
-        return userManagement.listUsers(usersKeycloakFilters);
+    public List<UserResponse> listUsers(UserFiltersRequest userFilters){
+
+        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters));
+        return UserMapper.modelToResponseList(userList);
     }
 }

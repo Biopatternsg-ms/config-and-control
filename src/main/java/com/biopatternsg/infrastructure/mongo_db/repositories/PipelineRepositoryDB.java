@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
@@ -49,33 +50,35 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
                 .firstResult();
     }
 
-    public List<PipelineCollection> findByUserAndFilters(FindPipelineRequest pipelineRequest, List<String> networkIdList){
+    public List<PipelineCollection> findByUserAndFilters(PipelineConfig findPipeline,
+                                                         List<String> networkIdList, int page, int size){
 
         Document query = new Document();
         query.append("networkId", new Document("$in", networkIdList));
 
-        if(pipelineRequest == null){
+        if(findPipeline == null){
             return find(query).list();
         }
 
-        if (pipelineRequest.id() != null && !pipelineRequest.id().isEmpty()) {
-            query.append("_id", new ObjectId(pipelineRequest.id()));
+        if (findPipeline.getId() != null && !findPipeline.getId().isEmpty()) {
+            query.append("_id", new ObjectId(findPipeline.getId()));
         }
 
-        if (pipelineRequest.networkId() != null && !pipelineRequest.networkId().isEmpty()) {
-            query.append("networkId", pipelineRequest.networkId());
+        if (findPipeline.getNetworkId() != null && !findPipeline.getNetworkId().isEmpty()) {
+            query.append("networkId", findPipeline.getNetworkId());
         }
 
-        if (pipelineRequest.name() != null) {
-            query.append("name", new Document("$regex", pipelineRequest.name()).append("$options", "i"));
+        if (findPipeline.getName() != null) {
+            query.append("name", new Document("$regex", findPipeline.getName()).append("$options", "i"));
         }
 
-        if (pipelineRequest.description() != null) {
-            query.append("description", new Document("$regex", pipelineRequest.description()).append("$options", "i"));
+        if (findPipeline.getDescription() != null) {
+            query.append("description", new Document("$regex", findPipeline.getDescription()).append("$options", "i"));
         }
 
-        return find(query)
-                .page(pipelineRequest.page(), pipelineRequest.size())
-                .list();
+        if(page <= 0 || size <= 0)
+            return find(query).list();
+
+        return find(query).page(page, size).list();
     }
 }

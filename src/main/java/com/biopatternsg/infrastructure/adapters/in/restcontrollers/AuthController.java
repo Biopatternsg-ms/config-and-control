@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.in.restcontrollers;
+package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
 import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
 import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.LoginClientResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.RefreshTokenResponse;
+import com.biopatternsg.domain.models.UserAuth;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -55,7 +54,7 @@ public class AuthController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = LoginClientResponse.class,
+                    implementation = UserAuth.class,
                     description = "Authentication token response"
                 )
             )
@@ -63,7 +62,7 @@ public class AuthController {
     })
     public Response login(@Valid LoginRequest request) {
 
-        LoginClientResponse token = userAuthentication.login(request.username(), request.password());
+        UserAuth token = userAuthentication.login(request.username(), request.password());
         return Response.ok(token).build();
     }
 
@@ -81,7 +80,7 @@ public class AuthController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = RefreshTokenResponse.class,
+                                    implementation = UserAuth.class,
                                     description = "Authentication token response"
                             )
                     )
@@ -89,7 +88,7 @@ public class AuthController {
     })
     public Response refreshToken(@Valid RefreshTokenRequest refreshTokenRequest){
 
-        RefreshTokenResponse token = userAuthentication.refreshPassword(refreshTokenRequest.getRefreshToken());
+        UserAuth token = userAuthentication.refreshToken(refreshTokenRequest.refreshToken());
         return Response.ok(token).build();
     }
 
@@ -115,7 +114,7 @@ public class AuthController {
     })
     public Response recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
 
-        return userAuthentication.recoveryPassword(recoveryPasswordRequest.getUsername());
+        return userAuthentication.recoveryPassword(recoveryPasswordRequest.username());
     }
 
 }

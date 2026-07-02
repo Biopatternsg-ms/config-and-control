@@ -15,19 +15,19 @@
  */
 package com.biopatternsg.domain.port.out.repositories;
 
-import com.biopatternsg.domain.models.UserRegister;
-import com.biopatternsg.infrastructure.dtos.UsersKeycloakFiltersRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
+import com.biopatternsg.domain.models.UserAuth;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
 public interface KeycloakRepository {
 
-    Response login(String user, String pass);
-    Response register(UserRegister userRegister);
-    Response refreshToken(String refreshToken);
-    List<UserResponse> listUsers(UsersKeycloakFiltersRequest usersKeycloakFilters);
+    UserAuth login(String user, String pass);
+    UserAuth refreshToken(String refreshToken);
+    Response register(UserConfig newUser);
+    List<UserConfig> listUsers(UserFilters userFilters);
     void verifyEmail(String userId);
     void recoveryPassword(String email);
 }

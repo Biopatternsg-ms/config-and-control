@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.out.repositories;
+package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
-import com.biopatternsg.infrastructure.adaptars.mappers.NetworkMapper;
-import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
+import com.biopatternsg.infrastructure.adapters.mappers.NetworkMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -64,9 +63,10 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
     }
 
     @Override
-    public List<NetworkConfig> findByFilters(FindNetworkRequest findNetworkRequest) {
+    public List<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size) {
 
-        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetworkRequest, sessionUtil.getUserId());
+        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetwork,
+                sessionUtil.getUserId(), page, size);
         return NetworkMapper.toNetworkConfigList(networkCollectionList);
     }
 }

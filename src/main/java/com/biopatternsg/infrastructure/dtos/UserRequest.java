@@ -15,17 +15,13 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import lombok.Builder;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
-@Builder
-public record PipelineResponse(
-
-        String id,
-        String networkId,
-        String name,
-        String description,
-        PipelineSteps step,
-        int createdAt
+public record UserRequest(
+        @NotNull @Email String username,
+        @NotNull String firstName,
+        @NotNull String lastName,
+        @NotNull String password
 ) {
 }

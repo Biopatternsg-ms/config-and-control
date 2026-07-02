@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
-import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-
-public record UpdatePipelineRequest(
-
-        @NotNull String id,
-        @NotNull String name,
-        @NotNull String description,
-        @NotNull Integer levels,
-        @NotNull List<ExpertObjectConfig> expertObjects,
-        @NotNull TranscriptionFactorConfig transcriptionFactorConfig
+public record AuthenticationResponse(
+        String access_token,
+        String refresh_token,
+        String token_type,
+        String id_token,
+        long expires_in
 ) {
 }

@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.adaptars.out.repositories;
+package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.infrastructure.adaptars.mappers.PipelineMapper;
-import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
-import com.biopatternsg.infrastructure.dtos.PipelineResponse;
+import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.mongo_db.repositories.PipelineRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
@@ -43,41 +41,44 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     @Override
     public PipelineConfig save(PipelineConfig pipelineConfig) {
 
-        var pipelineCollection = PipelineMapper.toPipelineCollection(pipelineConfig);
+        var pipelineCollection = PipelineMapper.configToCollection(pipelineConfig);
         pipelineCollection.persistOrUpdate();
-        return PipelineMapper.toPipelineConfig(pipelineCollection);
+        return PipelineMapper.collectionToConfig(pipelineCollection);
     }
 
     @Override
     public PipelineConfig findById(String id) {
 
         var pipelineObject = pipelineRepositoryDB.findByIdAndUser(id, networkIdList());
-        return PipelineMapper.toPipelineConfig(pipelineObject);
+        return PipelineMapper.collectionToConfig(pipelineObject);
     }
 
     @Override
     public PipelineConfig findByName(String name) {
 
         var pipelineObject = pipelineRepositoryDB.findByName(name, networkIdList());
-        return PipelineMapper.toPipelineConfig(pipelineObject);
+        return PipelineMapper.collectionToConfig(pipelineObject);
     }
 
     @Override
     public PipelineConfig findByNameExists(String networkId, String name) {
 
         var pipelineObject = pipelineRepositoryDB.findByNameIfExists(networkId, name);
-        return PipelineMapper.toPipelineConfig(pipelineObject);
+        return PipelineMapper.collectionToConfig(pipelineObject);
     }
 
     @Override
-    public List<PipelineResponse> findByFilters(FindPipelineRequest findPipelineRequest) {
-        var pipelineObject = pipelineRepositoryDB.findByUserAndFilters(findPipelineRequest, networkIdList());
-        return PipelineMapper.toPipelineResponseList(pipelineObject);
+    public List<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size) {
+
+        var pipelineObjects = pipelineRepositoryDB.findByUserAndFilters(findPipeline,
+                networkIdList(), page, size);
+        return PipelineMapper.collectionToConfigList(pipelineObjects);
     }
 
     private List<String> networkIdList(){
 
-        var networkList = networkRepositoryDB.findByUserAndFilters(null, sessionUtil.getUserId());
+        var networkList = networkRepositoryDB.findByUserAndFilters(null,
+                sessionUtil.getUserId(), 0, 0);
         return networkList.stream()
                 .map(network -> network.id.toString())
                 .toList();

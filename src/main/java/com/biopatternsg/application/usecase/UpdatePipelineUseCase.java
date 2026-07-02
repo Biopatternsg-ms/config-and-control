@@ -15,13 +15,15 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.UpdatePipeline;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.infrastructure.dtos.UpdatePipelineRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Objects;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -30,38 +32,37 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private final PipelineRepository pipelineRepository;
 
     @Override
-    public PipelineConfig execute(UpdatePipelineRequest pipelineRequest) {
+    public PipelineConfig execute(PipelineConfig pipelineConfig, UpdatePipelineEnum pipelineEnum) {
 
-        var pipelineConfig = requestToConfig(pipelineRequest);
         //Pipeline don't exists
-        var pipelineConfigCurrent = pipelineRepository.findById(pipelineConfig.getId());
-        if(pipelineConfigCurrent == null){
+        var pipelineCurrent = pipelineRepository.findById(pipelineConfig.getId());
+        if(pipelineCurrent == null){
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
         //Pipeline exists in network
-        var findPipelineName = pipelineRepository.findByNameExists(pipelineConfigCurrent.getNetworkId(), pipelineConfig.getName());
-        if(findPipelineName != null){
+        var findPipelineName = pipelineRepository.findByNameExists(pipelineCurrent.getNetworkId(), pipelineCurrent.getName());
+        if(findPipelineName != null && !Objects.equals(findPipelineName.getId(), pipelineCurrent.getId())){
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
-        pipelineConfigCurrent.setName(pipelineConfig.getName());
-        pipelineConfigCurrent.setDescription(pipelineConfig.getDescription());
-        pipelineConfigCurrent.setLevels(pipelineConfig.getLevels());
-        pipelineConfigCurrent.setExpertObjects(pipelineConfig.getExpertObjects());
-        pipelineConfigCurrent.setTranscriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig());
+        switch (pipelineEnum){
+            case DESCRIPTION -> updateDescription(pipelineConfig, pipelineCurrent);
+            case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineCurrent);
+            case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineCurrent);
+        }
 
-        return pipelineRepository.save(pipelineConfigCurrent);
+        return pipelineRepository.save(pipelineCurrent);
     }
 
-    private PipelineConfig requestToConfig(UpdatePipelineRequest pipelineRequest){
+    private void updateDescription(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setDescription(pipelineRequest.getDescription());
+    }
 
-        return PipelineConfig.builder()
-                .id(pipelineRequest.id())
-                .name(pipelineRequest.name())
-                .description(pipelineRequest.description())
-                .levels(pipelineRequest.levels())
-                .expertObjects(pipelineRequest.expertObjects())
-                .transcriptionFactorConfig(pipelineRequest.transcriptionFactorConfig())
-                .build();
+    private void updateTranscriptionFactor(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setTranscriptionFactorConfig(pipelineRequest.getTranscriptionFactorConfig());
+    }
+
+    private void updateExportObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setExpertObjects(pipelineRequest.getExpertObjects());
     }
 }
