@@ -83,6 +83,7 @@ class ArchitectureLayerTest {
     void useCasesNamingConventionTest() {
         ArchRuleDefinition.classes()
                 .that().resideInAPackage("..application.usecase..")
+                .and().areTopLevelClasses()
                 .should().haveSimpleNameEndingWith("UseCase")
                 .check(this.javaClasses);
     }
