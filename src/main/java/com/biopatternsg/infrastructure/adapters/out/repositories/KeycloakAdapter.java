@@ -52,6 +52,7 @@ public class KeycloakAdapter implements KeycloakRepository {
     @ConfigProperty(name = "keycloak.grant-type-client")
     String grantTypeClient;
 
+    @Override
     public UserAuth login(String user, String pass) {
 
         try{
