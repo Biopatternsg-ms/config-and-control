@@ -37,6 +37,7 @@ public class PipelineCollection extends PanacheMongoEntity {
     private String description;
     private String networkId;
     private Integer levels;
+    private Integer retMax;
     private PipelineSteps step;
     private List<PipelineStatus> statuses;
     private List<ExpertObjectConfig> expertObjects;

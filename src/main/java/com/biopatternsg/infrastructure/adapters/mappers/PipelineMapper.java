@@ -38,6 +38,7 @@ public class PipelineMapper {
                 .description(pipelineCollection.getDescription())
                 .step(pipelineCollection.getStep())
                 .levels(pipelineCollection.getLevels())
+                .retMax(pipelineCollection.getRetMax() != null ? pipelineCollection.getRetMax() : 0)
                 .statuses(pipelineCollection.getStatuses())
                 .expertObjects(pipelineCollection.getExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
@@ -74,6 +75,7 @@ public class PipelineMapper {
                 .step(pipelineConfig.getStep())
                 .statuses(pipelineConfig.getStatuses())
                 .levels(pipelineConfig.getLevels())
+                .retMax(pipelineConfig.getRetMax())
                 .expertObjects(pipelineConfig.getExpertObjects())
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
                 .build();
