@@ -18,6 +18,7 @@ package com.biopatternsg.application.services;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
+import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PipelineStepOrchestrator {
 
     private final TriggerPubmedIntegration triggerPubmedIntegration;
+    private final BiologicalObjectRepository biologicalObjectRepository;
 
     public void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step) {
         switch (step) {
@@ -50,6 +52,10 @@ public class PipelineStepOrchestrator {
             case BUILD_KNOWLEDGE_BASE -> {
                 log.info("Step is BUILD_KNOWLEDGE_BASE completed, triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
                 triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
+            }
+            case GENERATE_ALIGNED_OBJECTS -> {
+                log.info("Step is GENERATE_ALIGNED_OBJECTS completed, triggering synonyms update for pipeline {}", pipelineConfig.getId());
+                biologicalObjectRepository.updateSynonyms(pipelineConfig);
             }
             default -> {
                 log.info("Step is unknown, doing nothing");

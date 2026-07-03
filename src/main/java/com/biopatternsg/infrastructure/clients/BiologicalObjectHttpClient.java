@@ -19,6 +19,7 @@ import com.biopatternsg.infrastructure.dtos.LaunchPipelineInternalRequest;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -28,4 +29,8 @@ public interface BiologicalObjectHttpClient {
     @POST
     @Path("/biological-object/launch-pipeline")
     String launch(@RequestBody LaunchPipelineInternalRequest pipelineRequest, @HeaderParam("x-user-id") String userId);
+
+    @POST
+    @Path("/biological-object/update-synonyms/{pipelineId}")
+    void updateSynonyms(@PathParam("pipelineId") String pipelineId, @HeaderParam("x-user-id") String userId);
 }
