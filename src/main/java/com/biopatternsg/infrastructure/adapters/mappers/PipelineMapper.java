@@ -129,6 +129,15 @@ public class PipelineMapper {
                 .build();
     }
 
+    public static PipelineConfig requestToUpdate(UpdatePipelineSearchConfigRequest updatePipeline){
+
+        return PipelineConfig.builder()
+                .id(updatePipeline.id())
+                .levels(updatePipeline.levels())
+                .retMax(updatePipeline.retMax())
+                .build();
+    }
+
     public static PipelineConfig requestToUpdate(FindPipelineRequest findPipeline){
 
         return PipelineConfig.builder()
