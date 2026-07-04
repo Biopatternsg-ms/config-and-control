@@ -195,8 +195,8 @@ public class PipelineController {
             )
         )
     })
-    public Response launch(@PathParam("id") String pipelineId){
-        launchPipeline.execute(pipelineId);
+    public Response launch(LaunchPipelineRequest launchPipelineRequest){
+        launchPipeline.execute(launchPipelineRequest.pipelineId());
         return Response.accepted().entity("Pipeline launched").build();
     }
 
