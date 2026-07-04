@@ -150,6 +150,32 @@ public class PipelineController {
                 UpdatePipelineEnum.EXPERT_OBJETS);
     }
 
+    @PUT
+    @Path("/search-config")
+    @Operation(
+            summary = "Update pipeline search configuration",
+            description = "Updates the search level and maximum Pubtator results (retMax) of an existing pipeline."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipeline search configuration successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UpdatePipelineSearchConfigRequest.class,
+                                    description = "Updated pipeline configuration"
+                            )
+                    )
+            )
+    })
+    public PipelineConfig updateSearchConfig(@Valid UpdatePipelineSearchConfigRequest updatePipeline){
+
+        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+                UpdatePipelineEnum.SEARCH_CONFIG);
+    }
+
     @POST
     @Path("/launch")
     @Operation(
@@ -169,8 +195,8 @@ public class PipelineController {
             )
         )
     })
-    public Response launch(@PathParam("id") String pipelineId){
-        launchPipeline.execute(pipelineId);
+    public Response launch(LaunchPipelineRequest launchPipelineRequest){
+        launchPipeline.execute(launchPipelineRequest.pipelineId());
         return Response.accepted().entity("Pipeline launched").build();
     }
 
