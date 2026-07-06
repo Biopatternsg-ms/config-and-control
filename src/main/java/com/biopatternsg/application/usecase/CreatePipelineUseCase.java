@@ -16,6 +16,7 @@
 package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
@@ -47,6 +48,7 @@ public class CreatePipelineUseCase implements CreatePipeline {
 
         //Build pipelineConfig
         pipelineConfig.setStep(PipelineSteps.CONFIG);
+        pipelineConfig.addStatus(Status.IN_PROGRESS);
         return pipelineRepository.save(pipelineConfig);
     }
 }

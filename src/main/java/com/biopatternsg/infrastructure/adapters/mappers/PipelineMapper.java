@@ -21,7 +21,9 @@ import com.biopatternsg.infrastructure.dtos.*;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import org.bson.types.ObjectId;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class PipelineMapper {
 
@@ -42,6 +44,7 @@ public class PipelineMapper {
                 .statuses(pipelineCollection.getStatuses())
                 .expertObjects(pipelineCollection.getExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
+                .useOnlyPrincipalName(pipelineCollection.getUseOnlyPrincipalName() != null ? pipelineCollection.getUseOnlyPrincipalName() : true)
                 .createdAt(pipelineCollection.id.getTimestamp())
                 .build();
     }
@@ -59,7 +62,19 @@ public class PipelineMapper {
                 .description(pipelineConfig.getDescription())
                 .step(pipelineConfig.getStep())
                 .createdAt(pipelineConfig.getCreatedAt())
+                .status(getMostRecentStatus(pipelineConfig.getStatuses()))
                 .build();
+    }
+
+    private static PipelineStatus getMostRecentStatus(List<PipelineStatus> statuses) {
+        if (statuses == null || statuses.isEmpty()) {
+            return null;
+        }
+        return statuses.stream()
+                .filter(Objects::nonNull)
+                .filter(status -> status.getCreatedAt() != null)
+                .max(Comparator.comparing(PipelineStatus::getCreatedAt))
+                .orElse(null);
     }
 
     public static PipelineCollection configToCollection(PipelineConfig pipelineConfig){
@@ -76,6 +91,7 @@ public class PipelineMapper {
                 .statuses(pipelineConfig.getStatuses())
                 .levels(pipelineConfig.getLevels())
                 .retMax(pipelineConfig.getRetMax())
+                .useOnlyPrincipalName(pipelineConfig.isUseOnlyPrincipalName())
                 .expertObjects(pipelineConfig.getExpertObjects())
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
                 .build();
@@ -137,6 +153,7 @@ public class PipelineMapper {
                 .id(updatePipeline.id())
                 .levels(updatePipeline.levels())
                 .retMax(updatePipeline.retMax())
+                .useOnlyPrincipalName(updatePipeline.useOnlyPrincipalName() != null ? updatePipeline.useOnlyPrincipalName() : true)
                 .build();
     }
 
