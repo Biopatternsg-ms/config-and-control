@@ -21,6 +21,7 @@ public record UpdatePipelineSearchConfigRequest(
 
         @NotNull String id,
         @NotNull Integer levels,
-        @NotNull Integer retMax
+        @NotNull Integer retMax,
+        Boolean useOnlyPrincipalName
 ) {
 }
