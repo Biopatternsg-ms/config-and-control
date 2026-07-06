@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
@@ -71,5 +72,14 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
         pipelineCurrent.setLevels(pipelineRequest.getLevels());
         pipelineCurrent.setRetMax(pipelineRequest.getRetMax());
         pipelineCurrent.setUseOnlyPrincipalName(pipelineRequest.isUseOnlyPrincipalName());
+
+        // CONFIG status transitions to COMPLETED only when step 1 (name, description) and step 4 (levels, retMax) fields are complete
+        if (pipelineCurrent.getName() != null && !pipelineCurrent.getName().trim().isEmpty() &&
+            pipelineCurrent.getDescription() != null && !pipelineCurrent.getDescription().trim().isEmpty() &&
+            pipelineCurrent.getLevels() != null && pipelineCurrent.getLevels() > 0 &&
+            pipelineCurrent.getRetMax() > 0) {
+            
+            pipelineCurrent.addStatus(Status.COMPLETED);
+        }
     }
 }
