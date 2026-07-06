@@ -70,5 +70,6 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setLevels(pipelineRequest.getLevels());
         pipelineCurrent.setRetMax(pipelineRequest.getRetMax());
+        pipelineCurrent.setUseOnlyPrincipalName(pipelineRequest.isUseOnlyPrincipalName());
     }
 }
