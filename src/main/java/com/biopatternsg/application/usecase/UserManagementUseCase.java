@@ -49,7 +49,23 @@ public class UserManagementUseCase implements UserManagement {
     }
 
     @Override
+    public void syncUsers(){
+        var keycloakList = keycloakRepository.listUsers(UserFilters.builder().build());
+        var apiRestList = userRepository.list(UserFilters.builder().build());
+
+        var apiRestIds = apiRestList.stream()
+                .map(UserConfig::getId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        for (UserConfig keycloakUser : keycloakList) {
+            if (keycloakUser.getId() != null && !apiRestIds.contains(keycloakUser.getId())) {
+                userRepository.create(keycloakUser);
+            }
+        }
+    }
+
+    @Override
     public List<UserConfig> listUsers(UserFilters userFilters) {
-        return keycloakRepository.listUsers(userFilters);
+        return userRepository.list(userFilters);
     }
 }

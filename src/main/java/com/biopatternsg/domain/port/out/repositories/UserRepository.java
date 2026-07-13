@@ -16,11 +16,12 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
 
 import java.util.List;
 
 public interface UserRepository {
 
     void create(UserConfig userConfig);
-    List<UserConfig> list(UserConfig userConfig);
+    List<UserConfig> list(UserFilters userFilters);
 }

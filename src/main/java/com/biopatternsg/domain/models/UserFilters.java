@@ -27,7 +27,7 @@ import lombok.Setter;
 public class UserFilters {
 
     String username;
-    String email;
-    String search;
+    String firstName;
+    String lastName;
     Boolean enable;
 }

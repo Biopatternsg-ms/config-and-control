@@ -16,11 +16,13 @@
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 import com.biopatternsg.infrastructure.mongo_db.repositories.UserRepositoryDB;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.List;
 @ApplicationScoped
 public class UserRepositoryAdapter implements UserRepository {
 
+    @Inject
     UserRepositoryDB userRepositoryDB;
 
     @Override
@@ -38,8 +41,8 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public List<UserConfig> list(UserConfig userConfig) {
-        List<UserCollection> collections = userRepositoryDB.findByFilters(userConfig);
+    public List<UserConfig> list(UserFilters userFilters) {
+        List<UserCollection> collections = userRepositoryDB.findByFilters(userFilters);
         return collections.stream()
                 .map(UserMapper::toDomain)
                 .toList();

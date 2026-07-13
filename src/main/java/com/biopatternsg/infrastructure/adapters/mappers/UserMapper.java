@@ -41,8 +41,8 @@ public class UserMapper {
 
         return UserFilters.builder()
                 .username(userFilters.username())
-                .email(userFilters.email())
-                .search(userFilters.search())
+                .firstName(userFilters.firstName())
+                .lastName(userFilters.lastName())
                 .enable(userFilters.enable())
                 .build();
     }

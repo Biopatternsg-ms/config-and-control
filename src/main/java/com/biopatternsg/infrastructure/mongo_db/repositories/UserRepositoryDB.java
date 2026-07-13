@@ -15,9 +15,9 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
-import com.biopatternsg.domain.models.UserConfig;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -50,7 +50,7 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
                 .list();
     }
 
-    public List<UserCollection> findByFilters(UserConfig findUser) {
+    public List<UserCollection> findByFilters(UserFilters findUser) {
         Document query = new Document();
         
         if (findUser == null) {

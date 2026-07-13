@@ -23,7 +23,7 @@ import lombok.Setter;
 @Builder
 public record UserFiltersRequest(
         @QueryParam("username") String username,
-        @QueryParam("email") String email,
-        @QueryParam("search") String search,
+        @QueryParam("firstName") String firstName,
+        @QueryParam("lastName") String lastName,
         @QueryParam("enabled") Boolean enable
 ) {}

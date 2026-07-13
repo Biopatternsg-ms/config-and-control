@@ -70,6 +70,7 @@ public class AdminController {
     }
 
     @POST
+    @Path("/users")
     @Operation(
             summary = "Register new user",
             description = "Registers a new user in the system with the provided credentials and information."
@@ -91,5 +92,30 @@ public class AdminController {
 
         userManagement.register(UserMapper.userRequestToModel(newUser));
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    @GET
+    @Path("/sync-users")
+    @Operation(
+            summary = "List keycloak users",
+            description = "List keycloak users with option to apply same filters"
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Users list successfully obtained",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UserResponse.class,
+                                    description = "Users list obtained"
+                            )
+                    )
+            )
+    })
+    public void syncUsers(){
+
+        userManagement.syncUsers();
     }
 }
