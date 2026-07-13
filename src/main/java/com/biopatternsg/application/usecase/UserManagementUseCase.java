@@ -19,6 +19,7 @@ import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
+import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -29,11 +30,13 @@ import java.util.List;
 public class UserManagementUseCase implements UserManagement {
 
     private final KeycloakRepository keycloakRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void register(UserConfig userConfig) {
 
         var response = keycloakRepository.register(userConfig);
+        userRepository.create(userConfig);
         java.net.URI location = response.getLocation();
         String path = location.getPath();
         String userId = path.substring(path.lastIndexOf('/') + 1);

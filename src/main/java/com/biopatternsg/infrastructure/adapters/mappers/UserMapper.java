@@ -20,6 +20,7 @@ import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 
 import java.util.List;
 
@@ -63,5 +64,25 @@ public class UserMapper {
     public static List<UserResponse> modelToResponseList(List<UserConfig> userList){
 
         return userList.stream().map(UserMapper::toResponse).toList();
+    }
+
+    public static UserCollection toCollection(UserConfig userConfig) {
+        if (userConfig == null) return null;
+        return UserCollection.builder()
+                .keycloakId(userConfig.getId())
+                .username(userConfig.getUsername())
+                .firstName(userConfig.getFirstName())
+                .lastName(userConfig.getLastName())
+                .build();
+    }
+
+    public static UserConfig toDomain(UserCollection collection) {
+        if (collection == null) return null;
+        return UserConfig.builder()
+                .id(collection.getKeycloakId())
+                .username(collection.getUsername())
+                .firstName(collection.getFirstName())
+                .lastName(collection.getLastName())
+                .build();
     }
 }
