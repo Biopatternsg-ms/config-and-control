@@ -64,6 +64,17 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
+    public UserAuth refreshToken(String refreshToken) {
+
+        try{
+            return keycloakHttpClient.refreshToken("refresh_token", clientId, clientSecret, refreshToken);
+        } catch (WebApplicationException e) {
+            log.info("Problemas con Keycloak: {}", e.getMessage());
+            throw new KeycloakServiceException(e.getResponse().getStatus());
+        }
+    }
+
+    @Override
     public Response register(UserConfig userConfig) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
@@ -88,17 +99,6 @@ public class KeycloakAdapter implements KeycloakRepository {
         try{
             return keycloakHttpClient.register( accessToken, newUser);
         } catch (WebApplicationException e) {
-            throw new KeycloakServiceException(e.getResponse().getStatus());
-        }
-    }
-
-    @Override
-    public UserAuth refreshToken(String refreshToken) {
-
-        try{
-            return keycloakHttpClient.refreshToken("refresh_token", clientId, clientSecret, refreshToken);
-        } catch (WebApplicationException e) {
-            log.info("Problemas con Keycloak: {}", e.getMessage());
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
     }

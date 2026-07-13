@@ -24,10 +24,11 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@MongoEntity(collection = "network")
-public class NetworkCollection extends PanacheMongoEntity {
+@MongoEntity(collection = "user")
+public class UserCollection extends PanacheMongoEntity {
 
-    private String userId;
-    private String name;
-    private String description;
+    private String keycloakId;
+    private String username;
+    private String firstName;
+    private String lastName;
 }

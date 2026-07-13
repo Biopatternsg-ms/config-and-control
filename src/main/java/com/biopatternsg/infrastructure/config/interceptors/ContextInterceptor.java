@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Provider
 @RequiredArgsConstructor
@@ -49,16 +50,38 @@ public class ContextInterceptor implements ContainerRequestFilter {
         }
 
         var context = requestContext.getHeaders();
-        validateContext(context);
+        validateUserContext(context);
+
+        if (path.contains("config-and-control/admin")) {
+            validateRoleContext(context);
+            log.info("userId no needed");
+            return;
+        }
 
         sessionUtil.setContext(context);
     }
 
-    private void validateContext(MultivaluedMap<String, String> context){
+    private void validateUserContext(MultivaluedMap<String, String> context){
 
         var userId = context.get("x-user-id");
         log.info("userId: {}", userId);
         if(userId == null){
+            throw new UnauthorizedServiceException();
+        }
+    }
+
+    private void validateRoleContext(MultivaluedMap<String, String> context){
+
+        var roles = context.get("x-user-roles");
+        log.info("roles: {}", roles);
+        if (roles == null || roles.isEmpty()) {
+            throw new UnauthorizedServiceException();
+        }
+
+        boolean hasAdmin = roles.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(r -> java.util.Arrays.asList(r.split(",")).contains("admin"));
+        if (!hasAdmin) {
             throw new UnauthorizedServiceException();
         }
     }
