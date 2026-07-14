@@ -36,10 +36,13 @@ public class UserManagementUseCase implements UserManagement {
     public void register(UserConfig userConfig) {
 
         var response = keycloakRepository.register(userConfig);
-        userRepository.create(userConfig);
         java.net.URI location = response.getLocation();
         String path = location.getPath();
         String userId = path.substring(path.lastIndexOf('/') + 1);
+
+        userConfig.setIdentityProviderId(userId);
+        userRepository.create(userConfig);
+
         keycloakRepository.verifyEmail(userId);
     }
 
@@ -54,11 +57,12 @@ public class UserManagementUseCase implements UserManagement {
         var apiRestList = userRepository.list(UserFilters.builder().build(), 0, 0);
 
         var apiRestIds = apiRestList.stream()
-                .map(UserConfig::getId)
+                .map(UserConfig::getIdentityProviderId)
                 .collect(java.util.stream.Collectors.toSet());
 
         for (UserConfig keycloakUser : keycloakList) {
             if (keycloakUser.getId() != null && !apiRestIds.contains(keycloakUser.getId())) {
+                keycloakUser.setIdentityProviderId(keycloakUser.getId());
                 userRepository.create(keycloakUser);
             }
         }

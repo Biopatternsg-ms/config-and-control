@@ -19,6 +19,7 @@ import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.RoleResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -105,5 +106,21 @@ public interface KeycloakHttpClient {
             @HeaderParam("Authorization") String token,
             @PathParam("userId") String userId,
             List<String> actions
+    );
+
+    @GET
+    @Path("/admin/realms/biopatternsg/roles")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<RoleResponse> getRoles(
+            @HeaderParam("Authorization") String token
+    );
+
+    @POST
+    @Path("/admin/realms/biopatternsg/users/{userId}/role-mappings/realm")
+    @Consumes(MediaType.APPLICATION_JSON)
+    void setRoles(
+            @HeaderParam("Authorization") String token,
+            @PathParam("userId") String userId,
+            List<RoleResponse> roles
     );
 }
