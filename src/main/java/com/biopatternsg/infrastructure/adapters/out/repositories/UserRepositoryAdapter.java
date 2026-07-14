@@ -41,8 +41,8 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public List<UserConfig> list(UserFilters userFilters) {
-        List<UserCollection> collections = userRepositoryDB.findByFilters(userFilters);
+    public List<UserConfig> list(UserFilters userFilters, int page, int size) {
+        List<UserCollection> collections = userRepositoryDB.findByFilters(userFilters, page, size);
         return collections.stream()
                 .map(UserMapper::toDomain)
                 .toList();

@@ -50,11 +50,12 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
                 .list();
     }
 
-    public List<UserCollection> findByFilters(UserFilters findUser) {
+    public List<UserCollection> findByFilters(UserFilters findUser, int page, int size) {
         Document query = new Document();
         
         if (findUser == null) {
-            return find(query).list();
+            if (page <= 0 || size <= 0) return find(query).list();
+            return find(query).page(page, size).list();
         }
 
         if (findUser.getUsername() != null && !findUser.getUsername().isEmpty()) {
@@ -69,6 +70,7 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
             query.append("lastName", new Document("$regex", findUser.getLastName()).append("$options", "i"));
         }
 
-        return find(query).list();
+        if (page <= 0 || size <= 0) return find(query).list();
+        return find(query).page(page, size).list();
     }
 }

@@ -25,5 +25,5 @@ public interface UserManagement {
     void register(UserConfig request);
     void recover(String userId);
     void syncUsers();
-    List<UserConfig> listUsers(UserFilters userFilters);
+    List<UserConfig> listUsers(UserFilters userFilters, int page, int size);
 }

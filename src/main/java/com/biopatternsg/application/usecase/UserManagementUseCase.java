@@ -51,7 +51,7 @@ public class UserManagementUseCase implements UserManagement {
     @Override
     public void syncUsers(){
         var keycloakList = keycloakRepository.listUsers(UserFilters.builder().build());
-        var apiRestList = userRepository.list(UserFilters.builder().build());
+        var apiRestList = userRepository.list(UserFilters.builder().build(), 0, 0);
 
         var apiRestIds = apiRestList.stream()
                 .map(UserConfig::getId)
@@ -65,7 +65,7 @@ public class UserManagementUseCase implements UserManagement {
     }
 
     @Override
-    public List<UserConfig> listUsers(UserFilters userFilters) {
-        return userRepository.list(userFilters);
+    public List<UserConfig> listUsers(UserFilters userFilters, int page, int size) {
+        return userRepository.list(userFilters, page, size);
     }
 }

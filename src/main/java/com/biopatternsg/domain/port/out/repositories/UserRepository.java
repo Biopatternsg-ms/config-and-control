@@ -23,5 +23,5 @@ import java.util.List;
 public interface UserRepository {
 
     void create(UserConfig userConfig);
-    List<UserConfig> list(UserFilters userFilters);
+    List<UserConfig> list(UserFilters userFilters, int page, int size);
 }

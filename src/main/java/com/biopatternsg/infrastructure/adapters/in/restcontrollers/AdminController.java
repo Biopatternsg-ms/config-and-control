@@ -65,7 +65,8 @@ public class AdminController {
     })
     public List<UserResponse> listUsers(UserFiltersRequest userFilters){
 
-        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters));
+        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters),
+                userFilters.page(), userFilters.size());
         return UserMapper.modelToResponseList(userList);
     }
 
