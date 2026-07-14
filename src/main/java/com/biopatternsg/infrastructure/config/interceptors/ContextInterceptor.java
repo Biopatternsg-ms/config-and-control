@@ -64,7 +64,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
     private void validateUserContext(MultivaluedMap<String, String> context){
 
         var userId = context.get("x-user-id");
-        log.info("userId: {}", userId);
+        // log.info("userId: {}", userId);
         if(userId == null){
             throw new UnauthorizedServiceException();
         }
@@ -73,7 +73,7 @@ public class ContextInterceptor implements ContainerRequestFilter {
     private void validateRoleContext(MultivaluedMap<String, String> context){
 
         var roles = context.get("x-user-roles");
-        log.info("roles: {}", roles);
+        // log.info("roles: {}", roles);
         if (roles == null || roles.isEmpty()) {
             throw new UnauthorizedServiceException();
         }
