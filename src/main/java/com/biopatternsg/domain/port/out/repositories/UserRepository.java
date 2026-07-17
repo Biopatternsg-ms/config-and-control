@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.mongo_db.collections;
+package com.biopatternsg.domain.port.out.repositories;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
-import lombok.*;
+import com.biopatternsg.domain.models.UserConfig;
+import com.biopatternsg.domain.models.UserFilters;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
-@MongoEntity(collection = "network")
-public class NetworkCollection extends PanacheMongoEntity {
+import java.util.List;
 
-    private String userId;
-    private String name;
-    private String description;
+public interface UserRepository {
+
+    void create(UserConfig userConfig);
+    List<UserConfig> list(UserFilters userFilters, int page, int size);
 }

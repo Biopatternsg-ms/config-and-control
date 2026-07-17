@@ -25,16 +25,12 @@ public record UserResponse(
         String id,
         @JsonProperty("username")
         String username,
-        @JsonProperty("email")
-        String email,
         @JsonProperty("firstName")
         String firstName,
         @JsonProperty("lastName")
         String lastName,
         @JsonProperty("enabled")
         String enabled,
-        @JsonProperty("emailVerified")
-        String emailVerified,
         @JsonProperty("createdTimestamp")
         int createdAt
 ) {

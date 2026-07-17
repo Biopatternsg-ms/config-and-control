@@ -64,6 +64,17 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
+    public UserAuth refreshToken(String refreshToken) {
+
+        try{
+            return keycloakHttpClient.refreshToken("refresh_token", clientId, clientSecret, refreshToken);
+        } catch (WebApplicationException e) {
+            log.info("Problemas con Keycloak: {}", e.getMessage());
+            throw new KeycloakServiceException(e.getResponse().getStatus());
+        }
+    }
+
+    @Override
     public Response register(UserConfig userConfig) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
@@ -76,29 +87,30 @@ public class KeycloakAdapter implements KeycloakRepository {
                 .lastName(userConfig.getLastName())
                 .enabled(true)
                 .emailVerified(false)
-                .credentials(
-                        List.of(UserCredentialsRequest.builder()
-                        .value(userConfig.getPassword())
-                        .type("password")
-                        .temporary(false)
-                        .build()))
-                .requiredActions(List.of("VERIFY_EMAIL"))
+                .requiredActions(List.of("UPDATE_PASSWORD"))
                 .build();
         
         try{
-            return keycloakHttpClient.register( accessToken, newUser);
+            Response response = keycloakHttpClient.register(accessToken, newUser);
+            if (response.getStatus() == 201) {
+                java.net.URI location = response.getLocation();
+                if (location != null) {
+                    String path = location.getPath();
+                    String userId = path.substring(path.lastIndexOf('/') + 1);
+                    
+                    var roles = keycloakHttpClient.getRoles(accessToken);
+                    if (roles != null) {
+                        var researcherRole = roles.stream()
+                                .filter(r -> "researcher".equals(r.getName()))
+                                .findFirst();
+                        researcherRole.ifPresent(roleResponse ->
+                                keycloakHttpClient.setRoles(accessToken, userId, List.of(roleResponse)));
+                    }
+                }
+            }
+            
+            return response;
         } catch (WebApplicationException e) {
-            throw new KeycloakServiceException(e.getResponse().getStatus());
-        }
-    }
-
-    @Override
-    public UserAuth refreshToken(String refreshToken) {
-
-        try{
-            return keycloakHttpClient.refreshToken("refresh_token", clientId, clientSecret, refreshToken);
-        } catch (WebApplicationException e) {
-            log.info("Problemas con Keycloak: {}", e.getMessage());
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
     }

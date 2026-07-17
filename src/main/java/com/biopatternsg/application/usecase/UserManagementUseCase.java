@@ -19,6 +19,7 @@ import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
+import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +30,7 @@ import java.util.List;
 public class UserManagementUseCase implements UserManagement {
 
     private final KeycloakRepository keycloakRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void register(UserConfig userConfig) {
@@ -37,6 +39,10 @@ public class UserManagementUseCase implements UserManagement {
         java.net.URI location = response.getLocation();
         String path = location.getPath();
         String userId = path.substring(path.lastIndexOf('/') + 1);
+
+        userConfig.setIdentityProviderId(userId);
+        userRepository.create(userConfig);
+
         keycloakRepository.verifyEmail(userId);
     }
 
@@ -46,7 +52,24 @@ public class UserManagementUseCase implements UserManagement {
     }
 
     @Override
-    public List<UserConfig> listUsers(UserFilters userFilters) {
-        return keycloakRepository.listUsers(userFilters);
+    public void syncUsers(){
+        var keycloakList = keycloakRepository.listUsers(UserFilters.builder().build());
+        var apiRestList = userRepository.list(UserFilters.builder().build(), 0, 0);
+
+        var apiRestIds = apiRestList.stream()
+                .map(UserConfig::getIdentityProviderId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        for (UserConfig keycloakUser : keycloakList) {
+            if (keycloakUser.getId() != null && !apiRestIds.contains(keycloakUser.getId())) {
+                keycloakUser.setIdentityProviderId(keycloakUser.getId());
+                userRepository.create(keycloakUser);
+            }
+        }
+    }
+
+    @Override
+    public List<UserConfig> listUsers(UserFilters userFilters, int page, int size) {
+        return userRepository.list(userFilters, page, size);
     }
 }

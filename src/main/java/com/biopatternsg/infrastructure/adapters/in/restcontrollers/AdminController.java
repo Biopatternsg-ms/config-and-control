@@ -18,10 +18,14 @@ package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
+import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -61,7 +65,58 @@ public class AdminController {
     })
     public List<UserResponse> listUsers(UserFiltersRequest userFilters){
 
-        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters));
+        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters),
+                userFilters.page(), userFilters.size());
         return UserMapper.modelToResponseList(userList);
+    }
+
+    @POST
+    @Path("/users")
+    @Operation(
+            summary = "Register new user",
+            description = "Registers a new user in the system with the provided credentials and information."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "201",
+                    description = "User successfully registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.STRING,
+                                    description = "Registration confirmation"
+                            )
+                    )
+            )
+    })
+    public Response register(@Valid UserRequest newUser) {
+
+        userManagement.register(UserMapper.userRequestToModel(newUser));
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @GET
+    @Path("/sync-users")
+    @Operation(
+            summary = "List keycloak users",
+            description = "List keycloak users with option to apply same filters"
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Users list successfully obtained",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UserResponse.class,
+                                    description = "Users list obtained"
+                            )
+                    )
+            )
+    })
+    public void syncUsers(){
+
+        userManagement.syncUsers();
     }
 }

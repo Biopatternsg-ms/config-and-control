@@ -15,15 +15,17 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
+import jakarta.validation.constraints.Min;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 @Builder
 public record UserFiltersRequest(
         @QueryParam("username") String username,
-        @QueryParam("email") String email,
-        @QueryParam("search") String search,
-        @QueryParam("enabled") Boolean enable
+        @QueryParam("firstName") String firstName,
+        @QueryParam("lastName") String lastName,
+        @QueryParam("enabled") Boolean enable,
+        @QueryParam("page") @DefaultValue("0") @Min(0) int page,
+        @QueryParam("size") @DefaultValue("10") int size
 ) {}

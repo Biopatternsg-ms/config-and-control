@@ -20,6 +20,7 @@ import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class UserMapper {
                 .email(newUser.username())
                 .firstName(newUser.firstName())
                 .lastName(newUser.lastName())
-                .password(newUser.password())
                 .build();
     }
 
@@ -40,8 +40,8 @@ public class UserMapper {
 
         return UserFilters.builder()
                 .username(userFilters.username())
-                .email(userFilters.email())
-                .search(userFilters.search())
+                .firstName(userFilters.firstName())
+                .lastName(userFilters.lastName())
                 .enable(userFilters.enable())
                 .build();
     }
@@ -51,11 +51,9 @@ public class UserMapper {
         return UserResponse.builder()
                 .id(userConfig.getId())
                 .username(userConfig.getUsername())
-                .email(userConfig.getEmail())
                 .firstName(userConfig.getFirstName())
                 .lastName(userConfig.getLastName())
                 .enabled(userConfig.getEnabled())
-                .emailVerified(userConfig.getEmailVerified())
                 .createdAt(userConfig.getCreatedAt())
                 .build();
     }
@@ -63,5 +61,27 @@ public class UserMapper {
     public static List<UserResponse> modelToResponseList(List<UserConfig> userList){
 
         return userList.stream().map(UserMapper::toResponse).toList();
+    }
+
+    public static UserCollection toCollection(UserConfig userConfig) {
+        if (userConfig == null) return null;
+        return UserCollection.builder()
+                .identityProviderId(userConfig.getIdentityProviderId())
+                .username(userConfig.getUsername())
+                .firstName(userConfig.getFirstName())
+                .lastName(userConfig.getLastName())
+                .enabled(userConfig.getEnabled())
+                .build();
+    }
+
+    public static UserConfig toDomain(UserCollection collection) {
+        if (collection == null) return null;
+        return UserConfig.builder()
+                .id(collection.id.toString())
+                .username(collection.getUsername())
+                .firstName(collection.getFirstName())
+                .lastName(collection.getLastName())
+                .createdAt(collection.id.getTimestamp())
+                .build();
     }
 }

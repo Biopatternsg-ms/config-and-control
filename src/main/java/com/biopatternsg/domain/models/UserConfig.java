@@ -27,12 +27,11 @@ import lombok.Setter;
 public class UserConfig {
 
     private String id;
+    private String identityProviderId;
     private String firstName;
     private String lastName;
     private String username;
     private String email;
-    private String password;
     private String enabled;
-    private String emailVerified;
     private int createdAt;
 }

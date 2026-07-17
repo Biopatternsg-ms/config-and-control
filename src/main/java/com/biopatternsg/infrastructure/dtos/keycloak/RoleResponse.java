@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.mongo_db.collections;
+package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
-@MongoEntity(collection = "network")
-public class NetworkCollection extends PanacheMongoEntity {
-
-    private String userId;
+@AllArgsConstructor
+@NoArgsConstructor
+public class RoleResponse {
+    private String id;
     private String name;
     private String description;
+    private Boolean composite;
+    private Boolean clientRole;
+    private String containerId;
 }
