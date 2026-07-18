@@ -43,6 +43,7 @@ public class PipelineConfig {
     private boolean useOnlyPrincipalName;
     private int createdAt;
     private int retMax;
+    private Integer maxComplexes;
 
     public void addStatus(Status status) {
         if(this.statuses == null) {

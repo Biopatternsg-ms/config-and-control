@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record UpdatePipelineSearchConfigRequest(
@@ -22,6 +23,7 @@ public record UpdatePipelineSearchConfigRequest(
         @NotNull String id,
         @NotNull Integer levels,
         @NotNull Integer retMax,
+        @NotNull @Min(1) Integer maxComplexes,
         Boolean useOnlyPrincipalName
 ) {
 }
