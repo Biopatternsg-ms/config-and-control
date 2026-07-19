@@ -71,13 +71,15 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setLevels(pipelineRequest.getLevels());
         pipelineCurrent.setRetMax(pipelineRequest.getRetMax());
+        pipelineCurrent.setMaxComplexes(pipelineRequest.getMaxComplexes());
         pipelineCurrent.setUseOnlyPrincipalName(pipelineRequest.isUseOnlyPrincipalName());
 
-        // CONFIG status transitions to COMPLETED only when step 1 (name, description) and step 4 (levels, retMax) fields are complete
+        // CONFIG status transitions to COMPLETED only when step 1 (name, description) and step 4 (levels, retMax, maxComplexes) fields are complete
         if (pipelineCurrent.getName() != null && !pipelineCurrent.getName().trim().isEmpty() &&
             pipelineCurrent.getDescription() != null && !pipelineCurrent.getDescription().trim().isEmpty() &&
             pipelineCurrent.getLevels() != null && pipelineCurrent.getLevels() > 0 &&
-            pipelineCurrent.getRetMax() > 0) {
+            pipelineCurrent.getRetMax() > 0 &&
+            pipelineCurrent.getMaxComplexes() != null && pipelineCurrent.getMaxComplexes() > 0) {
             
             pipelineCurrent.addStatus(Status.COMPLETED);
         }
