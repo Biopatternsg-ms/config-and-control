@@ -50,6 +50,7 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
         var pipelineBiologicalObject = new LaunchPipelineInternalRequest(
                 pipelineConfig.getId(),
                 pipelineConfig.getLevels(),
+                pipelineConfig.getMaxComplexes(),
                 pipelineConfig.getExpertObjects(),
                 pipelineConfig.getTranscriptionFactorConfig());
         return biologicalObjectHttpClient.launch(pipelineBiologicalObject, sessionUtil.getUserId());

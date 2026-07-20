@@ -24,6 +24,7 @@ public record LaunchPipelineInternalRequest(
 
         String pipelineId,
         Integer levels,
+        Integer maxComplexes,
         List<ExpertObjectConfig>expertObjects,
         TranscriptionFactorConfig transcriptionFactorConfig
 ) {
