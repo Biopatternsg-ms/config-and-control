@@ -44,6 +44,7 @@ public class PipelineController {
     private final UpdatePipeline updatePipeline;
     private final FindPipeline findPipeline;
     private final UpdatePipelineStep updatePipelineStep;
+    private final GetPipelineExecution getPipelineExecution;
 
     @POST
     @Operation(
@@ -274,5 +275,29 @@ public class PipelineController {
         var pipelineConfigList = findPipeline.byFilters(PipelineMapper.requestToUpdate(pipelineFilters),
                 pipelineFilters.page(), pipelineFilters.size());
         return PipelineMapper.collectionToResponseList(pipelineConfigList);
+    }
+
+    @GET
+    @Path("/{id}/execution")
+    @Operation(
+            summary = "Get pipeline execution progress",
+            description = "Retrieves current execution status, timeline duration, and step statuses for a pipeline."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipeline execution progress successfully obtained",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = ExperimentExecutionResponse.class,
+                                    description = "Pipeline execution status and steps"
+                            )
+                    )
+            )
+    })
+    public ExperimentExecutionResponse getExecutionProgress(@PathParam("id") String id){
+        return getPipelineExecution.execute(id);
     }
 }
