@@ -22,8 +22,8 @@ import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.domain.port.in.GetPipelineExecution;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.infrastructure.dtos.ExperimentExecutionResponse;
-import com.biopatternsg.infrastructure.dtos.PipelineStepExecutionResponse;
+import com.biopatternsg.domain.models.ExperimentExecutionResponse;
+import com.biopatternsg.domain.models.PipelineStepExecutionResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 

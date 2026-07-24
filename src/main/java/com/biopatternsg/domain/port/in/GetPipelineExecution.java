@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.infrastructure.dtos.ExperimentExecutionResponse;
+import com.biopatternsg.domain.models.ExperimentExecutionResponse;
 
 public interface GetPipelineExecution {
     ExperimentExecutionResponse execute(String pipelineId);

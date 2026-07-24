@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
+import com.biopatternsg.domain.models.ExperimentExecutionResponse;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.in.*;
 import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
