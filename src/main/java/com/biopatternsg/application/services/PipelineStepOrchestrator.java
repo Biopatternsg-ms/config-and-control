@@ -53,10 +53,6 @@ public class PipelineStepOrchestrator {
                 log.info("Step is BUILD_KNOWLEDGE_BASE completed, triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
                 triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
             }
-            case GENERATE_ALIGNED_OBJECTS -> {
-                log.info("Step is GENERATE_ALIGNED_OBJECTS completed, triggering synonyms update for pipeline {}", pipelineConfig.getId());
-                biologicalObjectRepository.updateSynonyms(pipelineConfig);
-            }
             default -> {
                 log.info("Step is unknown, doing nothing");
             }

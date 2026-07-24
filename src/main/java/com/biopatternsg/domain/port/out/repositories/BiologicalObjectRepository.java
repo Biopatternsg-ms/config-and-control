@@ -20,5 +20,4 @@ import com.biopatternsg.domain.models.PipelineConfig;
 public interface BiologicalObjectRepository {
 
     String launch(PipelineConfig pipelineConfig);
-    void updateSynonyms(PipelineConfig pipelineConfig);
 }
