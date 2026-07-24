@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos;
+package com.biopatternsg.domain.models;
 
-import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
-import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
-
-import java.util.List;
-
-public record LaunchPipelineInternalRequest(
-
-        String pipelineId,
-        Integer levels,
-        Integer maxComplexes,
-        List<ExpertObjectConfig>expertObjects,
-        TranscriptionFactorConfig transcriptionFactorConfig
-) {
-}
+public record PipelineStepExecutionResponse(
+        String id,
+        String name,
+        String status,
+        String startTime,
+        String duration,
+        String outputText,
+        String description,
+        String iconName
+) {}

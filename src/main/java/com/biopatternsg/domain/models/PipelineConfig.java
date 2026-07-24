@@ -45,16 +45,20 @@ public class PipelineConfig {
     private int retMax;
     private Integer maxComplexes;
 
-    public void addStatus(Status status) {
+    public void addStatusForStep(PipelineSteps step, Status status) {
         if(this.statuses == null) {
             this.statuses = new ArrayList<>();
         }
         this.statuses.stream()
-                .filter(ps -> ps.getStep() == this.step && ps.getStatus() == status)
+                .filter(ps -> ps.getStep() == step && ps.getStatus() == status)
                 .findFirst()
                 .ifPresentOrElse(
                         ps -> ps.setCreatedAt(new Date()),
-                        () -> this.statuses.add(new PipelineStatus(this.step, status, new Date()))
+                        () -> this.statuses.add(new PipelineStatus(step, status, new Date()))
                 );
+    }
+
+    public void addStatus(Status status) {
+        addStatusForStep(this.step, status);
     }
 }

@@ -16,6 +16,7 @@
 package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.port.in.LaunchPipeline;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
@@ -38,9 +39,18 @@ public class LaunchPipelineUseCase implements LaunchPipeline {
             throw new UnprocessableEntityException("The pipeline don't exist");
         }
 
-        biologicalObjectRepository.launch(pipeline);
-
         pipeline.setStep(PipelineSteps.LAUNCH);
+        pipeline.addStatus(Status.IN_PROGRESS);
         pipelineRepository.save(pipeline);
+
+        try {
+            biologicalObjectRepository.launch(pipeline);
+            pipeline.addStatus(Status.COMPLETED);
+            pipelineRepository.save(pipeline);
+        } catch (Exception e) {
+            pipeline.addStatus(Status.FAILED);
+            pipelineRepository.save(pipeline);
+            throw e;
+        }
     }
 }

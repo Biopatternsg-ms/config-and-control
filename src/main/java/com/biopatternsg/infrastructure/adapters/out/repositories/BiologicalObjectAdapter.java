@@ -50,21 +50,10 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
         var pipelineBiologicalObject = new LaunchPipelineInternalRequest(
                 pipelineConfig.getId(),
                 pipelineConfig.getLevels(),
+                pipelineConfig.getMaxComplexes(),
                 pipelineConfig.getExpertObjects(),
                 pipelineConfig.getTranscriptionFactorConfig());
         return biologicalObjectHttpClient.launch(pipelineBiologicalObject, sessionUtil.getUserId());
     }
 
-    @Override
-    public void updateSynonyms(PipelineConfig pipelineConfig) {
-        try {
-            String userId = sessionUtil.getUserId();
-            biologicalObjectHttpClient.updateSynonyms(pipelineConfig.getId(), userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_SYNONYMS, Status.IN_PROGRESS);
-            log.info("Biological Object API update-synonyms called successfully for pipeline {}", pipelineConfig.getId());
-        } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_SYNONYMS, Status.FAILED);
-            log.error("Error calling Biological Object API update-synonyms for pipeline {}", pipelineConfig.getId(), e);
-        }
-    }
 }

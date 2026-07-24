@@ -30,7 +30,4 @@ public interface BiologicalObjectHttpClient {
     @Path("/biological-object/launch-pipeline")
     String launch(@RequestBody LaunchPipelineInternalRequest pipelineRequest, @HeaderParam("x-user-id") String userId);
 
-    @POST
-    @Path("/biological-object/update-synonyms/{pipelineId}")
-    void updateSynonyms(@PathParam("pipelineId") String pipelineId, @HeaderParam("x-user-id") String userId);
 }
