@@ -185,8 +185,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
     }
 
     private String formatTime(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        return sdf.format(date);
+        if (date == null) return null;
+        return date.toInstant().toString();
     }
 
     private String formatDuration(Date start, Date end) {
