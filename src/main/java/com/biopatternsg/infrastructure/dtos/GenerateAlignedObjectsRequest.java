@@ -15,7 +15,12 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+
+import java.util.List;
+
 public record GenerateAlignedObjectsRequest(
-        String pipelineId
+        String pipelineId,
+        List<ExpertObjectConfig> expertObjects
 ) {
 }
