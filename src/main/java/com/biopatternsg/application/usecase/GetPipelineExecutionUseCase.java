@@ -50,6 +50,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         List<PipelineStepExecutionResponse> stepResponses = new ArrayList<>();
 
         Date overallStartTime = null;
+        Date overallEndTime = null;
         Date currentPhaseStartTime = null;
 
         for (PipelineSteps stepEnum : PipelineSteps.values()) {
@@ -98,6 +99,11 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
                     overallStartTime = stepStart;
                 }
             }
+            if (stepEnd != null) {
+                if (overallEndTime == null || stepEnd.after(overallEndTime)) {
+                    overallEndTime = stepEnd;
+                }
+            }
 
             String startTimeFormatted = stepStart != null ? formatTime(stepStart) : null;
             String durationFormatted = formatDuration(stepStart, stepEnd);
@@ -116,7 +122,10 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         }
 
         String overallStatus = determineOverallStatus(stepResponses);
-        String totalExecutionTime = formatHms(overallStartTime, new Date());
+        Date totalEndTime = "ACTIVE".equals(overallStatus) || overallEndTime == null
+                ? new Date()
+                : overallEndTime;
+        String totalExecutionTime = formatHms(overallStartTime, totalEndTime);
         String currentPhaseDuration = formatMs(currentPhaseStartTime, new Date());
 
         return new ExperimentExecutionResponse(
