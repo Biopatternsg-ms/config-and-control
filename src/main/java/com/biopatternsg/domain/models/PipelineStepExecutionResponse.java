@@ -15,6 +15,8 @@
  */
 package com.biopatternsg.domain.models;
 
+import java.util.Map;
+
 public record PipelineStepExecutionResponse(
         String id,
         String name,
@@ -23,5 +25,6 @@ public record PipelineStepExecutionResponse(
         String duration,
         String outputText,
         String description,
-        String iconName
+        String iconName,
+        Map<String, String> metrics
 ) {}

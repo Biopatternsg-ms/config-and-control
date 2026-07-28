@@ -23,6 +23,8 @@ import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @ApplicationScoped
 @RequiredArgsConstructor
 public class PipelineService {
@@ -30,13 +32,17 @@ public class PipelineService {
     private final PipelineRepository pipelineRepository;
 
     public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
+        return updateStep(id, step, status, null);
+    }
+
+    public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
         var pipelineConfig = pipelineRepository.findById(id);
         if (pipelineConfig == null) {
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
 
         pipelineConfig.setStep(step);
-        pipelineConfig.addStatus(status);
+        pipelineConfig.addStatusForStep(step, status, metrics);
         return pipelineRepository.save(pipelineConfig);
     }
 }

@@ -24,11 +24,14 @@ import com.biopatternsg.domain.port.in.GetPipelineExecution;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.domain.models.ExperimentExecutionResponse;
 import com.biopatternsg.domain.models.PipelineStepExecutionResponse;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.models.pipeline_config.TranscriptionFactorConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -109,6 +112,17 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             String durationFormatted = formatDuration(stepStart, stepEnd);
             String outputText = formatOutputText(statusStr, durationFormatted);
 
+            // Collect metrics from the most recent status entry for this step
+            Map<String, String> stepMetrics = null;
+            if (stepEnum == PipelineSteps.CONFIG) {
+                stepMetrics = deriveConfigMetrics(pipelineConfig);
+            } else {
+                // Take metrics from completed or failed status, whichever is present
+                Optional<PipelineStatus> metricSource = completedStatus.isPresent() ? completedStatus
+                        : failedStatus.isPresent() ? failedStatus : inProgressStatus;
+                stepMetrics = metricSource.map(PipelineStatus::getMetrics).orElse(null);
+            }
+
             stepResponses.add(new PipelineStepExecutionResponse(
                     "step-" + stepEnum.getValue(),
                     getStepName(stepEnum),
@@ -117,7 +131,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
                     durationFormatted,
                     outputText,
                     getStepDescription(stepEnum),
-                    getStepIcon(stepEnum)
+                    getStepIcon(stepEnum),
+                    stepMetrics
             ));
         }
 
@@ -149,6 +164,51 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         if (allCompleted) return "COMPLETED";
 
         return "PENDING";
+    }
+
+    private Map<String, String> deriveConfigMetrics(PipelineConfig config) {
+        Map<String, String> metrics = new LinkedHashMap<>();
+
+        if (config.getExpertObjects() != null) {
+            metrics.put("expertObjectsConfigured", String.valueOf(config.getExpertObjects().size()));
+            String symbols = config.getExpertObjects().stream()
+                    .map(ExpertObjectConfig::getSymbol)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(", "));
+            if (!symbols.isBlank()) metrics.put("expertObjectSymbols", symbols);
+        }
+
+        if (config.getLevels() != null) {
+            metrics.put("searchLevels", String.valueOf(config.getLevels()));
+        }
+        if (config.getRetMax() > 0) {
+            metrics.put("retMax", String.valueOf(config.getRetMax()));
+        }
+        if (config.getMaxComplexes() != null) {
+            metrics.put("maxComplexes", String.valueOf(config.getMaxComplexes()));
+        }
+        metrics.put("useOnlyPrincipalName", String.valueOf(config.isUseOnlyPrincipalName()));
+
+        TranscriptionFactorConfig tfConfig = config.getTranscriptionFactorConfig();
+        if (tfConfig != null) {
+            if (tfConfig.getSources() != null && !tfConfig.getSources().isEmpty()) {
+                String sources = tfConfig.getSources().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.joining(", "));
+                metrics.put("tfSources", sources);
+            }
+            if (tfConfig.getPromoterRegion() != null && !tfConfig.getPromoterRegion().isBlank()) {
+                metrics.put("promoterRegion", tfConfig.getPromoterRegion());
+            }
+            if (tfConfig.getGenome() != null) {
+                metrics.put("genome", tfConfig.getGenome().name());
+            }
+            if (tfConfig.getChromosome() != null && !tfConfig.getChromosome().isBlank()) {
+                metrics.put("chromosome", tfConfig.getChromosome());
+            }
+        }
+
+        return metrics.isEmpty() ? null : metrics;
     }
 
     private String getStepName(PipelineSteps step) {

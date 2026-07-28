@@ -19,9 +19,12 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Map;
+
 public record PipelineStepRequest(
        @NotNull String id,
        @NotNull PipelineSteps step,
-       @NotNull Status status
+       @NotNull Status status,
+       Map<String, String> metrics
 ) {
 }

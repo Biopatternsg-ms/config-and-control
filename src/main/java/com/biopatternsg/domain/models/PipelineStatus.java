@@ -20,6 +20,7 @@ import com.biopatternsg.domain.enums.Status;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,4 +31,5 @@ public class PipelineStatus {
     private PipelineSteps step;
     private Status status;
     private Date createdAt;
+    private Map<String, String> metrics;
 }

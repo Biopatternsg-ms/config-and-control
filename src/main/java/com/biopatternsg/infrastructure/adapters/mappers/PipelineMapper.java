@@ -175,6 +175,7 @@ public class PipelineMapper {
         return PipelineStatus.builder()
                 .step(pipelineStepRequest.step())
                 .status(pipelineStepRequest.status())
+                .metrics(pipelineStepRequest.metrics())
                 .build();
     }
 }

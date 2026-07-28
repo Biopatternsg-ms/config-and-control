@@ -24,6 +24,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Getter
@@ -46,6 +47,10 @@ public class PipelineConfig {
     private Integer maxComplexes;
 
     public void addStatusForStep(PipelineSteps step, Status status) {
+        addStatusForStep(step, status, null);
+    }
+
+    public void addStatusForStep(PipelineSteps step, Status status, Map<String, String> metrics) {
         if(this.statuses == null) {
             this.statuses = new ArrayList<>();
         }
@@ -53,12 +58,15 @@ public class PipelineConfig {
                 .filter(ps -> ps.getStep() == step && ps.getStatus() == status)
                 .findFirst()
                 .ifPresentOrElse(
-                        ps -> ps.setCreatedAt(new Date()),
-                        () -> this.statuses.add(new PipelineStatus(step, status, new Date()))
+                        ps -> {
+                            ps.setCreatedAt(new Date());
+                            if (metrics != null) ps.setMetrics(metrics);
+                        },
+                        () -> this.statuses.add(new PipelineStatus(step, status, new Date(), metrics))
                 );
     }
 
     public void addStatus(Status status) {
-        addStatusForStep(this.step, status);
+        addStatusForStep(this.step, status, null);
     }
 }
