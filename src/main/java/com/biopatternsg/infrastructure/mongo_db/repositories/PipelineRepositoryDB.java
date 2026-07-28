@@ -16,7 +16,6 @@
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;

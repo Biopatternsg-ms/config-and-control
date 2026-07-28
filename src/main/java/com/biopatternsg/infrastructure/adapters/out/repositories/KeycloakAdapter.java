@@ -23,7 +23,6 @@ import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
 import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.UpdateUserKeycloakRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserCredentialsRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
