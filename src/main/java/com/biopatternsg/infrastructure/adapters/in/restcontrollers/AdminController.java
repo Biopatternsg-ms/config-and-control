@@ -97,26 +97,27 @@ public class AdminController {
     @PUT
     @Path("/user/{id}/status")
     @Operation(
-            summary = "Register new user",
-            description = "Registers a new user in the system with the provided credentials and information."
+            summary = "Update user status",
+            description = "Updates the enabled status of a user in the system and the identity provider."
     )
     @APIResponses({
             @APIResponse(
-                    responseCode = "201",
-                    description = "User successfully registered",
+                    responseCode = "200",
+                    description = "User status successfully updated",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(
-                                    type = SchemaType.STRING,
-                                    description = "Registration confirmation"
+                                    type = SchemaType.OBJECT,
+                                    implementation = UserResponse.class,
+                                    description = "Updated user"
                             )
                     )
             )
     })
     public Response updateStatus(@PathParam("id") String id, @Valid UpdateUserStatusRequest updateStatus) {
 
-        userManagement.register(UserMapper.requestToModel(newUser));
-        return Response.status(Response.Status.CREATED).build();
+        var userConfig = userManagement.updateStatus(id, updateStatus.enabled());
+        return Response.ok(UserMapper.modelToResponse(userConfig)).build();
     }
 
     @GET

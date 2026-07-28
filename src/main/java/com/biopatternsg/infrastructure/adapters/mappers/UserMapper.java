@@ -20,7 +20,7 @@ import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloak;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloakResponse;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 
 import java.util.List;
@@ -93,19 +93,19 @@ public class UserMapper {
                 .build();
     }
 
-    public static UserConfig keycloakToModel(UserKeycloak userKeycloak){
+    public static UserConfig keycloakToModel(UserKeycloakResponse userKeycloakResponse){
 
-        if (userKeycloak == null) return null;
+        if (userKeycloakResponse == null) return null;
         return UserConfig.builder()
-                .identityProviderId(userKeycloak.id())
-                .username(userKeycloak.username())
-                .firstName(userKeycloak.firstName())
-                .lastName(userKeycloak.lastName())
-                .enabled(userKeycloak.enabled())
+                .identityProviderId(userKeycloakResponse.id())
+                .username(userKeycloakResponse.username())
+                .firstName(userKeycloakResponse.firstName())
+                .lastName(userKeycloakResponse.lastName())
+                .enabled(userKeycloakResponse.enabled())
                 .build();
     }
 
-    public static List<UserConfig> keycloakToModelList(List<UserKeycloak> identifiersList){
+    public static List<UserConfig> keycloakToModelList(List<UserKeycloakResponse> identifiersList){
 
         return identifiersList.stream().map(UserMapper::keycloakToModel).toList();
     }

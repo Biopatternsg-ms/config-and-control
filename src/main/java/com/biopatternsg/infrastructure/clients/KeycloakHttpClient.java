@@ -19,8 +19,9 @@ import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.RoleResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.UpdateUserKeycloakRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloak;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloakResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -94,7 +95,7 @@ public interface KeycloakHttpClient {
 
     @GET
     @Path("admin/realms/biopatternsg/users")
-    List<UserKeycloak> usersList(
+    List<UserKeycloakResponse> usersList(
             @HeaderParam("Authorization") String token,
             @BeanParam UserFilters usersKeycloakFilters
     );
@@ -106,6 +107,15 @@ public interface KeycloakHttpClient {
             @HeaderParam("Authorization") String token,
             @PathParam("userId") String userId,
             List<String> actions
+    );
+
+    @PUT
+    @Path("/admin/realms/biopatternsg/users/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    void updateUser(
+            @HeaderParam("Authorization") String token,
+            @PathParam("userId") String userId,
+            UpdateUserKeycloakRequest request
     );
 
     @GET

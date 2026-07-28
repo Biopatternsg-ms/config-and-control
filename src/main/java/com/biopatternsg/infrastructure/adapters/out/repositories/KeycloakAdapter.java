@@ -22,6 +22,7 @@ import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
 import com.biopatternsg.domain.models.UserAuth;
+import com.biopatternsg.infrastructure.dtos.keycloak.UpdateUserKeycloakRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserCredentialsRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -137,6 +138,20 @@ public class KeycloakAdapter implements KeycloakRepository {
 
         try{
             keycloakHttpClient.sendEmail(accessToken, userId, actions);
+        } catch (WebApplicationException e) {
+            throw new KeycloakServiceException(e.getResponse().getStatus());
+        }
+    }
+
+    @Override
+    public void updateEnabled(String userId, boolean enabled) {
+
+        var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
+        var accessToken = "Bearer " + credentials.getAccess_token();
+        var updateUserKeycloak = UpdateUserKeycloakRequest.builder().enabled(enabled).build();
+
+        try{
+            keycloakHttpClient.updateUser(accessToken, userId, updateUserKeycloak);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }

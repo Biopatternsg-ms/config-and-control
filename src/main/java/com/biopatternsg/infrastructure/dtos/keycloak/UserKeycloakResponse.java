@@ -21,7 +21,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record UserKeycloak(
+public record UserKeycloakResponse(
 
         @JsonProperty("id")
         String id,

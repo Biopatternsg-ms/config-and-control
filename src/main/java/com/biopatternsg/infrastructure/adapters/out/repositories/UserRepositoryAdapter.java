@@ -24,6 +24,7 @@ import com.biopatternsg.infrastructure.mongo_db.repositories.UserRepositoryDB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -44,6 +45,19 @@ public class UserRepositoryAdapter implements UserRepository {
     public UserConfig find(String username){
         var userCollection = userRepositoryDB.findUsername(username);
         return UserMapper.collectionToModel(userCollection);
+    }
+
+    @Override
+    public UserConfig findById(String id) {
+        var userCollection = userRepositoryDB.findById(new ObjectId(id));
+        return UserMapper.collectionToModel(userCollection);
+    }
+
+    @Override
+    public void update(UserConfig userConfig) {
+        UserCollection userCollection = UserMapper.modelToCollection(userConfig);
+        userCollection.id = new ObjectId(userConfig.getId());
+        userRepositoryDB.persistOrUpdate(userCollection);
     }
 
     @Override

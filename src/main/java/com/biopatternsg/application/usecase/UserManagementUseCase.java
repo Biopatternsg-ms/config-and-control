@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.in.UserManagement;
@@ -73,5 +74,20 @@ public class UserManagementUseCase implements UserManagement {
         if(user != null){
             keycloakRepository.sendEmail(user.getIdentityProviderId(), List.of("UPDATE_PASSWORD"));
         }
+    }
+
+    @Override
+    public UserConfig updateStatus(String id, boolean enabled) {
+
+        var user = userRepository.findById(id);
+        if (user == null) {
+            throw new UnprocessableEntityException("The user doesn't exist");
+        }
+
+        user.setEnabled(enabled);
+        keycloakRepository.updateEnabled(user.getIdentityProviderId(), enabled);
+        userRepository.update(user);
+
+        return user;
     }
 }

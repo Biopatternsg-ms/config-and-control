@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.out.repositories;
+package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
-import com.biopatternsg.domain.models.UserAuth;
-import jakarta.ws.rs.core.Response;
+import lombok.Builder;
 
-import java.util.List;
-
-public interface KeycloakRepository {
-
-    UserAuth login(String user, String pass);
-    UserAuth refreshToken(String refreshToken);
-    Response register(UserConfig newUser);
-    List<UserConfig> listUsers(UserFilters userFilters);
-    void sendEmail(String userId, List<String> actions);
-    void updateEnabled(String userId, boolean enabled);
+@Builder
+public record UpdateUserKeycloakRequest(
+        boolean enabled
+) {
 }
