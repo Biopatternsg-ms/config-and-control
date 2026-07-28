@@ -32,6 +32,10 @@ public class UserConfig {
     private String lastName;
     private String username;
     private String email;
-    private boolean enabled;
+    private Boolean enabled;
     private int createdAt;
+
+    public boolean isEnabled() {
+        return enabled != null && enabled;
+    }
 }

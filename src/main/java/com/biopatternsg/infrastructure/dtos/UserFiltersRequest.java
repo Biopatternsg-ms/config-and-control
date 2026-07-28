@@ -25,7 +25,7 @@ public record UserFiltersRequest(
         @QueryParam("username") String username,
         @QueryParam("firstName") String firstName,
         @QueryParam("lastName") String lastName,
-        @QueryParam("enabled") Boolean enable,
+        @QueryParam("enabled") Boolean enabled,
         @QueryParam("page") @DefaultValue("0") @Min(0) int page,
         @QueryParam("size") @DefaultValue("10") int size
 ) {}

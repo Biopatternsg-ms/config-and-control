@@ -16,7 +16,6 @@
 package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
@@ -82,14 +81,14 @@ public class UserMapper {
                 .build();
     }
 
-    public static UserFilters filtersToModel(UserFiltersRequest userFilters){
+    public static UserConfig filtersToModel(UserFiltersRequest userFilters){
 
         if (userFilters == null) return null;
-        return UserFilters.builder()
+        return UserConfig.builder()
                 .username(userFilters.username())
                 .firstName(userFilters.firstName())
                 .lastName(userFilters.lastName())
-                .enable(userFilters.enable())
+                .enabled(userFilters.enabled())
                 .build();
     }
 

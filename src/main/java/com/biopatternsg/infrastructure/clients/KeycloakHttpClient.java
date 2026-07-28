@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.domain.models.UserFilters;
+import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.RoleResponse;
@@ -97,7 +97,7 @@ public interface KeycloakHttpClient {
     @Path("admin/realms/biopatternsg/users")
     List<UserKeycloakResponse> usersList(
             @HeaderParam("Authorization") String token,
-            @BeanParam UserFilters usersKeycloakFilters
+            @BeanParam UserConfig usersKeycloakFilters
     );
 
     @PUT

@@ -17,7 +17,6 @@ package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.exceptions.KeycloakServiceException;
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
@@ -117,7 +116,7 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
-    public List<UserConfig> listUsers(UserFilters userFilters) {
+    public List<UserConfig> listUsers(UserConfig userFilters) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.getAccess_token();

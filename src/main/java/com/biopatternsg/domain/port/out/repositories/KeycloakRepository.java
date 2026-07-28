@@ -16,7 +16,6 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.models.UserAuth;
 import jakarta.ws.rs.core.Response;
 
@@ -27,7 +26,7 @@ public interface KeycloakRepository {
     UserAuth login(String user, String pass);
     UserAuth refreshToken(String refreshToken);
     Response register(UserConfig newUser);
-    List<UserConfig> listUsers(UserFilters userFilters);
+    List<UserConfig> listUsers(UserConfig userFilters);
     void sendEmail(String userId, List<String> actions);
     void updateEnabled(String userId, boolean enabled);
 }

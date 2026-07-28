@@ -16,7 +16,6 @@
 package com.biopatternsg.domain.port.in;
 
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 
 import java.util.List;
 
@@ -26,5 +25,5 @@ public interface UserManagement {
     void syncUsers();
     void recoveryPassword(String email);
     UserConfig updateStatus(String id, boolean enabled);
-    List<UserConfig> listUsers(UserFilters userFilters, int page, int size);
+    List<UserConfig> listUsers(UserConfig filters, int page, int size);
 }

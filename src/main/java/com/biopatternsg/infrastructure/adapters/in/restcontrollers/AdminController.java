@@ -62,7 +62,7 @@ public class AdminController {
                     )
             )
     })
-    public List<UserResponse> listUsers(UserFiltersRequest userFilters){
+    public List<UserResponse> listUsers(@BeanParam UserFiltersRequest userFilters){
 
         var userList = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
