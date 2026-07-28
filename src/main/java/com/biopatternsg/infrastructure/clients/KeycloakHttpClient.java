@@ -15,12 +15,12 @@
  */
 package com.biopatternsg.infrastructure.clients;
 
-import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.models.UserAuth;
 import com.biopatternsg.infrastructure.dtos.keycloak.IntrospectResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.RoleResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloak;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -94,7 +94,7 @@ public interface KeycloakHttpClient {
 
     @GET
     @Path("admin/realms/biopatternsg/users")
-    List<UserConfig> usersList(
+    List<UserKeycloak> usersList(
             @HeaderParam("Authorization") String token,
             @BeanParam UserFilters usersKeycloakFilters
     );

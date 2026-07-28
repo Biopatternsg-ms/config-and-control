@@ -28,6 +28,5 @@ public interface KeycloakRepository {
     UserAuth refreshToken(String refreshToken);
     Response register(UserConfig newUser);
     List<UserConfig> listUsers(UserFilters userFilters);
-    void verifyEmail(String userId);
-    void recoveryPassword(String email);
+    void sendEmail(String userId, List<String> actions);
 }

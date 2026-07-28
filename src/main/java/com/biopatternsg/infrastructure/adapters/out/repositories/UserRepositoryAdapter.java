@@ -35,16 +35,22 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public void create(UserConfig userConfig) {
-        UserCollection userCollection = UserMapper.toCollection(userConfig);
+        UserCollection userCollection = UserMapper.modelToCollection(userConfig);
         userRepositoryDB.persistOrUpdate(userCollection);
         Response.ok().build();
+    }
+
+    @Override
+    public UserConfig find(String username){
+        var userCollection = userRepositoryDB.findUsername(username);
+        return UserMapper.collectionToModel(userCollection);
     }
 
     @Override
     public List<UserConfig> list(UserFilters userFilters, int page, int size) {
         List<UserCollection> collections = userRepositoryDB.findByFilters(userFilters, page, size);
         return collections.stream()
-                .map(UserMapper::toDomain)
+                .map(UserMapper::collectionToModel)
                 .toList();
     }
 }

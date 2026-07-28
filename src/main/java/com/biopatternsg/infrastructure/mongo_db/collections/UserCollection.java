@@ -31,5 +31,5 @@ public class UserCollection extends PanacheMongoEntity {
     private String username;
     private String firstName;
     private String lastName;
-    private String enabled;
+    private boolean enabled;
 }

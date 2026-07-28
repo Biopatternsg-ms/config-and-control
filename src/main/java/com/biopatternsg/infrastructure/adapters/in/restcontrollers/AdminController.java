@@ -17,14 +17,13 @@ package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
+import com.biopatternsg.infrastructure.dtos.UpdateUserStatusRequest;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.dtos.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -65,7 +64,7 @@ public class AdminController {
     })
     public List<UserResponse> listUsers(UserFiltersRequest userFilters){
 
-        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters),
+        var userList = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
         return UserMapper.modelToResponseList(userList);
     }
@@ -91,7 +90,32 @@ public class AdminController {
     })
     public Response register(@Valid UserRequest newUser) {
 
-        userManagement.register(UserMapper.userRequestToModel(newUser));
+        userManagement.register(UserMapper.requestToModel(newUser));
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @PUT
+    @Path("/user/{id}/status")
+    @Operation(
+            summary = "Register new user",
+            description = "Registers a new user in the system with the provided credentials and information."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "201",
+                    description = "User successfully registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.STRING,
+                                    description = "Registration confirmation"
+                            )
+                    )
+            )
+    })
+    public Response updateStatus(@PathParam("id") String id, @Valid UpdateUserStatusRequest updateStatus) {
+
+        userManagement.register(UserMapper.requestToModel(newUser));
         return Response.status(Response.Status.CREATED).build();
     }
 

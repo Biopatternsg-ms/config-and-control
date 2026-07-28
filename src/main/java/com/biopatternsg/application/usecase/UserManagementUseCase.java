@@ -29,8 +29,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserManagementUseCase implements UserManagement {
 
-    private final KeycloakRepository keycloakRepository;
     private final UserRepository userRepository;
+    private final KeycloakRepository keycloakRepository;
 
     @Override
     public void register(UserConfig userConfig) {
@@ -43,12 +43,7 @@ public class UserManagementUseCase implements UserManagement {
         userConfig.setIdentityProviderId(userId);
         userRepository.create(userConfig);
 
-        keycloakRepository.verifyEmail(userId);
-    }
-
-    @Override
-    public void recover(String userId) {
-        keycloakRepository.recoveryPassword(userId);
+        keycloakRepository.sendEmail(userId, List.of("VERIFY_EMAIL"));
     }
 
     @Override
@@ -61,8 +56,7 @@ public class UserManagementUseCase implements UserManagement {
                 .collect(java.util.stream.Collectors.toSet());
 
         for (UserConfig keycloakUser : keycloakList) {
-            if (keycloakUser.getId() != null && !apiRestIds.contains(keycloakUser.getId())) {
-                keycloakUser.setIdentityProviderId(keycloakUser.getId());
+            if (!apiRestIds.contains(keycloakUser.getId())) {
                 userRepository.create(keycloakUser);
             }
         }
@@ -71,5 +65,13 @@ public class UserManagementUseCase implements UserManagement {
     @Override
     public List<UserConfig> listUsers(UserFilters userFilters, int page, int size) {
         return userRepository.list(userFilters, page, size);
+    }
+
+    @Override
+    public void recoveryPassword(String email){
+        var user = userRepository.find(email);
+        if(user != null){
+            keycloakRepository.sendEmail(user.getIdentityProviderId(), List.of("UPDATE_PASSWORD"));
+        }
     }
 }

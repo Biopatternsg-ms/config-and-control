@@ -23,7 +23,7 @@ import java.util.List;
 public interface UserManagement {
 
     void register(UserConfig request);
-    void recover(String userId);
     void syncUsers();
+    void recoveryPassword(String email);
     List<UserConfig> listUsers(UserFilters userFilters, int page, int size);
 }

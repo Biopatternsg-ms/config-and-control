@@ -18,8 +18,10 @@ package com.biopatternsg.infrastructure.dtos.keycloak;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
-public record UserResponse(
+public record UserKeycloak(
 
         @JsonProperty("id")
         String id,
@@ -30,8 +32,16 @@ public record UserResponse(
         @JsonProperty("lastName")
         String lastName,
         @JsonProperty("enabled")
-        String enabled,
-        @JsonProperty("createdTimestamp")
-        int createdAt
+        boolean enabled,
+        //@JsonProperty("createdTimestamp")
+        //long createdAt,
+        @JsonProperty("totp")
+        boolean totp,
+        @JsonProperty("emailVerified")
+        boolean emailVerified,
+        @JsonProperty("disableableCredentialTypes")
+        List<String> disableableCredentialTypes,
+        @JsonProperty("requiredActions")
+        List<String> requiredActions
 ) {
 }

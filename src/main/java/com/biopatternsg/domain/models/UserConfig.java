@@ -32,6 +32,6 @@ public class UserConfig {
     private String lastName;
     private String username;
     private String email;
-    private String enabled;
+    private boolean enabled;
     private int createdAt;
 }
