@@ -16,8 +16,7 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-
-import java.util.List;
+import com.biopatternsg.domain.models.ReportFormat;
 
 public interface PipelineRepository {
 
@@ -25,5 +24,5 @@ public interface PipelineRepository {
     PipelineConfig findById(String id);
     PipelineConfig findByName(String name);
     PipelineConfig findByNameExists(String networkId, String name);
-    List<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size);
+    ReportFormat<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size);
 }

@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
-import com.biopatternsg.domain.models.UserList;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
@@ -39,7 +39,7 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
                 .firstResult();
     }
 
-    public UserList<UserCollection> findByFilters(UserConfig filters, int page, int size) {
+    public ReportFormat<UserCollection> findByFilters(UserConfig filters, int page, int size) {
         Document query = new Document();
 
         if (filters != null) {
@@ -65,6 +65,6 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
                 ? find(query).list()
                 : find(query).page(page, size).list();
 
-        return new UserList<>(count, list);
+        return new ReportFormat<>(count, list);
     }
 }

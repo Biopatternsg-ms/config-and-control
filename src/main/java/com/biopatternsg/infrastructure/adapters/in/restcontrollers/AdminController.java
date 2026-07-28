@@ -15,11 +15,11 @@
  */
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.dtos.UpdateUserStatusRequest;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
-import com.biopatternsg.infrastructure.dtos.UserListResponse;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -55,17 +55,18 @@ public class AdminController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UserListResponse.class,
+                                    implementation = ReportFormat.class,
                                     description = "Users list obtained"
                             )
                     )
             )
     })
-    public UserListResponse listUsers(UserFiltersRequest userFilters){
+    public ReportFormat<UserResponse> listUsers(UserFiltersRequest userFilters){
 
-        var result = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
+        var modelFormat = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
-        return UserMapper.paginatedToResponse(result);
+        var responseList = modelFormat.list().stream().map(UserMapper::modelToResponse).toList();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 
     @POST

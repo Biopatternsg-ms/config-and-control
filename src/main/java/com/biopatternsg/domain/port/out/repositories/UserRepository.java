@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.domain.port.out.repositories;
 
-import com.biopatternsg.domain.models.UserList;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
 
 public interface UserRepository {
@@ -24,5 +24,5 @@ public interface UserRepository {
     void update(UserConfig userConfig);
     UserConfig find(String username);
     UserConfig findById(String id);
-    UserList<UserConfig> list(UserConfig userFilters, int page, int size);
+    ReportFormat<UserConfig> list(UserConfig userFilters, int page, int size);
 }

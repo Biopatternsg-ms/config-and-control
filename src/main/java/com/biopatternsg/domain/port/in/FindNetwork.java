@@ -16,12 +16,11 @@
 package com.biopatternsg.domain.port.in;
 
 import com.biopatternsg.domain.models.NetworkConfig;
-
-import java.util.List;
+import com.biopatternsg.domain.models.ReportFormat;
 
 public interface FindNetwork {
 
     NetworkConfig byId(String id);
     NetworkConfig byName(String name);
-    List<NetworkConfig> byFilters(NetworkConfig findNetwork, int page, int size);
+    ReportFormat<NetworkConfig> byFilters(NetworkConfig findNetwork, int page, int size);
 }

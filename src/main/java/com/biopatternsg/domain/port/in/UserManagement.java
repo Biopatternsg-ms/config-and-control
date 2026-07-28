@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.domain.port.in;
 
-import com.biopatternsg.domain.models.UserList;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
 
 public interface UserManagement {
@@ -24,5 +24,5 @@ public interface UserManagement {
     void syncUsers();
     void recoveryPassword(String email);
     UserConfig updateStatus(String id, boolean enabled);
-    UserList<UserConfig> listUsers(UserConfig filters, int page, int size);
+    ReportFormat<UserConfig> listUsers(UserConfig filters, int page, int size);
 }

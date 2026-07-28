@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.CreateNetwork;
 import com.biopatternsg.domain.port.in.FindNetwork;
 import com.biopatternsg.domain.port.in.UpdateNetwork;
@@ -141,10 +142,11 @@ public class NetworkController {
                     )
             )
     })
-    public List<NetworkResponse> findList(FindNetworkRequest networkFilters){
+    public ReportFormat<NetworkResponse> findList(FindNetworkRequest networkFilters){
 
-        var networkConfigList = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
+        var modelFormat = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
                 networkFilters.page(), networkFilters.size());
-        return NetworkMapper.toNetworkResponseList(networkConfigList);
+        var responseList = modelFormat.list().stream().map(NetworkMapper::toNetworkResponse).toList();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 }

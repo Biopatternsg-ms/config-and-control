@@ -16,12 +16,11 @@
 package com.biopatternsg.domain.port.in;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-
-import java.util.List;
+import com.biopatternsg.domain.models.ReportFormat;
 
 public interface FindPipeline {
 
     PipelineConfig byId(String id);
     PipelineConfig byName(String name);
-    List<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size);
+    ReportFormat<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size);
 }

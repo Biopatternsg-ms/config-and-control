@@ -15,9 +15,12 @@
  */
 package com.biopatternsg.domain.models;
 
+import lombok.Builder;
+
 import java.util.List;
 
-public record UserList<T>(
+@Builder
+public record ReportFormat<T>(
         long count,
         List<T> list
 ) {}

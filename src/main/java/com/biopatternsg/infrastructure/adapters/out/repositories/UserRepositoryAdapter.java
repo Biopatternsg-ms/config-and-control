@@ -15,7 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
-import com.biopatternsg.domain.models.UserList;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
@@ -26,8 +26,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
-import java.util.List;
-
 @ApplicationScoped
 public class UserRepositoryAdapter implements UserRepository {
 
@@ -36,6 +34,7 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public void create(UserConfig userConfig) {
+
         UserCollection userCollection = UserMapper.modelToCollection(userConfig);
         userRepositoryDB.persistOrUpdate(userCollection);
         Response.ok().build();
@@ -43,29 +42,31 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public UserConfig find(String username){
+
         var userCollection = userRepositoryDB.findUsername(username);
         return UserMapper.collectionToModel(userCollection);
     }
 
     @Override
     public UserConfig findById(String id) {
+
         var userCollection = userRepositoryDB.findById(new ObjectId(id));
         return UserMapper.collectionToModel(userCollection);
     }
 
     @Override
     public void update(UserConfig userConfig) {
+
         UserCollection userCollection = UserMapper.modelToCollection(userConfig);
         userCollection.id = new ObjectId(userConfig.getId());
         userRepositoryDB.persistOrUpdate(userCollection);
     }
 
     @Override
-    public UserList<UserConfig> list(UserConfig filters, int page, int size) {
-        UserList<UserCollection> result = userRepositoryDB.findByFilters(filters, page, size);
-        List<UserConfig> users = result.list().stream()
-                .map(UserMapper::collectionToModel)
-                .toList();
-        return new UserList<>(result.count(), users);
+    public ReportFormat<UserConfig> list(UserConfig filters, int page, int size) {
+
+        var reportCollection = userRepositoryDB.findByFilters(filters, page, size);
+        var modelList = reportCollection.list().stream().map(UserMapper::collectionToModel).toList();
+        return new ReportFormat<>(reportCollection.count(), modelList);
     }
 }
