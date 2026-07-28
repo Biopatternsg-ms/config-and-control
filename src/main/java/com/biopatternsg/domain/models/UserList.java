@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.in;
+package com.biopatternsg.domain.models;
 
-import com.biopatternsg.domain.models.UserList;
-import com.biopatternsg.domain.models.UserConfig;
+import java.util.List;
 
-public interface UserManagement {
-
-    void register(UserConfig request);
-    void syncUsers();
-    void recoveryPassword(String email);
-    UserConfig updateStatus(String id, boolean enabled);
-    UserList<UserConfig> listUsers(UserConfig filters, int page, int size);
-}
+public record UserList<T>(
+        long count,
+        List<T> list
+) {}

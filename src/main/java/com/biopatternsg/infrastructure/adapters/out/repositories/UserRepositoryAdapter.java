@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
+import com.biopatternsg.domain.models.UserList;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
@@ -60,10 +61,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public List<UserConfig> list(UserConfig filters, int page, int size) {
-        List<UserCollection> collections = userRepositoryDB.findByFilters(filters, page, size);
-        return collections.stream()
+    public UserList<UserConfig> list(UserConfig filters, int page, int size) {
+        UserList<UserCollection> result = userRepositoryDB.findByFilters(filters, page, size);
+        List<UserConfig> users = result.list().stream()
                 .map(UserMapper::collectionToModel)
                 .toList();
+        return new UserList<>(result.count(), users);
     }
 }

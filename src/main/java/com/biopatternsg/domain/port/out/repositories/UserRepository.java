@@ -15,9 +15,8 @@
  */
 package com.biopatternsg.domain.port.out.repositories;
 
+import com.biopatternsg.domain.models.UserList;
 import com.biopatternsg.domain.models.UserConfig;
-
-import java.util.List;
 
 public interface UserRepository {
 
@@ -25,5 +24,5 @@ public interface UserRepository {
     void update(UserConfig userConfig);
     UserConfig find(String username);
     UserConfig findById(String id);
-    List<UserConfig> list(UserConfig userFilters, int page, int size);
+    UserList<UserConfig> list(UserConfig userFilters, int page, int size);
 }

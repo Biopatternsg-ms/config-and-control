@@ -16,6 +16,7 @@
 package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
+import com.biopatternsg.domain.models.UserList;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
@@ -49,7 +50,7 @@ public class UserManagementUseCase implements UserManagement {
     @Override
     public void syncUsers(){
         var keycloakList = keycloakRepository.listUsers(UserConfig.builder().build());
-        var apiRestList = userRepository.list(UserConfig.builder().build(), 0, 0);
+        var apiRestList = userRepository.list(UserConfig.builder().build(), 0, 0).list();
 
         var apiRestIds = apiRestList.stream()
                 .map(UserConfig::getIdentityProviderId)
@@ -63,7 +64,7 @@ public class UserManagementUseCase implements UserManagement {
     }
 
     @Override
-    public List<UserConfig> listUsers(UserConfig filters, int page, int size) {
+    public UserList<UserConfig> listUsers(UserConfig filters, int page, int size) {
         return userRepository.list(filters, page, size);
     }
 

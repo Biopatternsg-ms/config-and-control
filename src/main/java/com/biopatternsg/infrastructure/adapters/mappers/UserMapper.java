@@ -15,8 +15,10 @@
  */
 package com.biopatternsg.infrastructure.adapters.mappers;
 
+import com.biopatternsg.domain.models.UserList;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
+import com.biopatternsg.infrastructure.dtos.UserListResponse;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloakResponse;
@@ -53,6 +55,15 @@ public class UserMapper {
     public static List<UserResponse> modelToResponseList(List<UserConfig> userList){
 
         return userList.stream().map(UserMapper::modelToResponse).toList();
+    }
+
+    public static UserListResponse paginatedToResponse(UserList<UserConfig> result){
+
+        if (result == null) return null;
+        return UserListResponse.builder()
+                .count(result.count())
+                .list(modelToResponseList(result.list()))
+                .build();
     }
 
     public static UserCollection modelToCollection(UserConfig userConfig) {

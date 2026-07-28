@@ -19,6 +19,7 @@ import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.dtos.UpdateUserStatusRequest;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
+import com.biopatternsg.infrastructure.dtos.UserListResponse;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -32,8 +33,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-
-import java.util.List;
 
 @ApplicationScoped
 @Path("/config-and-control/admin")
@@ -56,17 +55,17 @@ public class AdminController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UserResponse.class,
+                                    implementation = UserListResponse.class,
                                     description = "Users list obtained"
                             )
                     )
             )
     })
-    public List<UserResponse> listUsers(@BeanParam UserFiltersRequest userFilters){
+    public UserListResponse listUsers(UserFiltersRequest userFilters){
 
-        var userList = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
+        var result = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
-        return UserMapper.modelToResponseList(userList);
+        return UserMapper.paginatedToResponse(result);
     }
 
     @POST

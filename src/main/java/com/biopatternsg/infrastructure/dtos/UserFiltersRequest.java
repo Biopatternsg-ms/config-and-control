@@ -18,14 +18,29 @@ package com.biopatternsg.infrastructure.dtos;
 import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
-import lombok.Builder;
 
-@Builder
 public record UserFiltersRequest(
-        @QueryParam("username") String username,
-        @QueryParam("firstName") String firstName,
-        @QueryParam("lastName") String lastName,
-        @QueryParam("enabled") Boolean enabled,
-        @QueryParam("page") @DefaultValue("0") @Min(0) int page,
-        @QueryParam("size") @DefaultValue("10") int size
-) {}
+
+        @QueryParam("username")
+        String username,
+
+        @QueryParam("firstName")
+        String firstName,
+
+        @QueryParam("lastName")
+        String lastName,
+
+        @QueryParam("enabled")
+        Boolean enabled,
+
+        @QueryParam("page")
+        @DefaultValue("0")
+        @Min(0)
+        int page,
+
+        @QueryParam("size")
+        @DefaultValue("10")
+        @Min(1)
+        int size
+) {
+}
