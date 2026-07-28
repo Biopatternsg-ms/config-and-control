@@ -129,6 +129,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         }
     }
 
+    @Override
     public void sendEmail(String userId, List<String> actions){
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
