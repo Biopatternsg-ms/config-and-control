@@ -16,11 +16,9 @@
 package com.biopatternsg.domain.port.in;
 
 import com.biopatternsg.domain.models.UserAuth;
-import jakarta.ws.rs.core.Response;
 
 public interface UserAuthentication {
 
     UserAuth login(String user, String pass);
     UserAuth refreshToken(String refreshToken);
-    Response recoveryPassword(String email);
 }

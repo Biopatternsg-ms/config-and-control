@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
@@ -68,19 +69,17 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     }
 
     @Override
-    public List<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size) {
+    public ReportFormat<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size) {
 
-        var pipelineObjects = pipelineRepositoryDB.findByUserAndFilters(findPipeline,
-                networkIdList(), page, size);
-        return PipelineMapper.collectionToConfigList(pipelineObjects);
+        var reportCollection = pipelineRepositoryDB.findByUserAndFilters(findPipeline, networkIdList(), page, size);
+        var modelList = reportCollection.list().stream().map(PipelineMapper::collectionToConfig).toList();
+        return new ReportFormat<>(reportCollection.count(),modelList);
     }
 
     private List<String> networkIdList(){
 
         var networkList = networkRepositoryDB.findByUserAndFilters(null,
                 sessionUtil.getUserId(), 0, 0);
-        return networkList.stream()
-                .map(network -> network.id.toString())
-                .toList();
+        return networkList.list().stream().map(network -> network.id.toString()).toList();
     }
 }

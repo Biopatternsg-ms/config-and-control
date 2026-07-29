@@ -15,16 +15,16 @@
  */
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
+import com.biopatternsg.infrastructure.dtos.UpdateUserStatusRequest;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.dtos.UserResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -33,8 +33,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-
-import java.util.List;
 
 @ApplicationScoped
 @Path("/config-and-control/admin")
@@ -57,17 +55,18 @@ public class AdminController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UserResponse.class,
+                                    implementation = ReportFormat.class,
                                     description = "Users list obtained"
                             )
                     )
             )
     })
-    public List<UserResponse> listUsers(UserFiltersRequest userFilters){
+    public ReportFormat<UserResponse> listUsers(UserFiltersRequest userFilters){
 
-        var userList = userManagement.listUsers(UserMapper.filtersRequestToModel(userFilters),
+        var modelFormat = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
-        return UserMapper.modelToResponseList(userList);
+        var responseList = modelFormat.list().stream().map(UserMapper::modelToResponse).toList();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 
     @POST
@@ -91,8 +90,34 @@ public class AdminController {
     })
     public Response register(@Valid UserRequest newUser) {
 
-        userManagement.register(UserMapper.userRequestToModel(newUser));
+        userManagement.register(UserMapper.requestToModel(newUser));
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    @PUT
+    @Path("/user/{id}/status")
+    @Operation(
+            summary = "Update user status",
+            description = "Updates the enabled status of a user in the system and the identity provider."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "User status successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UserResponse.class,
+                                    description = "Updated user"
+                            )
+                    )
+            )
+    })
+    public Response updateStatus(@PathParam("id") String id, @Valid UpdateUserStatusRequest updateStatus) {
+
+        var userConfig = userManagement.updateStatus(id, updateStatus.enabled());
+        return Response.ok(UserMapper.modelToResponse(userConfig)).build();
     }
 
     @GET

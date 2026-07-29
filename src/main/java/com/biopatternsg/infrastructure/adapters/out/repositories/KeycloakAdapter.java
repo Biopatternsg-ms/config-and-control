@@ -17,11 +17,11 @@ package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.exceptions.KeycloakServiceException;
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
+import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.clients.KeycloakHttpClient;
 import com.biopatternsg.domain.models.UserAuth;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserCredentialsRequest;
+import com.biopatternsg.infrastructure.dtos.keycloak.UpdateUserKeycloakRequest;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserRegisterRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -116,23 +116,24 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
-    public List<UserConfig> listUsers(UserFilters userFilters) {
+    public List<UserConfig> listUsers(UserConfig userFilters) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.getAccess_token();
 
         try{
-            return keycloakHttpClient.usersList(accessToken, userFilters);
+            var usersKeycloak = keycloakHttpClient.usersList(accessToken, userFilters);
+            return UserMapper.keycloakToModelList(usersKeycloak);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
     }
 
-    public void verifyEmail(String userId){
+    @Override
+    public void sendEmail(String userId, List<String> actions){
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.getAccess_token();
-        List<String> actions = List.of("VERIFY_EMAIL");
 
         try{
             keycloakHttpClient.sendEmail(accessToken, userId, actions);
@@ -142,24 +143,16 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
-    public void recoveryPassword(String username) {
+    public void updateEnabled(String userId, boolean enabled) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.getAccess_token();
-        List<String> actions = List.of("UPDATE_PASSWORD");
+        var updateUserKeycloak = UpdateUserKeycloakRequest.builder().enabled(enabled).build();
 
         try{
-            var filters = UserFilters.builder().username(username).build();
-            var users = keycloakHttpClient.usersList(accessToken, filters);
-            if (users != null && !users.isEmpty()) {
-                var firstUser = users.getFirst();
-                if (firstUser != null && firstUser.getId() != null && !firstUser.getId().isBlank()) {
-                    keycloakHttpClient.sendEmail(accessToken, firstUser.getId(), actions);
-                }
-            }
+            keycloakHttpClient.updateUser(accessToken, userId, updateUserKeycloak);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
     }
-
 }

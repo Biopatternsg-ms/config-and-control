@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.in;
+package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.domain.models.ReportFormat;
+import lombok.Builder;
 
-public interface FindPipeline {
-
-    PipelineConfig byId(String id);
-    PipelineConfig byName(String name);
-    ReportFormat<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size);
+@Builder
+public record UpdateUserKeycloakRequest(
+        boolean enabled
+) {
 }

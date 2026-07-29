@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.mongo_db.collections.NetworkCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
@@ -49,31 +50,31 @@ public class NetworkRepositoryDB implements PanacheMongoRepository <NetworkColle
                 .firstResult();
     }
 
-    public List<NetworkCollection> findByUserAndFilters(NetworkConfig findNetwork,
-                                                        String userId, int page, int size){
+    public ReportFormat<NetworkCollection> findByUserAndFilters(NetworkConfig findNetwork,
+                                                                String userId, int page, int size){
 
         Document query = new Document();
         query.append("userId", userId);
 
-        if(findNetwork == null){
-            return find(query).list();
+        if(findNetwork != null){
+            if (findNetwork.getId() != null && !findNetwork.getId().isEmpty()) {
+                query.append("_id", new ObjectId(findNetwork.getId()));
+            }
+
+            if (findNetwork.getName() != null) {
+                query.append("name", new Document("$regex", findNetwork.getName()).append("$options", "i"));
+            }
+
+            if (findNetwork.getDescription() != null) {
+                query.append("description", new Document("$regex", findNetwork.getDescription()).append("$options", "i"));
+            }
         }
 
-        if (findNetwork.getId() != null && !findNetwork.getId().isEmpty()) {
-            query.append("_id", new ObjectId(findNetwork.getId()));
-        }
+        long count = find(query).count();
+        List<NetworkCollection> list = (page < 0 || size <= 0)
+            ? find(query).list()
+            : find(query).page(page, size).list();
 
-        if (findNetwork.getName() != null) {
-            query.append("name", new Document("$regex", findNetwork.getName()).append("$options", "i"));
-        }
-
-        if (findNetwork.getDescription() != null) {
-            query.append("description", new Document("$regex", findNetwork.getDescription()).append("$options", "i"));
-        }
-
-        if(page <= 0 || size <= 0)
-            return find(query).list();
-
-        return find(query).page(page, size).list();
+        return new ReportFormat<>(count, list);
     }
 }

@@ -15,7 +15,8 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
-import com.biopatternsg.domain.models.UserFilters;
+import com.biopatternsg.domain.models.ReportFormat;
+import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
@@ -38,39 +39,32 @@ public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> 
                 .firstResult();
     }
 
-    public List<UserCollection> findByFirstName(String firstName) {
-        return find("{'firstName': {'$regex': :firstName, '$options': 'i'}}",
-                Parameters.with("firstName", firstName))
-                .list();
-    }
-
-    public List<UserCollection> findByLastName(String lastName) {
-        return find("{'lastName': {'$regex': :lastName, '$options': 'i'}}",
-                Parameters.with("lastName", lastName))
-                .list();
-    }
-
-    public List<UserCollection> findByFilters(UserFilters findUser, int page, int size) {
+    public ReportFormat<UserCollection> findByFilters(UserConfig filters, int page, int size) {
         Document query = new Document();
-        
-        if (findUser == null) {
-            if (page <= 0 || size <= 0) return find(query).list();
-            return find(query).page(page, size).list();
+
+        if (filters != null) {
+            if (filters.getUsername() != null && !filters.getUsername().isEmpty()) {
+                query.append("username", filters.getUsername());
+            }
+
+            if (filters.getFirstName() != null && !filters.getFirstName().isEmpty()) {
+                query.append("firstName", new Document("$regex", filters.getFirstName()).append("$options", "i"));
+            }
+
+            if (filters.getLastName() != null && !filters.getLastName().isEmpty()) {
+                query.append("lastName", new Document("$regex", filters.getLastName()).append("$options", "i"));
+            }
+
+            if (filters.getEnabled() != null) {
+                query.append("enabled", filters.getEnabled());
+            }
         }
 
-        if (findUser.getUsername() != null && !findUser.getUsername().isEmpty()) {
-            query.append("username", findUser.getUsername());
-        }
+        long count = find(query).count();
+        List<UserCollection> list = (page < 0 || size <= 0)
+                ? find(query).list()
+                : find(query).page(page, size).list();
 
-        if (findUser.getFirstName() != null && !findUser.getFirstName().isEmpty()) {
-            query.append("firstName", new Document("$regex", findUser.getFirstName()).append("$options", "i"));
-        }
-
-        if (findUser.getLastName() != null && !findUser.getLastName().isEmpty()) {
-            query.append("lastName", new Document("$regex", findUser.getLastName()).append("$options", "i"));
-        }
-
-        if (page <= 0 || size <= 0) return find(query).list();
-        return find(query).page(page, size).list();
+        return new ReportFormat<>(count, list);
     }
 }

@@ -15,15 +15,14 @@
  */
 package com.biopatternsg.domain.port.in;
 
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
-
-import java.util.List;
 
 public interface UserManagement {
 
     void register(UserConfig request);
-    void recover(String userId);
     void syncUsers();
-    List<UserConfig> listUsers(UserFilters userFilters, int page, int size);
+    void recoveryPassword(String email);
+    UserConfig updateStatus(String id, boolean enabled);
+    ReportFormat<UserConfig> listUsers(UserConfig filters, int page, int size);
 }

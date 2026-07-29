@@ -16,6 +16,7 @@
 package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.FindPipeline;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,7 +41,7 @@ public class FindPipelineUseCase implements FindPipeline {
     }
 
     @Override
-    public List<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size) {
+    public ReportFormat<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size) {
         return pipelineRepository.findByFilters(findPipeline, page, size);
     }
 }

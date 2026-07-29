@@ -27,7 +27,6 @@ import com.biopatternsg.domain.models.PipelineStepExecutionResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @ApplicationScoped
