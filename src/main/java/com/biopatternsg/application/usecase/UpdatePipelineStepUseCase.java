@@ -36,7 +36,7 @@ public class UpdatePipelineStepUseCase implements UpdatePipelineStep {
     public void execute(String pipelineId, PipelineStatus pipelineStatus) {
 
         var pipelineConfig = pipelineService.updateStep(
-                pipelineId, pipelineStatus.getStep(), pipelineStatus.getStatus());
+                pipelineId, pipelineStatus.getStep(), pipelineStatus.getStatus(), pipelineStatus.getMetrics());
 
         if (pipelineStatus.getStatus() == Status.COMPLETED) {
             pipelineStepOrchestrator.orchestrate(pipelineConfig, pipelineStatus.getStep());

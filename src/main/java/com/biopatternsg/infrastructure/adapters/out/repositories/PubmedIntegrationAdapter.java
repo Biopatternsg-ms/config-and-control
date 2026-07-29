@@ -123,7 +123,8 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
     @Override
     public void executeGenerateAlignedObjects(PipelineConfig pipelineConfig) {
         GenerateAlignedObjectsRequest request = new GenerateAlignedObjectsRequest(
-                pipelineConfig.getId()
+                pipelineConfig.getId(),
+                pipelineConfig.getExpertObjects()
         );
 
         try {

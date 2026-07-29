@@ -46,13 +46,16 @@ public class CreatePipelineUseCase implements CreatePipeline {
             throw new UnprocessableEntityException("The pipeline name already exists");
         }
 
-        //Build pipelineConfig: initialize all steps as PENDING
+        //Build pipelineConfig: initialize CONFIG as IN_PROGRESS and all other steps as PENDING
         for (PipelineSteps stepVal : PipelineSteps.values()) {
-            pipelineConfig.addStatusForStep(stepVal, Status.PENDING);
+            if (stepVal == PipelineSteps.CONFIG) {
+                pipelineConfig.addStatusForStep(stepVal, Status.IN_PROGRESS);
+            } else {
+                pipelineConfig.addStatusForStep(stepVal, Status.PENDING);
+            }
         }
 
         pipelineConfig.setStep(PipelineSteps.CONFIG);
-        pipelineConfig.addStatus(Status.IN_PROGRESS);
         return pipelineRepository.save(pipelineConfig);
     }
 }
