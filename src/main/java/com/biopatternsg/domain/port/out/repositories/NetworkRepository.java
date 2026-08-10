@@ -16,8 +16,7 @@
 package com.biopatternsg.domain.port.out.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
-
-import java.util.List;
+import com.biopatternsg.domain.models.ReportFormat;
 
 public interface NetworkRepository {
 
@@ -25,5 +24,5 @@ public interface NetworkRepository {
     NetworkConfig findById(String id);
     NetworkConfig findByName(String name);
     NetworkConfig findByNameExists(String id, String name);
-    List<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size);
+    ReportFormat<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size);
 }

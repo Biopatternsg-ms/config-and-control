@@ -15,8 +15,6 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;

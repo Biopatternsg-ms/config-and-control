@@ -16,7 +16,7 @@
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.infrastructure.dtos.FindPipelineRequest;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import io.quarkus.panache.common.Parameters;
@@ -50,35 +50,35 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
                 .firstResult();
     }
 
-    public List<PipelineCollection> findByUserAndFilters(PipelineConfig findPipeline,
-                                                         List<String> networkIdList, int page, int size){
+    public ReportFormat<PipelineCollection> findByUserAndFilters(PipelineConfig findPipeline,
+                                                                 List<String> networkIdList, int page, int size){
 
         Document query = new Document();
         query.append("networkId", new Document("$in", networkIdList));
 
-        if(findPipeline == null){
-            return find(query).list();
+        if(findPipeline != null){
+            if (findPipeline.getId() != null && !findPipeline.getId().isEmpty()) {
+                query.append("_id", new ObjectId(findPipeline.getId()));
+            }
+
+            if (findPipeline.getNetworkId() != null && !findPipeline.getNetworkId().isEmpty()) {
+                query.append("networkId", findPipeline.getNetworkId());
+            }
+
+            if (findPipeline.getName() != null) {
+                query.append("name", new Document("$regex", findPipeline.getName()).append("$options", "i"));
+            }
+
+            if (findPipeline.getDescription() != null) {
+                query.append("description", new Document("$regex", findPipeline.getDescription()).append("$options", "i"));
+            }
         }
 
-        if (findPipeline.getId() != null && !findPipeline.getId().isEmpty()) {
-            query.append("_id", new ObjectId(findPipeline.getId()));
-        }
+        long count = find(query).count();
+        List<PipelineCollection> list = (page < 0 || size <= 0)
+            ? find(query).list()
+            : find(query).page(page, size).list();
 
-        if (findPipeline.getNetworkId() != null && !findPipeline.getNetworkId().isEmpty()) {
-            query.append("networkId", findPipeline.getNetworkId());
-        }
-
-        if (findPipeline.getName() != null) {
-            query.append("name", new Document("$regex", findPipeline.getName()).append("$options", "i"));
-        }
-
-        if (findPipeline.getDescription() != null) {
-            query.append("description", new Document("$regex", findPipeline.getDescription()).append("$options", "i"));
-        }
-
-        if(page <= 0 || size <= 0)
-            return find(query).list();
-
-        return find(query).page(page, size).list();
+        return new ReportFormat<>(count, list);
     }
 }

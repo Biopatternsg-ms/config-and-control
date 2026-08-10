@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.models;
+package com.biopatternsg.infrastructure.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
-@AllArgsConstructor
-@Setter
-@Getter
-@Builder
-public class UserFilters {
-
-    String username;
-    String firstName;
-    String lastName;
-    Boolean enable;
+public record UpdateUserStatusRequest(
+        @NotNull(message = "El campo 'enabled' es obligatorio y no puede ser nulo")
+        @JsonProperty("enabled")
+        Boolean enabled
+) {
 }

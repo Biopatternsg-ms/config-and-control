@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.in;
+package com.biopatternsg.infrastructure.dtos;
 
-import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.domain.models.ReportFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
-public interface FindPipeline {
+import java.util.List;
 
-    PipelineConfig byId(String id);
-    PipelineConfig byName(String name);
-    ReportFormat<PipelineConfig> byFilters(PipelineConfig findPipeline, int page, int size);
+@Builder
+public record UserListResponse(
+
+        @JsonProperty("count")
+        long count,
+
+        @JsonProperty("list")
+        List<UserResponse> list
+) {
 }

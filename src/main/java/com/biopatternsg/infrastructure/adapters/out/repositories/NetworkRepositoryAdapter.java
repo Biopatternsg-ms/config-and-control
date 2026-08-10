@@ -16,14 +16,13 @@
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.NetworkMapper;
 import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import java.util.List;
 
 @ApplicationScoped
 public class NetworkRepositoryAdapter implements NetworkRepository {
@@ -63,10 +62,11 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
     }
 
     @Override
-    public List<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size) {
+    public ReportFormat<NetworkConfig> findByFilters(NetworkConfig findNetwork, int page, int size) {
 
-        var networkCollectionList = networkRepositoryDB.findByUserAndFilters(findNetwork,
+        var reportCollection = networkRepositoryDB.findByUserAndFilters(findNetwork,
                 sessionUtil.getUserId(), page, size);
-        return NetworkMapper.toNetworkConfigList(networkCollectionList);
+        var modelList = reportCollection.list().stream().map(NetworkMapper::toNetworkConfig).toList();
+        return new ReportFormat<> (reportCollection.count(), modelList);
     }
 }

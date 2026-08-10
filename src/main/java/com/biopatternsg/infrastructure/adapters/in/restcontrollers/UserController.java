@@ -15,8 +15,14 @@
  */
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
+import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.domain.port.in.UserManagement;
-import jakarta.ws.rs.GET;
+import com.biopatternsg.infrastructure.dtos.LoginRequest;
+import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
+import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
+import com.biopatternsg.domain.models.UserAuth;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -24,9 +30,8 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
@@ -34,30 +39,84 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final UserAuthentication userAuthentication;
     private final UserManagement userManagement;
 
-    @GET
-    @Path("/{id}/password-recovery")
+    @POST
+    @Path("/login")
     @Operation(
-        summary = "Recover user account",
-        description = "Initiates the account recovery process for a user with the specified ID."
+        summary = "User authentication",
+        description = "Authenticates a user with provided credentials and returns an authentication token."
     )
     @APIResponses({
         @APIResponse(
-            responseCode = "202",
-            description = "Account recovery process initiated",
+            responseCode = "200",
+            description = "User successfully authenticated",
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(
-                    type = SchemaType.STRING,
-                    description = "Recovery confirmation"
+                    type = SchemaType.OBJECT,
+                    implementation = UserAuth.class,
+                    description = "Authentication token response"
                 )
             )
         )
     })
-    public Response passwordRecover(@PathParam("id") String userId) {
+    public Response login(@Valid LoginRequest request) {
 
-        userManagement.recover(userId);
-        return Response.accepted().build();
+        UserAuth token = userAuthentication.login(request.username(), request.password());
+        return Response.ok(token).build();
     }
+
+    @POST
+    @Path("/refresh-token")
+    @Operation(
+            summary = "Refresh user authentication",
+            description = "Refresh token and provided credentials to update and returns an authentication token."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "User successfully authenticated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UserAuth.class,
+                                    description = "Authentication token response"
+                            )
+                    )
+            )
+    })
+    public Response refreshToken(@Valid RefreshTokenRequest refreshTokenRequest){
+
+        UserAuth token = userAuthentication.refreshToken(refreshTokenRequest.refreshToken());
+        return Response.ok(token).build();
+    }
+
+    @POST
+    @Path("/recovery-password")
+    @Operation(
+            summary = "Recovery password process",
+            description = "Receive email to recovery password process sending an email"
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "User successfully authenticated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = Response.class,
+                                    description = "Recovery password process"
+                            )
+                    )
+            )
+    })
+    public void recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
+
+        userManagement.recoveryPassword(recoveryPasswordRequest.username());
+    }
+
 }

@@ -36,14 +36,13 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 @ApplicationScoped
 public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
 
-    @RestClient
-    @Inject
     private final PubmedRestClient pubmedRestClient;
     private final PipelineService pipelineService;
     private final SessionUtil sessionUtil;
     private static final int DEFAULT_LEVEL = 1;
     private static final int DEFAULT_RETMAX = 10;
 
+    @Inject
     public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineService pipelineService, SessionUtil sessionUtil) {
         this.pubmedRestClient = pubmedRestClient;
         this.pipelineService = pipelineService;

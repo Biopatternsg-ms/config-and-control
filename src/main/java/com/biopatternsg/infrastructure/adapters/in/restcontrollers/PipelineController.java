@@ -18,6 +18,7 @@ package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.models.ExperimentExecutionResponse;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.*;
 import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.*;
@@ -297,11 +298,12 @@ public class PipelineController {
                     )
             )
     })
-    public List<PipelineResponse> findList(FindPipelineRequest pipelineFilters){
+    public ReportFormat<PipelineResponse> findList(FindPipelineRequest pipelineFilters){
 
-        var pipelineConfigList = findPipeline.byFilters(PipelineMapper.requestToUpdate(pipelineFilters),
+        var modelFormat = findPipeline.byFilters(PipelineMapper.requestToUpdate(pipelineFilters),
                 pipelineFilters.page(), pipelineFilters.size());
-        return PipelineMapper.collectionToResponseList(pipelineConfigList);
+        var responseList = modelFormat.list().stream().map(PipelineMapper::configToResponse).toList();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 
     @GET

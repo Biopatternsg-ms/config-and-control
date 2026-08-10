@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.infrastructure.dtos.keycloak;
+package com.biopatternsg.domain.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
-@Builder
-public record UserResponse(
+import java.util.List;
 
-        @JsonProperty("id")
-        String id,
-        @JsonProperty("username")
-        String username,
-        @JsonProperty("firstName")
-        String firstName,
-        @JsonProperty("lastName")
-        String lastName,
-        @JsonProperty("enabled")
-        String enabled,
-        @JsonProperty("createdTimestamp")
-        int createdAt
-) {
-}
+@Builder
+public record ReportFormat<T>(
+        long count,
+        List<T> list
+) {}

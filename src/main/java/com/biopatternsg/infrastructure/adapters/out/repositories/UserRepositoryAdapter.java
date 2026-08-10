@@ -15,8 +15,8 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import com.biopatternsg.infrastructure.adapters.mappers.UserMapper;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
@@ -24,8 +24,7 @@ import com.biopatternsg.infrastructure.mongo_db.repositories.UserRepositoryDB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-
-import java.util.List;
+import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class UserRepositoryAdapter implements UserRepository {
@@ -35,16 +34,39 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public void create(UserConfig userConfig) {
-        UserCollection userCollection = UserMapper.toCollection(userConfig);
+
+        UserCollection userCollection = UserMapper.modelToCollection(userConfig);
         userRepositoryDB.persistOrUpdate(userCollection);
         Response.ok().build();
     }
 
     @Override
-    public List<UserConfig> list(UserFilters userFilters, int page, int size) {
-        List<UserCollection> collections = userRepositoryDB.findByFilters(userFilters, page, size);
-        return collections.stream()
-                .map(UserMapper::toDomain)
-                .toList();
+    public UserConfig find(String username){
+
+        var userCollection = userRepositoryDB.findUsername(username);
+        return UserMapper.collectionToModel(userCollection);
+    }
+
+    @Override
+    public UserConfig findById(String id) {
+
+        var userCollection = userRepositoryDB.findById(new ObjectId(id));
+        return UserMapper.collectionToModel(userCollection);
+    }
+
+    @Override
+    public void update(UserConfig userConfig) {
+
+        UserCollection userCollection = UserMapper.modelToCollection(userConfig);
+        userCollection.id = new ObjectId(userConfig.getId());
+        userRepositoryDB.persistOrUpdate(userCollection);
+    }
+
+    @Override
+    public ReportFormat<UserConfig> list(UserConfig filters, int page, int size) {
+
+        var reportCollection = userRepositoryDB.findByFilters(filters, page, size);
+        var modelList = reportCollection.list().stream().map(UserMapper::collectionToModel).toList();
+        return new ReportFormat<>(reportCollection.count(), modelList);
     }
 }

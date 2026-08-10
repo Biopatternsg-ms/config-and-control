@@ -16,72 +16,91 @@
 package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.UserConfig;
-import com.biopatternsg.domain.models.UserFilters;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
-import com.biopatternsg.infrastructure.dtos.keycloak.UserResponse;
+import com.biopatternsg.infrastructure.dtos.UserResponse;
+import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloakResponse;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
 
 import java.util.List;
 
 public class UserMapper {
 
-    public static UserConfig userRequestToModel(UserRequest newUser){
+    public static UserConfig requestToModel(UserRequest userRequest){
 
+        if (userRequest == null) return null;
         return UserConfig.builder()
-                .username(newUser.username())
-                .email(newUser.username())
-                .firstName(newUser.firstName())
-                .lastName(newUser.lastName())
+                .username(userRequest.username())
+                .email(userRequest.username())
+                .firstName(userRequest.firstName())
+                .lastName(userRequest.lastName())
                 .build();
     }
 
-    public static UserFilters filtersRequestToModel(UserFiltersRequest userFilters){
+    public static UserResponse modelToResponse(UserConfig userConfig){
 
-        return UserFilters.builder()
-                .username(userFilters.username())
-                .firstName(userFilters.firstName())
-                .lastName(userFilters.lastName())
-                .enable(userFilters.enable())
-                .build();
-    }
-
-    public static UserResponse toResponse(UserConfig userConfig){
-
+        if (userConfig == null) return null;
         return UserResponse.builder()
                 .id(userConfig.getId())
                 .username(userConfig.getUsername())
                 .firstName(userConfig.getFirstName())
                 .lastName(userConfig.getLastName())
-                .enabled(userConfig.getEnabled())
+                .enabled(userConfig.isEnabled())
                 .createdAt(userConfig.getCreatedAt())
                 .build();
     }
 
-    public static List<UserResponse> modelToResponseList(List<UserConfig> userList){
+    public static UserCollection modelToCollection(UserConfig userConfig) {
 
-        return userList.stream().map(UserMapper::toResponse).toList();
-    }
-
-    public static UserCollection toCollection(UserConfig userConfig) {
         if (userConfig == null) return null;
         return UserCollection.builder()
                 .identityProviderId(userConfig.getIdentityProviderId())
                 .username(userConfig.getUsername())
                 .firstName(userConfig.getFirstName())
                 .lastName(userConfig.getLastName())
-                .enabled(userConfig.getEnabled())
+                .enabled(userConfig.isEnabled())
                 .build();
     }
 
-    public static UserConfig toDomain(UserCollection collection) {
+    public static UserConfig collectionToModel(UserCollection collection) {
+
         if (collection == null) return null;
         return UserConfig.builder()
                 .id(collection.id.toString())
+                .identityProviderId(collection.getIdentityProviderId())
                 .username(collection.getUsername())
                 .firstName(collection.getFirstName())
                 .lastName(collection.getLastName())
+                .enabled(collection.isEnabled())
                 .createdAt(collection.id.getTimestamp())
                 .build();
+    }
+
+    public static UserConfig filtersToModel(UserFiltersRequest userFilters){
+
+        if (userFilters == null) return null;
+        return UserConfig.builder()
+                .username(userFilters.username())
+                .firstName(userFilters.firstName())
+                .lastName(userFilters.lastName())
+                .enabled(userFilters.enabled())
+                .build();
+    }
+
+    public static UserConfig keycloakToModel(UserKeycloakResponse userKeycloakResponse){
+
+        if (userKeycloakResponse == null) return null;
+        return UserConfig.builder()
+                .identityProviderId(userKeycloakResponse.id())
+                .username(userKeycloakResponse.username())
+                .firstName(userKeycloakResponse.firstName())
+                .lastName(userKeycloakResponse.lastName())
+                .enabled(userKeycloakResponse.enabled())
+                .build();
+    }
+
+    public static List<UserConfig> keycloakToModelList(List<UserKeycloakResponse> identifiersList){
+
+        return identifiersList.stream().map(UserMapper::keycloakToModel).toList();
     }
 }
