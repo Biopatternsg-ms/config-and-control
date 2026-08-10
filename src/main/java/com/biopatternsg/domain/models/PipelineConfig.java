@@ -40,6 +40,7 @@ public class PipelineConfig {
     private PipelineSteps step;
     private List<PipelineStatus> statuses;
     private List<ExpertObjectConfig> expertObjects;
+    private List<String> alignedExpertObjects;
     private TranscriptionFactorConfig transcriptionFactorConfig;
     private boolean useOnlyPrincipalName;
     private int createdAt;

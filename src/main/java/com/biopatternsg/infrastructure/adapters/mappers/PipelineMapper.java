@@ -44,6 +44,7 @@ public class PipelineMapper {
                 .maxComplexes(pipelineCollection.getMaxComplexes())
                 .statuses(pipelineCollection.getStatuses())
                 .expertObjects(pipelineCollection.getExpertObjects())
+                .alignedExpertObjects(pipelineCollection.getAlignedExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
                 .useOnlyPrincipalName(pipelineCollection.getUseOnlyPrincipalName() != null ? pipelineCollection.getUseOnlyPrincipalName() : true)
                 .createdAt(pipelineCollection.id.getTimestamp())
@@ -95,6 +96,7 @@ public class PipelineMapper {
                 .maxComplexes(pipelineConfig.getMaxComplexes())
                 .useOnlyPrincipalName(pipelineConfig.isUseOnlyPrincipalName())
                 .expertObjects(pipelineConfig.getExpertObjects())
+                .alignedExpertObjects(pipelineConfig.getAlignedExpertObjects())
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
                 .build();
 
@@ -146,6 +148,14 @@ public class PipelineMapper {
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .expertObjects(updatePipeline.expertObjects())
+                .build();
+    }
+
+    public static PipelineConfig requestToUpdate(UpdateAlignedExpertObjectsRequest updatePipeline){
+
+        return PipelineConfig.builder()
+                .id(updatePipeline.id())
+                .alignedExpertObjects(updatePipeline.alignedExpertObjects())
                 .build();
     }
 

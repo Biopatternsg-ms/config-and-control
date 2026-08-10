@@ -178,6 +178,32 @@ public class PipelineController {
                 UpdatePipelineEnum.SEARCH_CONFIG);
     }
 
+    @PUT
+    @Path("/aligned-expert-objects")
+    @Operation(
+            summary = "Update pipeline aligned expert objects",
+            description = "Updates the list of confirmed aligned biological symbols (alignedExpertObjects) of an existing pipeline."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipeline aligned expert objects successfully updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    type = SchemaType.OBJECT,
+                                    implementation = UpdateAlignedExpertObjectsRequest.class,
+                                    description = "Updated pipeline configuration"
+                            )
+                    )
+            )
+    })
+    public PipelineConfig updateAlignedExpertObjects(@Valid UpdateAlignedExpertObjectsRequest updatePipeline){
+
+        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+                UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS);
+    }
+
     @POST
     @Path("/launch")
     @Operation(

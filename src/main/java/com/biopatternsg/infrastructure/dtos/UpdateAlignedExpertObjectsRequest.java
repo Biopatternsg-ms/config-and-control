@@ -13,8 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.enums;
+package com.biopatternsg.infrastructure.dtos;
 
-public enum UpdatePipelineEnum {
-    DESCRIPTION, TRANSCRIPTION_FACTOR, EXPERT_OBJETS, SEARCH_CONFIG, ALIGNED_EXPERT_OBJECTS
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+public record UpdateAlignedExpertObjectsRequest(
+
+        @NotNull String id,
+        @NotNull List<String> alignedExpertObjects
+) {
 }

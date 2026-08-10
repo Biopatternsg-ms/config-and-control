@@ -51,6 +51,7 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineCurrent);
             case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineCurrent);
             case SEARCH_CONFIG -> updateSearchConfig(pipelineConfig, pipelineCurrent);
+            case ALIGNED_EXPERT_OBJECTS -> updateAlignedExpertObjects(pipelineConfig, pipelineCurrent);
         }
 
         return pipelineRepository.save(pipelineCurrent);
@@ -66,6 +67,10 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
 
     private void updateExportObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setExpertObjects(pipelineRequest.getExpertObjects());
+    }
+
+    private void updateAlignedExpertObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setAlignedExpertObjects(pipelineRequest.getAlignedExpertObjects());
     }
 
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
