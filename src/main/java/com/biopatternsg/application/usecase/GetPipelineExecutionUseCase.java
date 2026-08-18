@@ -122,6 +122,13 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             Map<String, String> stepMetrics = null;
             if (stepEnum == PipelineSteps.CONFIG) {
                 stepMetrics = deriveConfigMetrics(pipelineConfig);
+            } else if (stepEnum == PipelineSteps.UPDATE_ALIGNED_OBJECTS) {
+                Optional<PipelineStatus> metricSource = completedStatus.isPresent() ? completedStatus
+                        : failedStatus.isPresent() ? failedStatus : inProgressStatus;
+                stepMetrics = metricSource.map(PipelineStatus::getMetrics).orElse(null);
+                if (stepMetrics == null && completedStatus.isPresent()) {
+                    stepMetrics = deriveUpdateAlignedObjectsMetrics(pipelineConfig);
+                }
             } else {
                 // Take metrics from completed or failed status, whichever is present
                 Optional<PipelineStatus> metricSource = completedStatus.isPresent() ? completedStatus
@@ -214,6 +221,17 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             }
         }
 
+        return metrics.isEmpty() ? null : metrics;
+    }
+
+    private Map<String, String> deriveUpdateAlignedObjectsMetrics(PipelineConfig config) {
+        Map<String, String> metrics = new LinkedHashMap<>();
+        if (config.getAlignedExpertObjects() != null && !config.getAlignedExpertObjects().isEmpty()) {
+            metrics.put("totalAlignedObjects", String.valueOf(config.getAlignedExpertObjects().size()));
+            String symbols = String.join(", ", config.getAlignedExpertObjects());
+            metrics.put("alignedSymbols", symbols);
+        }
+        metrics.put("statusMessage", "Manual alignment confirmed by expert");
         return metrics.isEmpty() ? null : metrics;
     }
 

@@ -26,6 +26,8 @@ import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @ApplicationScoped
@@ -81,7 +83,16 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     private void updateAlignedExpertObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setAlignedExpertObjects(pipelineRequest.getAlignedExpertObjects());
         pipelineCurrent.setStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS);
-        pipelineCurrent.addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED);
+
+        Map<String, String> metrics = new LinkedHashMap<>();
+        if (pipelineRequest.getAlignedExpertObjects() != null && !pipelineRequest.getAlignedExpertObjects().isEmpty()) {
+            metrics.put("totalAlignedObjects", String.valueOf(pipelineRequest.getAlignedExpertObjects().size()));
+            String symbols = String.join(", ", pipelineRequest.getAlignedExpertObjects());
+            metrics.put("alignedSymbols", symbols);
+        }
+        metrics.put("statusMessage", "Manual alignment confirmed by expert");
+
+        pipelineCurrent.addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED, metrics);
     }
 
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){

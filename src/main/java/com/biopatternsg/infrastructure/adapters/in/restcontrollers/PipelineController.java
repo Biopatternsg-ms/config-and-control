@@ -27,6 +27,11 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.domain.enums.Status;
+import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
+import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
+import com.biopatternsg.domain.services.PipelineService;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -47,6 +52,8 @@ public class PipelineController {
     private final FindPipeline findPipeline;
     private final UpdatePipelineStep updatePipelineStep;
     private final GetPipelineExecution getPipelineExecution;
+    private final PipelineService pipelineService;
+    private final TriggerPubmedIntegration triggerPubmedIntegration;
 
     @POST
     @Operation(
@@ -203,6 +210,35 @@ public class PipelineController {
 
         return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS);
+    }
+
+    @POST
+    @Path("/{id}/regenerate-aligned-objects")
+    @Operation(
+        summary = "Regenerate aligned objects",
+        description = "Re-triggers the aligned objects generation step with updated symbols."
+    )
+    @APIResponses({
+        @APIResponse(
+            responseCode = "202",
+            description = "Regeneration process successfully initiated",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    type = SchemaType.STRING,
+                    description = "Success message"
+                )
+            )
+        )
+    })
+    public Response regenerateAlignedObjects(@PathParam("id") String id){
+        var pipeline = findPipeline.byId(id);
+        if (pipeline == null) {
+            throw new UnprocessableEntityException("The pipeline don't exists");
+        }
+        pipelineService.updateStep(id, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
+        triggerPubmedIntegration.executeGenerateAlignedObjects(pipeline);
+        return Response.accepted().entity("Regeneration triggered").build();
     }
 
     @POST

@@ -61,9 +61,7 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
             }
             case UPDATE_ALIGNED_OBJECTS -> {
-                log.info("Step is UPDATE_ALIGNED_OBJECTS completed, setting UPDATE_ALIGNED_OBJECTS to PENDING and re-triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
-                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
-                triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
+                log.info("Step UPDATE_ALIGNED_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");
