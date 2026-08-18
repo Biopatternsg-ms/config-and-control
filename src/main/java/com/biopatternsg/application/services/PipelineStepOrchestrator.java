@@ -16,9 +16,11 @@
 package com.biopatternsg.application.services;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
+import com.biopatternsg.domain.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class PipelineStepOrchestrator {
 
     private final TriggerPubmedIntegration triggerPubmedIntegration;
     private final BiologicalObjectRepository biologicalObjectRepository;
+    private final PipelineService pipelineService;
 
     public void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step) {
         switch (step) {
@@ -51,6 +54,15 @@ public class PipelineStepOrchestrator {
             }
             case BUILD_KNOWLEDGE_BASE -> {
                 log.info("Step is BUILD_KNOWLEDGE_BASE completed, triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
+                triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
+            }
+            case GENERATE_ALIGNED_OBJECTS -> {
+                log.info("Step is GENERATE_ALIGNED_OBJECTS completed, setting UPDATE_ALIGNED_OBJECTS to IN_PROGRESS for pipeline {}", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
+            }
+            case UPDATE_ALIGNED_OBJECTS -> {
+                log.info("Step is UPDATE_ALIGNED_OBJECTS completed, setting UPDATE_ALIGNED_OBJECTS to PENDING and re-triggering expert objects alignment for pipeline {}", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
                 triggerPubmedIntegration.executeGenerateAlignedObjects(pipelineConfig);
             }
             default -> {

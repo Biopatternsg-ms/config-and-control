@@ -60,6 +60,11 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
                     .filter(ps -> ps.getStep() == stepEnum)
                     .toList();
 
+            Optional<PipelineStatus> latestStatusOpt = stepStatuses.stream()
+                    .filter(Objects::nonNull)
+                    .filter(ps -> ps.getCreatedAt() != null)
+                    .max(Comparator.comparing(PipelineStatus::getCreatedAt));
+
             Optional<PipelineStatus> completedStatus = stepStatuses.stream()
                     .filter(ps -> ps.getStatus() == Status.COMPLETED)
                     .findFirst();
@@ -80,19 +85,21 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             Date stepStart = null;
             Date stepEnd = null;
 
-            if (completedStatus.isPresent()) {
+            Status currentStatusEnum = latestStatusOpt.map(PipelineStatus::getStatus).orElse(Status.PENDING);
+
+            if (currentStatusEnum == Status.COMPLETED && completedStatus.isPresent()) {
                 statusStr = "COMPLETED";
                 stepEnd = completedStatus.get().getCreatedAt();
                 stepStart = inProgressStatus.map(PipelineStatus::getCreatedAt).orElse(stepEnd);
-            } else if (failedStatus.isPresent()) {
+            } else if (currentStatusEnum == Status.FAILED && failedStatus.isPresent()) {
                 statusStr = "FAILED";
                 stepEnd = failedStatus.get().getCreatedAt();
                 stepStart = inProgressStatus.map(PipelineStatus::getCreatedAt).orElse(stepEnd);
-            } else if (inProgressStatus.isPresent()) {
+            } else if (currentStatusEnum == Status.IN_PROGRESS && inProgressStatus.isPresent()) {
                 statusStr = "ACTIVE";
                 stepStart = inProgressStatus.get().getCreatedAt();
                 currentPhaseStartTime = stepStart;
-            } else if (pendingStatus.isPresent()) {
+            } else {
                 statusStr = "PENDING";
             }
 
@@ -222,6 +229,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case SEARCH_PUBTATOR -> "Search PubTator Annotations";
             case BUILD_KNOWLEDGE_BASE -> "Build Knowledge Base Graph";
             case GENERATE_ALIGNED_OBJECTS -> "Generate Aligned Objects";
+            case UPDATE_ALIGNED_OBJECTS -> "Update Aligned Objects";
         };
     }
 
@@ -237,6 +245,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case SEARCH_PUBTATOR -> "Extracts bio-entity annotations using the PubTator engine.";
             case BUILD_KNOWLEDGE_BASE -> "Assembles the unified biological knowledge base network.";
             case GENERATE_ALIGNED_OBJECTS -> "Generates aligned objects and final output artifacts.";
+            case UPDATE_ALIGNED_OBJECTS -> "Manual review and update of aligned biological objects.";
         };
     }
 
@@ -248,7 +257,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case EXPERT_OBJECTS, SEARCH_LEVELS -> "Cpu";
             case COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR -> "FileText";
             case BUILD_KNOWLEDGE_BASE -> "Activity";
-            case GENERATE_ALIGNED_OBJECTS -> "FileText";
+            case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS -> "FileText";
         };
     }
 

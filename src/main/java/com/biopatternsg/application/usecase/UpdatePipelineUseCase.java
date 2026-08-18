@@ -15,6 +15,8 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
@@ -31,6 +33,7 @@ import java.util.Objects;
 public class UpdatePipelineUseCase implements UpdatePipeline {
 
     private final PipelineRepository pipelineRepository;
+    private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     @Override
     public PipelineConfig execute(PipelineConfig pipelineConfig, UpdatePipelineEnum pipelineEnum) {
@@ -54,7 +57,13 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             case ALIGNED_EXPERT_OBJECTS -> updateAlignedExpertObjects(pipelineConfig, pipelineCurrent);
         }
 
-        return pipelineRepository.save(pipelineCurrent);
+        var savedPipeline = pipelineRepository.save(pipelineCurrent);
+
+        if (pipelineEnum == UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS) {
+            pipelineStepOrchestrator.orchestrate(savedPipeline, PipelineSteps.UPDATE_ALIGNED_OBJECTS);
+        }
+
+        return savedPipeline;
     }
 
     private void updateDescription(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
@@ -71,6 +80,8 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
 
     private void updateAlignedExpertObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setAlignedExpertObjects(pipelineRequest.getAlignedExpertObjects());
+        pipelineCurrent.setStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS);
+        pipelineCurrent.addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED);
     }
 
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){

@@ -100,7 +100,7 @@ public class PipelineMapper {
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
                 .build();
 
-        if(pipelineConfig.getId() != null){
+        if(pipelineConfig.getId() != null && ObjectId.isValid(pipelineConfig.getId())){
             pipelineCollection.id = new ObjectId(pipelineConfig.getId());
         }
 
