@@ -51,14 +51,18 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
 
         List<PipelineStepExecutionResponse> stepResponses = new ArrayList<>();
 
-        Date overallStartTime = null;
-        Date overallEndTime = null;
         Date currentPhaseStartTime = null;
+        long totalProcessingSeconds = 0;
 
         for (PipelineSteps stepEnum : PipelineSteps.values()) {
             List<PipelineStatus> stepStatuses = statuses.stream()
                     .filter(ps -> ps.getStep() == stepEnum)
                     .toList();
+
+            Optional<PipelineStatus> latestStatusOpt = stepStatuses.stream()
+                    .filter(Objects::nonNull)
+                    .filter(ps -> ps.getCreatedAt() != null)
+                    .max(Comparator.comparing(PipelineStatus::getCreatedAt));
 
             Optional<PipelineStatus> completedStatus = stepStatuses.stream()
                     .filter(ps -> ps.getStatus() == Status.COMPLETED)
@@ -80,31 +84,28 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             Date stepStart = null;
             Date stepEnd = null;
 
-            if (completedStatus.isPresent()) {
+            Status currentStatusEnum = latestStatusOpt.map(PipelineStatus::getStatus).orElse(Status.PENDING);
+
+            if (currentStatusEnum == Status.COMPLETED && completedStatus.isPresent()) {
                 statusStr = "COMPLETED";
                 stepEnd = completedStatus.get().getCreatedAt();
                 stepStart = inProgressStatus.map(PipelineStatus::getCreatedAt).orElse(stepEnd);
-            } else if (failedStatus.isPresent()) {
+            } else if (currentStatusEnum == Status.FAILED && failedStatus.isPresent()) {
                 statusStr = "FAILED";
                 stepEnd = failedStatus.get().getCreatedAt();
                 stepStart = inProgressStatus.map(PipelineStatus::getCreatedAt).orElse(stepEnd);
-            } else if (inProgressStatus.isPresent()) {
+            } else if (currentStatusEnum == Status.IN_PROGRESS && inProgressStatus.isPresent()) {
                 statusStr = "ACTIVE";
                 stepStart = inProgressStatus.get().getCreatedAt();
                 currentPhaseStartTime = stepStart;
-            } else if (pendingStatus.isPresent()) {
+            } else {
                 statusStr = "PENDING";
             }
 
             if (stepStart != null) {
-                if (overallStartTime == null || stepStart.before(overallStartTime)) {
-                    overallStartTime = stepStart;
-                }
-            }
-            if (stepEnd != null) {
-                if (overallEndTime == null || stepEnd.after(overallEndTime)) {
-                    overallEndTime = stepEnd;
-                }
+                long endMillis = (stepEnd != null) ? stepEnd.getTime() : System.currentTimeMillis();
+                long stepSecs = Math.max(0, (endMillis - stepStart.getTime()) / 1000);
+                totalProcessingSeconds += stepSecs;
             }
 
             String startTimeFormatted = stepStart != null ? formatTime(stepStart) : null;
@@ -115,6 +116,13 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             Map<String, String> stepMetrics = null;
             if (stepEnum == PipelineSteps.CONFIG) {
                 stepMetrics = deriveConfigMetrics(pipelineConfig);
+            } else if (stepEnum == PipelineSteps.UPDATE_ALIGNED_OBJECTS) {
+                Optional<PipelineStatus> metricSource = completedStatus.isPresent() ? completedStatus
+                        : failedStatus.isPresent() ? failedStatus : inProgressStatus;
+                stepMetrics = metricSource.map(PipelineStatus::getMetrics).orElse(null);
+                if (stepMetrics == null && completedStatus.isPresent()) {
+                    stepMetrics = deriveUpdateAlignedObjectsMetrics(pipelineConfig);
+                }
             } else {
                 // Take metrics from completed or failed status, whichever is present
                 Optional<PipelineStatus> metricSource = completedStatus.isPresent() ? completedStatus
@@ -136,10 +144,10 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         }
 
         String overallStatus = determineOverallStatus(stepResponses);
-        Date totalEndTime = "ACTIVE".equals(overallStatus) || overallEndTime == null
-                ? new Date()
-                : overallEndTime;
-        String totalExecutionTime = formatHms(overallStartTime, totalEndTime);
+        long hrs = totalProcessingSeconds / 3600;
+        long mins = (totalProcessingSeconds % 3600) / 60;
+        long secs = totalProcessingSeconds % 60;
+        String totalExecutionTime = String.format("%02d:%02d:%02d", hrs, mins, secs);
         String currentPhaseDuration = formatMs(currentPhaseStartTime, new Date());
 
         return new ExperimentExecutionResponse(
@@ -210,6 +218,17 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         return metrics.isEmpty() ? null : metrics;
     }
 
+    private Map<String, String> deriveUpdateAlignedObjectsMetrics(PipelineConfig config) {
+        Map<String, String> metrics = new LinkedHashMap<>();
+        if (config.getAlignedExpertObjects() != null && !config.getAlignedExpertObjects().isEmpty()) {
+            metrics.put("totalAlignedObjects", String.valueOf(config.getAlignedExpertObjects().size()));
+            String symbols = String.join(", ", config.getAlignedExpertObjects());
+            metrics.put("alignedSymbols", symbols);
+        }
+        metrics.put("statusMessage", "Manual alignment confirmed by expert");
+        return metrics.isEmpty() ? null : metrics;
+    }
+
     private String getStepName(PipelineSteps step) {
         return switch (step) {
             case CONFIG -> "Configuration Setup";
@@ -222,6 +241,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case SEARCH_PUBTATOR -> "Search PubTator Annotations";
             case BUILD_KNOWLEDGE_BASE -> "Build Knowledge Base Graph";
             case GENERATE_ALIGNED_OBJECTS -> "Generate Aligned Objects";
+            case UPDATE_ALIGNED_OBJECTS -> "Update Aligned Objects";
         };
     }
 
@@ -237,6 +257,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case SEARCH_PUBTATOR -> "Extracts bio-entity annotations using the PubTator engine.";
             case BUILD_KNOWLEDGE_BASE -> "Assembles the unified biological knowledge base network.";
             case GENERATE_ALIGNED_OBJECTS -> "Generates aligned objects and final output artifacts.";
+            case UPDATE_ALIGNED_OBJECTS -> "Manual review and update of aligned biological objects.";
         };
     }
 
@@ -248,7 +269,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case EXPERT_OBJECTS, SEARCH_LEVELS -> "Cpu";
             case COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR -> "FileText";
             case BUILD_KNOWLEDGE_BASE -> "Activity";
-            case GENERATE_ALIGNED_OBJECTS -> "FileText";
+            case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS -> "FileText";
         };
     }
 
