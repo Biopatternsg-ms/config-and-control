@@ -51,9 +51,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
 
         List<PipelineStepExecutionResponse> stepResponses = new ArrayList<>();
 
-        Date overallStartTime = null;
-        Date overallEndTime = null;
         Date currentPhaseStartTime = null;
+        long totalProcessingSeconds = 0;
 
         for (PipelineSteps stepEnum : PipelineSteps.values()) {
             List<PipelineStatus> stepStatuses = statuses.stream()
@@ -104,14 +103,9 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             }
 
             if (stepStart != null) {
-                if (overallStartTime == null || stepStart.before(overallStartTime)) {
-                    overallStartTime = stepStart;
-                }
-            }
-            if (stepEnd != null) {
-                if (overallEndTime == null || stepEnd.after(overallEndTime)) {
-                    overallEndTime = stepEnd;
-                }
+                long endMillis = (stepEnd != null) ? stepEnd.getTime() : System.currentTimeMillis();
+                long stepSecs = Math.max(0, (endMillis - stepStart.getTime()) / 1000);
+                totalProcessingSeconds += stepSecs;
             }
 
             String startTimeFormatted = stepStart != null ? formatTime(stepStart) : null;
@@ -150,10 +144,10 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
         }
 
         String overallStatus = determineOverallStatus(stepResponses);
-        Date totalEndTime = "ACTIVE".equals(overallStatus) || overallEndTime == null
-                ? new Date()
-                : overallEndTime;
-        String totalExecutionTime = formatHms(overallStartTime, totalEndTime);
+        long hrs = totalProcessingSeconds / 3600;
+        long mins = (totalProcessingSeconds % 3600) / 60;
+        long secs = totalProcessingSeconds % 60;
+        String totalExecutionTime = String.format("%02d:%02d:%02d", hrs, mins, secs);
         String currentPhaseDuration = formatMs(currentPhaseStartTime, new Date());
 
         return new ExperimentExecutionResponse(
