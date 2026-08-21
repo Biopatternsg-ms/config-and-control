@@ -106,6 +106,8 @@ public interface KeycloakHttpClient {
     void sendEmail(
             @HeaderParam("Authorization") String token,
             @PathParam("userId") String userId,
+            @QueryParam("client_id") String clientId,
+            @QueryParam("redirect_uri") String redirectUri,
             List<String> actions
     );
 

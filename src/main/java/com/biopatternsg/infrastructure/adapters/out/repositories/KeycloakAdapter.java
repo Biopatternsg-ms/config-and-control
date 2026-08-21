@@ -51,6 +51,8 @@ public class KeycloakAdapter implements KeycloakRepository {
     String grantType;
     @ConfigProperty(name = "keycloak.grant-type-client")
     String grantTypeClient;
+    @ConfigProperty(name = "keycloak.redirect-uri", defaultValue = "https://bioai.redclara.net")
+    String redirectUri;
 
     @Override
     public UserAuth login(String user, String pass) {
@@ -136,7 +138,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         var accessToken = "Bearer " + credentials.getAccess_token();
 
         try{
-            keycloakHttpClient.sendEmail(accessToken, userId, actions);
+            keycloakHttpClient.sendEmail(accessToken, userId, clientId, redirectUri, actions);
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
