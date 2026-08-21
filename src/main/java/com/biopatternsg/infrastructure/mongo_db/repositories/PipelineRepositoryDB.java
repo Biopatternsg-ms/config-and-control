@@ -30,7 +30,9 @@ import java.util.List;
 public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineCollection> {
 
     public PipelineCollection findByIdAndUser(String id, List<String> networkIdList){
-
+        if (id == null || !ObjectId.isValid(id)) {
+            return null;
+        }
         return find("{'_id': :id, 'networkId': {'$in': :networkList}}",
                 Parameters.with("id", new ObjectId(id)).and("networkList", networkIdList))
                 .firstResult();

@@ -43,5 +43,6 @@ public class PipelineCollection extends PanacheMongoEntity {
     private PipelineSteps step;
     private List<PipelineStatus> statuses;
     private List<ExpertObjectConfig> expertObjects;
+    private List<String> alignedExpertObjects;
     private TranscriptionFactorConfig transcriptionFactorConfig;
 }

@@ -19,6 +19,7 @@ import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.infrastructure.clients.PubmedRestClient;
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
@@ -31,6 +32,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import java.util.List;
 
 @Slf4j
 @ApplicationScoped
@@ -122,9 +125,20 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
 
     @Override
     public void executeGenerateAlignedObjects(PipelineConfig pipelineConfig) {
+        List<ExpertObjectConfig> expertObjects = pipelineConfig.getExpertObjects();
+        if (pipelineConfig.getAlignedExpertObjects() != null && !pipelineConfig.getAlignedExpertObjects().isEmpty()) {
+            expertObjects = pipelineConfig.getAlignedExpertObjects().stream()
+                    .map(symbol -> {
+                        ExpertObjectConfig config = new ExpertObjectConfig();
+                        config.setSymbol(symbol);
+                        return config;
+                    })
+                    .toList();
+        }
+
         GenerateAlignedObjectsRequest request = new GenerateAlignedObjectsRequest(
                 pipelineConfig.getId(),
-                pipelineConfig.getExpertObjects()
+                expertObjects
         );
 
         try {

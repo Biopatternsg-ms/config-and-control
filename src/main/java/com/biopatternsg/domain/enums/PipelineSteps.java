@@ -29,7 +29,8 @@ public enum PipelineSteps {
     SEARCH_PUBMED_IDS("search_pubmed_ids", PipelineStage.PUBMED_INTEGRATION),
     SEARCH_PUBTATOR("search_pubtator", PipelineStage.PUBMED_INTEGRATION),
     BUILD_KNOWLEDGE_BASE("build_knowledge_base", PipelineStage.PUBMED_INTEGRATION),
-    GENERATE_ALIGNED_OBJECTS("generate_aligned_objects", PipelineStage.PUBMED_INTEGRATION);
+    GENERATE_ALIGNED_OBJECTS("generate_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
+    UPDATE_ALIGNED_OBJECTS("update_aligned_objects", PipelineStage.PUBMED_INTEGRATION);
 
     private final String value;
     private final PipelineStage stage;

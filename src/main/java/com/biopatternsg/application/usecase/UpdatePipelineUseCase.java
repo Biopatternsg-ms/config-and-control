@@ -15,6 +15,8 @@
  */
 package com.biopatternsg.application.usecase;
 
+import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
@@ -24,6 +26,8 @@ import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @ApplicationScoped
@@ -31,6 +35,7 @@ import java.util.Objects;
 public class UpdatePipelineUseCase implements UpdatePipeline {
 
     private final PipelineRepository pipelineRepository;
+    private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     @Override
     public PipelineConfig execute(PipelineConfig pipelineConfig, UpdatePipelineEnum pipelineEnum) {
@@ -51,9 +56,16 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
             case TRANSCRIPTION_FACTOR -> updateTranscriptionFactor(pipelineConfig, pipelineCurrent);
             case EXPERT_OBJETS -> updateExportObjects(pipelineConfig, pipelineCurrent);
             case SEARCH_CONFIG -> updateSearchConfig(pipelineConfig, pipelineCurrent);
+            case ALIGNED_EXPERT_OBJECTS -> updateAlignedExpertObjects(pipelineConfig, pipelineCurrent);
         }
 
-        return pipelineRepository.save(pipelineCurrent);
+        var savedPipeline = pipelineRepository.save(pipelineCurrent);
+
+        if (pipelineEnum == UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS) {
+            pipelineStepOrchestrator.orchestrate(savedPipeline, PipelineSteps.UPDATE_ALIGNED_OBJECTS);
+        }
+
+        return savedPipeline;
     }
 
     private void updateDescription(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
@@ -66,6 +78,21 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
 
     private void updateExportObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
         pipelineCurrent.setExpertObjects(pipelineRequest.getExpertObjects());
+    }
+
+    private void updateAlignedExpertObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
+        pipelineCurrent.setAlignedExpertObjects(pipelineRequest.getAlignedExpertObjects());
+        pipelineCurrent.setStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS);
+
+        Map<String, String> metrics = new LinkedHashMap<>();
+        if (pipelineRequest.getAlignedExpertObjects() != null && !pipelineRequest.getAlignedExpertObjects().isEmpty()) {
+            metrics.put("totalAlignedObjects", String.valueOf(pipelineRequest.getAlignedExpertObjects().size()));
+            String symbols = String.join(", ", pipelineRequest.getAlignedExpertObjects());
+            metrics.put("alignedSymbols", symbols);
+        }
+        metrics.put("statusMessage", "Manual alignment confirmed by expert");
+
+        pipelineCurrent.addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED, metrics);
     }
 
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
