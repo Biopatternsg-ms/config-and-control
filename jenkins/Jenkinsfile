@@ -112,6 +112,7 @@ pipeline {
                             -e KC_GRANT_TYPE_CLIENT='${KC_GRANT_TYPE_CLIENT}' \\
                             -e KC_SCOPE='${KC_SCOPE}' \\
                             -e KC_REALM_NAME='${KC_REALM_NAME}' \\
+                            -e KC_REDIRECT_URI='${KC_REDIRECT_URI}' \\
                             --name ${CONTAINER_NAME} \\
                             -p ${CONFIG_AND_CONTROL_PORT}:8080 \\
                             --network ${NETWORK} \\
