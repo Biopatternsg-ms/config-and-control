@@ -55,6 +55,13 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public UserConfig findByKeycloakId(String keycloakId) {
+
+        var userCollection = userRepositoryDB.findByKeycloakId(keycloakId);
+        return UserMapper.collectionToModel(userCollection);
+    }
+
+    @Override
     public void update(UserConfig userConfig) {
 
         UserCollection userCollection = UserMapper.modelToCollection(userConfig);

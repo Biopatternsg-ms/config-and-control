@@ -20,6 +20,7 @@ import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
 import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
 import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
+import com.biopatternsg.infrastructure.dtos.keycloak.KeycloakEventNotification;
 import com.biopatternsg.domain.models.UserAuth;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
@@ -33,7 +34,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ApplicationScoped
 @Path("/config-and-control/users")
 @RequiredArgsConstructor
@@ -117,6 +120,24 @@ public class UserController {
     public void recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
 
         userManagement.recoveryPassword(recoveryPasswordRequest.username());
+    }
+
+    @POST
+    @Path("/keycloak-events")
+    @Operation(
+            summary = "Keycloak event webhook receiver",
+            description = "Receives events from Keycloak webhook plugin (e.g., VERIFY_EMAIL)"
+    )
+    public Response handleKeycloakEvent(KeycloakEventNotification event) {
+
+        log.info("Keycloak webhook event received. Payload: {}", event);
+
+        if (event != null && "VERIFY_EMAIL".equalsIgnoreCase(event.type()) && event.userId() != null) {
+            log.info("Processing VERIFY_EMAIL event for userId: {}", event.userId());
+            userManagement.processEmailVerification(event.userId());
+        }
+
+        return Response.ok().build();
     }
 
 }

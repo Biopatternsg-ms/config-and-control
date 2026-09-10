@@ -13,17 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.port.in;
+package com.biopatternsg.infrastructure.dtos.keycloak;
 
-import com.biopatternsg.domain.models.ReportFormat;
-import com.biopatternsg.domain.models.UserConfig;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Builder;
 
-public interface UserManagement {
+import java.util.Map;
 
-    void register(UserConfig request);
-    void syncUsers();
-    void recoveryPassword(String email);
-    UserConfig updateStatus(String id, boolean enabled);
-    void processEmailVerification(String keycloakId);
-    ReportFormat<UserConfig> listUsers(UserConfig filters, int page, int size);
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record KeycloakEventNotification(
+        String id,
+        String type,
+        String realmId,
+        String clientId,
+        String userId,
+        String ipAddress,
+        String error,
+        Map<String, Object> details,
+        String resourcePath,
+        String representation
+) {
 }
