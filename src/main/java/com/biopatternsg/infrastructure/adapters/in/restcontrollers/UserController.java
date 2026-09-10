@@ -126,15 +126,28 @@ public class UserController {
     @Path("/keycloak-events")
     @Operation(
             summary = "Keycloak event webhook receiver",
-            description = "Receives events from Keycloak webhook plugin (e.g., VERIFY_EMAIL)"
+            description = "Receives events from Keycloak webhook plugin (e.g., VERIFY_EMAIL or CUSTOM_REQUIRED_ACTION)"
     )
     public Response handleKeycloakEvent(KeycloakEventNotification event) {
 
         log.info("Keycloak webhook event received. Payload: {}", event);
 
-        if (event != null && "VERIFY_EMAIL".equalsIgnoreCase(event.type()) && event.userId() != null) {
-            log.info("Processing VERIFY_EMAIL event for userId: {}", event.userId());
-            userManagement.processEmailVerification(event.userId());
+        boolean isVerifyEmail = event != null && (
+                "VERIFY_EMAIL".equalsIgnoreCase(event.type()) ||
+                ("CUSTOM_REQUIRED_ACTION".equalsIgnoreCase(event.type())
+                        && event.details() != null
+                        && "VERIFY_EMAIL".equalsIgnoreCase(String.valueOf(event.details().get("custom_required_action"))))
+        );
+
+        if (isVerifyEmail) {
+            String targetId = (event.userId() != null && !event.userId().isBlank())
+                    ? event.userId()
+                    : (event.details() != null ? String.valueOf(event.details().get("username")) : null);
+
+            if (targetId != null && !targetId.isBlank() && !"null".equalsIgnoreCase(targetId)) {
+                log.info("Processing email verification event for identifier: {}", targetId);
+                userManagement.processEmailVerification(targetId);
+            }
         }
 
         return Response.ok().build();

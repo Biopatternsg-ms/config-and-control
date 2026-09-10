@@ -34,4 +34,19 @@ public record KeycloakEventNotification(
         String resourcePath,
         String representation
 ) {
+    @Override
+    public String toString() {
+        return "KeycloakEventNotification[" +
+                "id=" + id +
+                ", type=" + type +
+                ", realmId=" + realmId +
+                ", clientId=" + clientId +
+                ", userId=" + userId +
+                ", ipAddress=" + ipAddress +
+                (error != null ? ", error=" + error : "") +
+                ", details=" + details +
+                (resourcePath != null ? ", resourcePath=" + resourcePath : "") +
+                (representation != null ? ", representation=" + representation : "") +
+                "]";
+    }
 }

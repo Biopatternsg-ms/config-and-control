@@ -81,6 +81,47 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldProcessCustomRequiredActionVerifyEmailEvent() {
+        FakeUserManagement fakeUserManagement = new FakeUserManagement();
+        UserController controller = new UserController(null, fakeUserManagement);
+
+        KeycloakEventNotification notification = KeycloakEventNotification.builder()
+                .type("CUSTOM_REQUIRED_ACTION")
+                .userId("test-user-uuid-123")
+                .realmId("biopatternsg")
+                .details(java.util.Map.of("custom_required_action", "VERIFY_EMAIL"))
+                .build();
+
+        Response response = controller.handleKeycloakEvent(notification);
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertTrue(fakeUserManagement.processEmailVerificationCalled.get());
+        assertEquals("test-user-uuid-123", fakeUserManagement.processedKeycloakId.get());
+    }
+
+    @Test
+    void shouldProcessCustomRequiredActionVerifyEmailWithUsernameFallback() {
+        FakeUserManagement fakeUserManagement = new FakeUserManagement();
+        UserController controller = new UserController(null, fakeUserManagement);
+
+        KeycloakEventNotification notification = KeycloakEventNotification.builder()
+                .type("CUSTOM_REQUIRED_ACTION")
+                .userId(null)
+                .realmId("biopatternsg")
+                .details(java.util.Map.of(
+                        "custom_required_action", "VERIFY_EMAIL",
+                        "username", "john.doe@example.com"
+                ))
+                .build();
+
+        Response response = controller.handleKeycloakEvent(notification);
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertTrue(fakeUserManagement.processEmailVerificationCalled.get());
+        assertEquals("john.doe@example.com", fakeUserManagement.processedKeycloakId.get());
+    }
+
+    @Test
     void shouldIgnoreNonVerifyEmailEvent() {
         FakeUserManagement fakeUserManagement = new FakeUserManagement();
         UserController controller = new UserController(null, fakeUserManagement);
