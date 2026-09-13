@@ -140,7 +140,7 @@ public class KeycloakAdapter implements KeycloakRepository {
         try{
             keycloakHttpClient.sendEmail(accessToken, userId, clientId, redirectUri, actions);
         } catch (WebApplicationException e) {
-            log.error("Error al enviar el correo al usuario {} {} {} {} {}", accessToken, userId, clientId, redirectUri, actions);
+            log.error("Error al enviar el correo al usuario");
             log.error(e.getMessage(),e);
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }
