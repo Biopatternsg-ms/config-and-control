@@ -28,9 +28,13 @@ import org.bson.Document;
 public class UserRepositoryDB implements PanacheMongoRepository<UserCollection> {
 
     public UserCollection findByKeycloakId(String keycloakId){
-        return find("{'keycloakId': :keycloakId}",
+        UserCollection user = find("{'identityProviderId': :keycloakId}",
                 Parameters.with("keycloakId", keycloakId))
                 .firstResult();
+        if (user == null) {
+            user = findUsername(keycloakId);
+        }
+        return user;
     }
 
     public UserCollection findUsername(String username) {

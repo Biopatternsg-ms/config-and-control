@@ -23,9 +23,11 @@ import com.biopatternsg.domain.port.out.repositories.KeycloakRepository;
 import com.biopatternsg.domain.port.out.repositories.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
 public class UserManagementUseCase implements UserManagement {
@@ -89,5 +91,19 @@ public class UserManagementUseCase implements UserManagement {
         userRepository.update(user);
 
         return user;
+    }
+
+    @Override
+    public void processEmailVerification(String keycloakId) {
+
+        log.info("Processing email verification in database for keycloakId: {}", keycloakId);
+        var user = userRepository.findByKeycloakId(keycloakId);
+        if (user != null) {
+            user.setEnabled(true);
+            userRepository.update(user);
+            log.info("User {} (keycloakId: {}) successfully marked as enabled", user.getUsername(), keycloakId);
+        } else {
+            log.warn("No user found in database with keycloakId: {}", keycloakId);
+        }
     }
 }

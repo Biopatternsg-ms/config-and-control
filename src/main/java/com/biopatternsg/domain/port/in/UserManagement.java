@@ -24,5 +24,6 @@ public interface UserManagement {
     void syncUsers();
     void recoveryPassword(String email);
     UserConfig updateStatus(String id, boolean enabled);
+    void processEmailVerification(String keycloakId);
     ReportFormat<UserConfig> listUsers(UserConfig filters, int page, int size);
 }

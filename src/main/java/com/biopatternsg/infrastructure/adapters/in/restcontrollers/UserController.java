@@ -20,6 +20,7 @@ import com.biopatternsg.domain.port.in.UserManagement;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
 import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
 import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
+import com.biopatternsg.infrastructure.dtos.keycloak.KeycloakEventNotification;
 import com.biopatternsg.domain.models.UserAuth;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
@@ -33,7 +34,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ApplicationScoped
 @Path("/config-and-control/users")
 @RequiredArgsConstructor
@@ -117,6 +120,37 @@ public class UserController {
     public void recoveryPassword(@Valid RecoveryPasswordRequest recoveryPasswordRequest){
 
         userManagement.recoveryPassword(recoveryPasswordRequest.username());
+    }
+
+    @POST
+    @Path("/keycloak-events")
+    @Operation(
+            summary = "Keycloak event webhook receiver",
+            description = "Receives events from Keycloak webhook plugin (e.g., VERIFY_EMAIL or CUSTOM_REQUIRED_ACTION)"
+    )
+    public Response handleKeycloakEvent(KeycloakEventNotification event) {
+
+        log.info("Keycloak webhook event received. Payload: {}", event);
+
+        boolean isVerifyEmail = event != null && (
+                "VERIFY_EMAIL".equalsIgnoreCase(event.type()) ||
+                ("CUSTOM_REQUIRED_ACTION".equalsIgnoreCase(event.type())
+                        && event.details() != null
+                        && "VERIFY_EMAIL".equalsIgnoreCase(String.valueOf(event.details().get("custom_required_action"))))
+        );
+
+        if (isVerifyEmail) {
+            String targetId = (event.userId() != null && !event.userId().isBlank())
+                    ? event.userId()
+                    : (event.details() != null ? String.valueOf(event.details().get("username")) : null);
+
+            if (targetId != null && !targetId.isBlank() && !"null".equalsIgnoreCase(targetId)) {
+                log.info("Processing email verification event for identifier: {}", targetId);
+                userManagement.processEmailVerification(targetId);
+            }
+        }
+
+        return Response.ok().build();
     }
 
 }

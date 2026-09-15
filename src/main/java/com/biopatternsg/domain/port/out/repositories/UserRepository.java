@@ -24,5 +24,6 @@ public interface UserRepository {
     void update(UserConfig userConfig);
     UserConfig find(String username);
     UserConfig findById(String id);
+    UserConfig findByKeycloakId(String keycloakId);
     ReportFormat<UserConfig> list(UserConfig userFilters, int page, int size);
 }
