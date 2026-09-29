@@ -242,6 +242,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case BUILD_KNOWLEDGE_BASE -> "Build Knowledge Base Graph";
             case GENERATE_ALIGNED_OBJECTS -> "Generate Aligned Objects";
             case UPDATE_ALIGNED_OBJECTS -> "Update Aligned Objects";
+            case CONFIGURE_INFERENCES -> "Configure Inferences";
         };
     }
 
@@ -258,6 +259,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case BUILD_KNOWLEDGE_BASE -> "Assembles the unified biological knowledge base network.";
             case GENERATE_ALIGNED_OBJECTS -> "Generates aligned objects and final output artifacts.";
             case UPDATE_ALIGNED_OBJECTS -> "Manual review and update of aligned biological objects.";
+            case CONFIGURE_INFERENCES -> "Configures biological restriction level for inference generation.";
         };
     }
 
@@ -268,7 +270,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case TRANSCRIPTION_FACTOR -> "Activity";
             case EXPERT_OBJECTS, SEARCH_LEVELS -> "Cpu";
             case COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR -> "FileText";
-            case BUILD_KNOWLEDGE_BASE -> "Activity";
+            case BUILD_KNOWLEDGE_BASE, CONFIGURE_INFERENCES -> "Activity";
             case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS -> "FileText";
         };
     }

@@ -61,7 +61,11 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
             }
             case UPDATE_ALIGNED_OBJECTS -> {
-                log.info("Step UPDATE_ALIGNED_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
+                log.info("Step UPDATE_ALIGNED_OBJECTS completed successfully for pipeline {}, setting CONFIGURE_INFERENCES to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.CONFIGURE_INFERENCES, Status.IN_PROGRESS);
+            }
+            case CONFIGURE_INFERENCES -> {
+                log.info("Step CONFIGURE_INFERENCES completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");
