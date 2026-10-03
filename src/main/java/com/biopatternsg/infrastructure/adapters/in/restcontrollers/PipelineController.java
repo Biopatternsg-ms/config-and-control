@@ -130,6 +130,8 @@ public class PipelineController {
     })
     public PipelineConfig updateTranscriptionFactor(@Valid UpdatePipelineTranscriptionFactorRequest updatePipeline){
 
+        //TODO: Manejar error y responder algo
+
         return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.TRANSCRIPTION_FACTOR);
     }

@@ -31,7 +31,8 @@ public enum PipelineSteps {
     BUILD_KNOWLEDGE_BASE("build_knowledge_base", PipelineStage.PUBMED_INTEGRATION),
     GENERATE_ALIGNED_OBJECTS("generate_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
     UPDATE_ALIGNED_OBJECTS("update_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
-    CONFIGURE_INFERENCES("configure_inferences", PipelineStage.INFERENCES);
+    CONFIGURE_INFERENCES("configure_inferences", PipelineStage.INFERENCES),
+    FIND_ROLES("find_roles", PipelineStage.INFERENCES);
 
     private final String value;
     private final PipelineStage stage;
