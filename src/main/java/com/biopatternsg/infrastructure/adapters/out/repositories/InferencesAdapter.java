@@ -79,6 +79,9 @@ public class InferencesAdapter implements TriggerInferences {
             }
         }
 
+        log.info("Triggering FIND_ROLES for pipeline {} with {} aligned objects: {}",
+                pipelineConfig.getId(), alignedObjects.size(), alignedObjects);
+
         FindRolesRequest request = new FindRolesRequest(
                 pipelineConfig.getId(),
                 alignedObjects
