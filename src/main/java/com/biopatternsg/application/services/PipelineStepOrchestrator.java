@@ -71,7 +71,11 @@ public class PipelineStepOrchestrator {
                 triggerInferences.executeFindRoles(pipelineConfig);
             }
             case FIND_ROLES -> {
-                log.info("Step FIND_ROLES completed successfully for pipeline {}", pipelineConfig.getId());
+                log.info("Step FIND_ROLES completed successfully for pipeline {}, setting UPDATE_BIOLOGICAL_OBJECTS to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.IN_PROGRESS);
+            }
+            case UPDATE_BIOLOGICAL_OBJECTS -> {
+                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");

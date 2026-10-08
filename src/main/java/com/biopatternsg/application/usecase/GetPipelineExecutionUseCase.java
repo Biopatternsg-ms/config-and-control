@@ -244,6 +244,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case UPDATE_ALIGNED_OBJECTS -> "Update Aligned Objects";
             case CONFIGURE_INFERENCES -> "Configure Inferences";
             case FIND_ROLES -> "Find Biological Roles";
+            case UPDATE_BIOLOGICAL_OBJECTS -> "Update Biological Objects";
         };
     }
 
@@ -262,6 +263,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case UPDATE_ALIGNED_OBJECTS -> "Manual review and update of aligned biological objects.";
             case CONFIGURE_INFERENCES -> "Configures biological restriction level for inference generation.";
             case FIND_ROLES -> "Identifies biological roles and classifications for aligned entities.";
+            case UPDATE_BIOLOGICAL_OBJECTS -> "Manual review and editing of biological roles and biotypes for entities.";
         };
     }
 
@@ -273,7 +275,7 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case EXPERT_OBJECTS, SEARCH_LEVELS -> "Cpu";
             case COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR -> "FileText";
             case BUILD_KNOWLEDGE_BASE, CONFIGURE_INFERENCES, FIND_ROLES -> "Activity";
-            case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS -> "FileText";
+            case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS, UPDATE_BIOLOGICAL_OBJECTS -> "FileText";
         };
     }
 

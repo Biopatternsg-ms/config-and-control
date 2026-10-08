@@ -145,12 +145,25 @@ class PipelineStepOrchestratorTest {
     }
 
     @Test
-    @DisplayName("When FIND_ROLES completes, orchestrator handles it gracefully without exception")
-    void orchestrate_findRoles_handledGracefully() {
+    @DisplayName("When FIND_ROLES completes, orchestrator sets UPDATE_BIOLOGICAL_OBJECTS to IN_PROGRESS")
+    void orchestrate_findRoles_setsUpdateBiologicalObjectsInProgress() {
         PipelineConfig config = PipelineConfig.builder().id("pipe-101").build();
 
-        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.FIND_ROLES));
-        assertFalse(triggerInferences.executeFindRolesCalled.get());
+        orchestrator.orchestrate(config, PipelineSteps.FIND_ROLES);
+
+        assertEquals(1, pipelineService.stepRecords.size());
+        StepRecord record = pipelineService.stepRecords.get(0);
+        assertEquals("pipe-101", record.id);
+        assertEquals(PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, record.step);
+        assertEquals(Status.IN_PROGRESS, record.status);
+    }
+
+    @Test
+    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator handles it gracefully without exception")
+    void orchestrate_updateBiologicalObjects_handledGracefully() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-101-bio").build();
+
+        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS));
     }
 
     @Test
