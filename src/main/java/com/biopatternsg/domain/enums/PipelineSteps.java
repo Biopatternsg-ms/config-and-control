@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.domain.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
@@ -41,6 +42,19 @@ public enum PipelineSteps {
     PipelineSteps(String value, PipelineStage stage) {
         this.value = value;
         this.stage = stage;
+    }
+
+    @JsonCreator
+    public static PipelineSteps fromString(String input) {
+        if (input == null) {
+            return null;
+        }
+        for (PipelineSteps step : values()) {
+            if (step.name().equalsIgnoreCase(input) || step.value.equalsIgnoreCase(input)) {
+                return step;
+            }
+        }
+        throw new IllegalArgumentException("Unknown PipelineStep: " + input);
     }
 
 }
