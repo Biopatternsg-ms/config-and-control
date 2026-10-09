@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.enums;
+package com.biopatternsg.infrastructure.dtos;
 
-public enum PipelineStage {
-    INIT,
-    BIOLOGICAL_OBJECT,
-    PUBMED_INTEGRATION,
-    INFERENCES
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+public record FindRolesRequest(
+        @NotNull String pipelineId,
+        List<String> alignedObjects
+) {
 }

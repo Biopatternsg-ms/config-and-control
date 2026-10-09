@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.enums;
+package com.biopatternsg.infrastructure.clients;
 
-public enum PipelineStage {
-    INIT,
-    BIOLOGICAL_OBJECT,
-    PUBMED_INTEGRATION,
-    INFERENCES
+import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient(configKey = "inferences-api")
+public interface InferencesRestClient {
+
+    @POST
+    @Path("/inferences/find-roles")
+    void findRoles(FindRolesRequest request, @HeaderParam("x-user-id") String userId);
 }

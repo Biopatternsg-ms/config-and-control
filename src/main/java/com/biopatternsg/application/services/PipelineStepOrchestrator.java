@@ -18,6 +18,7 @@ package com.biopatternsg.application.services;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.domain.services.PipelineService;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PipelineStepOrchestrator {
 
     private final TriggerPubmedIntegration triggerPubmedIntegration;
+    private final TriggerInferences triggerInferences;
     private final BiologicalObjectRepository biologicalObjectRepository;
     private final PipelineService pipelineService;
 
@@ -61,7 +63,19 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
             }
             case UPDATE_ALIGNED_OBJECTS -> {
-                log.info("Step UPDATE_ALIGNED_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
+                log.info("Step UPDATE_ALIGNED_OBJECTS completed successfully for pipeline {}, setting CONFIGURE_INFERENCES to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.CONFIGURE_INFERENCES, Status.IN_PROGRESS);
+            }
+            case CONFIGURE_INFERENCES -> {
+                log.info("Step CONFIGURE_INFERENCES completed successfully for pipeline {}, triggering FIND_ROLES", pipelineConfig.getId());
+                triggerInferences.executeFindRoles(pipelineConfig);
+            }
+            case FIND_ROLES -> {
+                log.info("Step FIND_ROLES completed successfully for pipeline {}, setting UPDATE_BIOLOGICAL_OBJECTS to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.IN_PROGRESS);
+            }
+            case UPDATE_BIOLOGICAL_OBJECTS -> {
+                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");

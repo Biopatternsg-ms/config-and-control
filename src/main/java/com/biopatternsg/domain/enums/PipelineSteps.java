@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.domain.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
@@ -30,7 +31,10 @@ public enum PipelineSteps {
     SEARCH_PUBTATOR("search_pubtator", PipelineStage.PUBMED_INTEGRATION),
     BUILD_KNOWLEDGE_BASE("build_knowledge_base", PipelineStage.PUBMED_INTEGRATION),
     GENERATE_ALIGNED_OBJECTS("generate_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
-    UPDATE_ALIGNED_OBJECTS("update_aligned_objects", PipelineStage.PUBMED_INTEGRATION);
+    UPDATE_ALIGNED_OBJECTS("update_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
+    CONFIGURE_INFERENCES("configure_inferences", PipelineStage.INFERENCES),
+    FIND_ROLES("find_roles", PipelineStage.INFERENCES),
+    UPDATE_BIOLOGICAL_OBJECTS("update_biological_objects", PipelineStage.INFERENCES);
 
     private final String value;
     private final PipelineStage stage;
@@ -38,6 +42,19 @@ public enum PipelineSteps {
     PipelineSteps(String value, PipelineStage stage) {
         this.value = value;
         this.stage = stage;
+    }
+
+    @JsonCreator
+    public static PipelineSteps fromString(String input) {
+        if (input == null) {
+            return null;
+        }
+        for (PipelineSteps step : values()) {
+            if (step.name().equalsIgnoreCase(input) || step.value.equalsIgnoreCase(input)) {
+                return step;
+            }
+        }
+        throw new IllegalArgumentException("Unknown PipelineStep: " + input);
     }
 
 }

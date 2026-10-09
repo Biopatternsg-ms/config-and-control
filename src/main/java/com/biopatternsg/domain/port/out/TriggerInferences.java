@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.enums;
+package com.biopatternsg.domain.port.out;
 
-public enum PipelineStage {
-    INIT,
-    BIOLOGICAL_OBJECT,
-    PUBMED_INTEGRATION,
-    INFERENCES
+import com.biopatternsg.domain.models.PipelineConfig;
+
+public interface TriggerInferences {
+    void executeFindRoles(PipelineConfig pipelineConfig);
 }
