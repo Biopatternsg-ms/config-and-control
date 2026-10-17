@@ -31,15 +31,13 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.domain.services.PipelineService;
+import com.biopatternsg.application.services.PipelineService;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @ApplicationScoped
 @Path("/config-and-control/pipelines")
