@@ -21,7 +21,6 @@ import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
-import com.biopatternsg.domain.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
