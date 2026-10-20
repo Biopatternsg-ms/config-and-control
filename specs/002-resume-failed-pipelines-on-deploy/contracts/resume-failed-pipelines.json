@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Config and Control - Pipeline Resumption API",
+    "description": "Administrative endpoint for resuming interrupted or failed pipelines following a service deployment.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/config-and-control/pipelines/resume-failed": {
+      "post": {
+        "summary": "Resume all failed pipelines",
+        "description": "Queries all pipelines in FAILED status, identifies each pipeline's failed step, resolves user ownership from its network, and re-dispatches execution via PipelineStepOrchestrator from the predecessor step.",
+        "operationId": "resumeFailedPipelines",
+        "parameters": [
+          {
+            "name": "x-system-call",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional system token header used by Jenkins CI/CD during deployment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumption batch evaluation completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeFailedPipelinesResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error during batch retrieval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResumeFailedPipelinesResponse": {
+        "type": "object",
+        "required": [
+          "totalFailed",
+          "resumed",
+          "skipped",
+          "errors",
+          "details"
+        ],
+        "properties": {
+          "totalFailed": {
+            "type": "integer",
+            "example": 3,
+            "description": "Total count of pipelines found in FAILED status"
+          },
+          "resumed": {
+            "type": "integer",
+            "example": 2,
+            "description": "Count of pipelines successfully re-dispatched to worker services"
+          },
+          "skipped": {
+            "type": "integer",
+            "example": 1,
+            "description": "Count of pipelines skipped (e.g. paused at manual steps)"
+          },
+          "errors": {
+            "type": "integer",
+            "example": 0,
+            "description": "Count of pipelines whose resumption raised an unhandled error"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PipelineResumeDetail"
+            }
+          }
+        }
+      },
+      "PipelineResumeDetail": {
+        "type": "object",
+        "required": [
+          "pipelineId",
+          "networkId",
+          "userId",
+          "failedStep",
+          "resultStatus"
+        ],
+        "properties": {
+          "pipelineId": {
+            "type": "string",
+            "example": "670d8a1b2f9a7c34d5e8f123"
+          },
+          "networkId": {
+            "type": "string",
+            "example": "670d89002f9a7c34d5e8f001"
+          },
+          "userId": {
+            "type": "string",
+            "example": "4a2b9f3e-8c7d-41e2-b8f6-3c5d7e9a1b2c"
+          },
+          "failedStep": {
+            "type": "string",
+            "enum": [
+              "LAUNCH",
+              "SEARCH_LEVELS",
+              "COMBINATIONS",
+              "SEARCH_PUBMED_IDS",
+              "SEARCH_PUBTATOR",
+              "BUILD_KNOWLEDGE_BASE",
+              "GENERATE_ALIGNED_OBJECTS",
+              "UPDATE_ALIGNED_OBJECTS",
+              "CONFIGURE_INFERENCES",
+              "FIND_ROLES",
+              "UPDATE_BIOLOGICAL_OBJECTS"
+            ],
+            "example": "SEARCH_PUBMED_IDS"
+          },
+          "resumedFromStep": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "LAUNCH",
+              "SEARCH_LEVELS",
+              "COMBINATIONS",
+              "SEARCH_PUBMED_IDS",
+              "SEARCH_PUBTATOR",
+              "BUILD_KNOWLEDGE_BASE",
+              "GENERATE_ALIGNED_OBJECTS",
+              "UPDATE_ALIGNED_OBJECTS",
+              "CONFIGURE_INFERENCES",
+              "FIND_ROLES",
+              "UPDATE_BIOLOGICAL_OBJECTS"
+            ],
+            "example": "COMBINATIONS"
+          },
+          "resultStatus": {
+            "type": "string",
+            "enum": [
+              "RESUMED",
+              "SKIPPED_MANUAL_STEP",
+              "ERROR"
+            ],
+            "example": "RESUMED"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true,
+            "example": "Successfully re-dispatched to pubmed-integration"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}

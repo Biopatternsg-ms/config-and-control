@@ -19,7 +19,9 @@ import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.models.ExperimentExecutionResponse;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
+import com.biopatternsg.domain.models.ResumeFailedPipelinesResponse;
 import com.biopatternsg.domain.port.in.*;
+import com.biopatternsg.domain.port.out.PipelineStepPort;
 import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.dtos.*;
 import jakarta.validation.Valid;
@@ -31,7 +33,6 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.application.services.PipelineService;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -46,11 +47,12 @@ public class PipelineController {
 
     private final CreatePipeline createPipeline;
     private final LaunchPipeline launchPipeline;
+    private final ResumeFailedPipelines resumeFailedPipelines;
     private final UpdatePipeline updatePipeline;
     private final FindPipeline findPipeline;
     private final UpdatePipelineStep updatePipelineStep;
     private final GetPipelineExecution getPipelineExecution;
-    private final PipelineService pipelineService;
+    private final PipelineStepPort pipelineStepPort;
     private final TriggerPubmedIntegration triggerPubmedIntegration;
 
     @POST
@@ -236,7 +238,7 @@ public class PipelineController {
         if (pipeline == null) {
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
-        pipelineService.updateStep(id, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
+        pipelineStepPort.updateStep(id, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
         triggerPubmedIntegration.executeGenerateAlignedObjects(pipeline);
         return Response.accepted().entity("Regeneration triggered").build();
     }
@@ -263,6 +265,31 @@ public class PipelineController {
     public Response launch(LaunchPipelineRequest launchPipelineRequest){
         launchPipeline.execute(launchPipelineRequest.pipelineId());
         return Response.accepted().entity("Pipeline launched").build();
+    }
+
+    @POST
+    @Path("/resume-failed")
+    @Operation(
+        summary = "Resume failed pipelines",
+        description = "Resumes all pipelines in FAILED status from their predecessor step following deployment."
+    )
+    @APIResponses({
+        @APIResponse(
+            responseCode = "200",
+            description = "Failed pipelines evaluated and re-dispatched",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(
+                    type = SchemaType.OBJECT,
+                    implementation = ResumeFailedPipelinesResponse.class,
+                    description = "Summary of resumed, skipped, and error pipelines"
+                )
+            )
+        )
+    })
+    public Response resumeFailedPipelines() {
+        var response = resumeFailedPipelines.execute();
+        return Response.ok(response).build();
     }
 
     @PATCH

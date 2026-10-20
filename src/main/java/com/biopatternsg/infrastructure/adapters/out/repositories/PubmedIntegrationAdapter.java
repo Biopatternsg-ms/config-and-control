@@ -15,11 +15,11 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
-import com.biopatternsg.application.services.PipelineService;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.port.out.PipelineStepPort;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.infrastructure.clients.PubmedRestClient;
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
@@ -40,15 +40,15 @@ import java.util.List;
 public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
 
     private final PubmedRestClient pubmedRestClient;
-    private final PipelineService pipelineService;
+    private final PipelineStepPort pipelineStepPort;
     private final SessionUtil sessionUtil;
     private static final int DEFAULT_LEVEL = 1;
     private static final int DEFAULT_RETMAX = 10;
 
     @Inject
-    public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineService pipelineService, SessionUtil sessionUtil) {
+    public PubmedIntegrationAdapter(@RestClient PubmedRestClient pubmedRestClient, PipelineStepPort pipelineStepPort, SessionUtil sessionUtil) {
         this.pubmedRestClient = pubmedRestClient;
-        this.pipelineService = pipelineService;
+        this.pipelineStepPort = pipelineStepPort;
         this.sessionUtil = sessionUtil;
     }
 
@@ -63,10 +63,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.buildPairs(request, userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.IN_PROGRESS);
             log.info("Pubmed API buildPairs called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.COMBINATIONS, Status.FAILED);
             log.error("Error calling Pubmed API buildPairs for pipeline {}", pipelineConfig.getId(), e);
         }
     }
@@ -81,10 +81,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.searchPubmedIds(request, userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.IN_PROGRESS);
             log.info("Pubmed API searchPubmedIds called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBMED_IDS, Status.FAILED);
             log.error("Error calling Pubmed API searchPubmedIds for pipeline {}", pipelineConfig.getId(), e);
         }
     }
@@ -98,10 +98,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.searchPubtator(request, userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.IN_PROGRESS);
             log.info("Pubmed API searchPubtator called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.SEARCH_PUBTATOR, Status.FAILED);
             log.error("Error calling Pubmed API searchPubtator for pipeline {}", pipelineConfig.getId(), e);
         }
     }
@@ -115,10 +115,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.generateKb(request, userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.BUILD_KNOWLEDGE_BASE, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.BUILD_KNOWLEDGE_BASE, Status.IN_PROGRESS);
             log.info("Pubmed API generateKb called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.BUILD_KNOWLEDGE_BASE, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.BUILD_KNOWLEDGE_BASE, Status.FAILED);
             log.error("Error calling Pubmed API generateKb for pipeline {}", pipelineConfig.getId(), e);
         }
     }
@@ -144,10 +144,10 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
         try {
             String userId = sessionUtil.getUserId();
             pubmedRestClient.generateAlignedObjects(request, userId);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.IN_PROGRESS);
             log.info("Pubmed API generateAlignedObjects called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.GENERATE_ALIGNED_OBJECTS, Status.FAILED);
             log.error("Error calling Pubmed API generateAlignedObjects for pipeline {}", pipelineConfig.getId(), e);
         }
     }

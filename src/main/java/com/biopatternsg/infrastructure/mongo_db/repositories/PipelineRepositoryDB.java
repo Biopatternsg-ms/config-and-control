@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
@@ -82,5 +83,18 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
             : find(query).page(page, size).list();
 
         return new ReportFormat<>(count, list);
+    }
+
+    public List<PipelineCollection> findAllFailed() {
+        List<PipelineCollection> candidates = find("{'statuses.status': 'FAILED'}").list();
+        return candidates.stream()
+                .filter(p -> {
+                    if (p.getStatuses() == null || p.getStatuses().isEmpty()) {
+                        return false;
+                    }
+                    var latest = p.getStatuses().get(p.getStatuses().size() - 1);
+                    return latest.getStatus() == Status.FAILED;
+                })
+                .toList();
     }
 }

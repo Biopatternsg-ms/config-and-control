@@ -121,6 +121,25 @@ pipeline {
                             ${imageName}
 
                         """
+
+                        // Post-deployment readiness probe and pipeline resumption
+                        echo "--- Awaiting application readiness on port ${CONFIG_AND_CONTROL_PORT} ---"
+                        sh """
+                        timeout 30 sh -c '
+                            until curl --silent --fail http://localhost:${CONFIG_AND_CONTROL_PORT}/q/health/ready > /dev/null 2>&1; do
+                                echo "Waiting for config-and-control container to become ready..."
+                                sleep 2
+                            done
+                        '
+                        """
+
+                        echo "--- Resuming failed pipelines ---"
+                        sh """
+                        curl -s -X POST \\
+                            -H "x-system-call: true" \\
+                            http://localhost:${CONFIG_AND_CONTROL_PORT}/config-and-control/pipelines/resume-failed || true
+                        """
+
                         echo "--- Deployment completed! ---"
                     }
                 }

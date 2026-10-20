@@ -115,6 +115,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
         <!-- La dependencia pmd-java ha sido MOVIDA desde aquí hacia dentro del plugin -->
     </dependencies>
 

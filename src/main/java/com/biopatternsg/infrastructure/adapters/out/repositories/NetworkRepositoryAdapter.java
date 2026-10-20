@@ -23,6 +23,7 @@ import com.biopatternsg.infrastructure.mongo_db.repositories.NetworkRepositoryDB
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class NetworkRepositoryAdapter implements NetworkRepository {
@@ -42,8 +43,19 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
 
     @Override
     public NetworkConfig findById(String id) {
-
-        var networkCollection = networkRepositoryDB.findByIdAndIdUser(id, sessionUtil.getUserId());
+        if (id == null || !ObjectId.isValid(id)) {
+            return null;
+        }
+        String userId = null;
+        try {
+            if (sessionUtil != null && sessionUtil.getContext() != null && sessionUtil.getContext().containsKey("x-user-id")) {
+                userId = sessionUtil.getUserId();
+            }
+        } catch (Exception ignored) {
+        }
+        var networkCollection = (userId != null && !userId.isBlank())
+                ? networkRepositoryDB.findByIdAndIdUser(id, userId)
+                : networkRepositoryDB.findById(new ObjectId(id));
         return NetworkMapper.toNetworkConfig(networkCollection);
     }
 

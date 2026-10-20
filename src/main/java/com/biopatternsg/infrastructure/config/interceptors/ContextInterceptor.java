@@ -44,8 +44,10 @@ public class ContextInterceptor implements ContainerRequestFilter {
         String path = requestContext.getUriInfo().getPath();
         log.info("Path: {}", path);
 
-        if (path.contains("config-and-control/users")) {
-            log.info("userId no needed");
+        if (path.contains("config-and-control/users") ||
+            path.contains("config-and-control/pipelines/resume-failed") ||
+            "true".equalsIgnoreCase(requestContext.getHeaderString("x-system-call"))) {
+            log.info("userId not needed for path {} (or system call)", path);
             return;
         }
 

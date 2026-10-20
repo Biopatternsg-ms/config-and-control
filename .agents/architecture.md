@@ -127,6 +127,7 @@ Ubicación: `com.biopatternsg.application.usecase.*` (Documentación detallada c
 | `UpdatePipelineStepUseCase` | `UpdatePipelineStep` | Actualiza estado de un paso y orquesta la siguiente fase. | [`UpdatePipelineStepUseCase.md`](use_cases/UpdatePipelineStepUseCase.md) |
 | `FindPipelineUseCase` | `FindPipeline` | Consulta y filtra pipelines por usuario o red. | [`FindPipelineUseCase.md`](use_cases/FindPipelineUseCase.md) |
 | `LaunchPipelineUseCase` | `LaunchPipeline` | Orquesta el inicio de un pipeline disparando servicios externos. | [`LaunchPipelineUseCase.md`](use_cases/LaunchPipelineUseCase.md) |
+| `ResumeFailedPipelinesUseCase` | `ResumeFailedPipelines` | Reanuda pipelines en estado FAILED desde su paso predecesor tras despliegues. | [`ResumeFailedPipelinesUseCase.md`](use_cases/ResumeFailedPipelinesUseCase.md) |
 | `GetPipelineExecutionUseCase` | `GetPipelineExecution` | Reconstruye estado consolidado, duraciones y métricas. | [`GetPipelineExecutionUseCase.md`](use_cases/GetPipelineExecutionUseCase.md) |
 | `CreateNetworkUseCase` | `CreateNetwork` | Registra una nueva red biológica en base de datos. | [`CreateNetworkUseCase.md`](use_cases/CreateNetworkUseCase.md) |
 | `UpdateNetworkUseCase` | `UpdateNetwork` | Modifica atributos o estado de una red biológica. | [`UpdateNetworkUseCase.md`](use_cases/UpdateNetworkUseCase.md) |

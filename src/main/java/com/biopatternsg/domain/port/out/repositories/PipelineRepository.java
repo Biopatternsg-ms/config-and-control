@@ -18,6 +18,8 @@ package com.biopatternsg.domain.port.out.repositories;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 
+import java.util.List;
+
 public interface PipelineRepository {
 
     PipelineConfig save(PipelineConfig pipelineConfig);
@@ -25,4 +27,5 @@ public interface PipelineRepository {
     PipelineConfig findByName(String name);
     PipelineConfig findByNameExists(String networkId, String name);
     ReportFormat<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size);
+    List<PipelineConfig> findAllFailed();
 }

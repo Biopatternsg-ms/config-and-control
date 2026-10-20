@@ -19,7 +19,7 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.port.out.PipelineStepPort;
 import com.biopatternsg.infrastructure.adapters.out.repositories.InferencesAdapter;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
@@ -75,12 +75,11 @@ class InferencesAdapterTest {
         }
     }
 
-    static class FakePipelineService extends PipelineService {
+    static class FakePipelineStepPort implements PipelineStepPort {
         final List<StepUpdateRecord> updates = new ArrayList<>();
         final AtomicInteger callOrder;
 
-        FakePipelineService(AtomicInteger callOrder) {
-            super(null);
+        FakePipelineStepPort(AtomicInteger callOrder) {
             this.callOrder = callOrder;
         }
 
@@ -98,7 +97,7 @@ class InferencesAdapterTest {
     }
 
     private FakeInferencesRestClient restClient;
-    private FakePipelineService pipelineService;
+    private FakePipelineStepPort pipelineStepPort;
     private SessionUtil sessionUtil;
     private InferencesAdapter adapter;
     private AtomicInteger globalOrder;
@@ -108,14 +107,14 @@ class InferencesAdapterTest {
         globalOrder = new AtomicInteger(0);
         restClient = new FakeInferencesRestClient();
         restClient.callOrder = globalOrder;
-        pipelineService = new FakePipelineService(globalOrder);
+        pipelineStepPort = new FakePipelineStepPort(globalOrder);
         sessionUtil = new SessionUtil();
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.putSingle("x-user-id", "test-user-123");
         sessionUtil.setContext(headers);
 
-        adapter = new InferencesAdapter(restClient, pipelineService, sessionUtil);
+        adapter = new InferencesAdapter(restClient, pipelineStepPort, sessionUtil);
     }
 
     @Test
@@ -135,8 +134,8 @@ class InferencesAdapterTest {
         assertEquals("test-user-123", restClient.capturedUserId.get());
 
         // Verify status updates: must have exactly 1 update to IN_PROGRESS
-        assertEquals(1, pipelineService.updates.size());
-        StepUpdateRecord record = pipelineService.updates.get(0);
+        assertEquals(1, pipelineStepPort.updates.size());
+        StepUpdateRecord record = pipelineStepPort.updates.get(0);
         assertEquals("pipe-1", record.pipelineId);
         assertEquals(PipelineSteps.FIND_ROLES, record.step);
         assertEquals(Status.IN_PROGRESS, record.status);
@@ -158,11 +157,11 @@ class InferencesAdapterTest {
         adapter.executeFindRoles(config);
 
         // Must record IN_PROGRESS first, then FAILED
-        assertEquals(2, pipelineService.updates.size());
-        assertEquals(Status.IN_PROGRESS, pipelineService.updates.get(0).status);
-        assertEquals(Status.FAILED, pipelineService.updates.get(1).status);
-        assertEquals(PipelineSteps.FIND_ROLES, pipelineService.updates.get(1).step);
-        assertEquals("pipe-error", pipelineService.updates.get(1).pipelineId);
+        assertEquals(2, pipelineStepPort.updates.size());
+        assertEquals(Status.IN_PROGRESS, pipelineStepPort.updates.get(0).status);
+        assertEquals(Status.FAILED, pipelineStepPort.updates.get(1).status);
+        assertEquals(PipelineSteps.FIND_ROLES, pipelineStepPort.updates.get(1).step);
+        assertEquals("pipe-error", pipelineStepPort.updates.get(1).pipelineId);
     }
 
     @Test
@@ -182,8 +181,8 @@ class InferencesAdapterTest {
         assertFalse(restClient.findRolesCalled.get(), "REST client must not be invoked when userId is missing");
 
         // Status must be marked as FAILED immediately
-        assertEquals(1, pipelineService.updates.size());
-        StepUpdateRecord record = pipelineService.updates.get(0);
+        assertEquals(1, pipelineStepPort.updates.size());
+        StepUpdateRecord record = pipelineStepPort.updates.get(0);
         assertEquals("pipe-no-user", record.pipelineId);
         assertEquals(PipelineSteps.FIND_ROLES, record.step);
         assertEquals(Status.FAILED, record.status);
@@ -202,8 +201,8 @@ class InferencesAdapterTest {
         adapter.executeFindRoles(config);
 
         assertFalse(restClient.findRolesCalled.get());
-        assertEquals(1, pipelineService.updates.size());
-        assertEquals(Status.FAILED, pipelineService.updates.get(0).status);
+        assertEquals(1, pipelineStepPort.updates.size());
+        assertEquals(Status.FAILED, pipelineStepPort.updates.get(0).status);
     }
 
     @Test
@@ -221,8 +220,8 @@ class InferencesAdapterTest {
         adapter.executeFindRoles(config);
 
         assertFalse(restClient.findRolesCalled.get());
-        assertEquals(1, pipelineService.updates.size());
-        assertEquals(Status.FAILED, pipelineService.updates.get(0).status);
+        assertEquals(1, pipelineStepPort.updates.size());
+        assertEquals(Status.FAILED, pipelineStepPort.updates.get(0).status);
     }
 
     @Test

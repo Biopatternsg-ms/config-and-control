@@ -19,8 +19,8 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
+import com.biopatternsg.domain.port.out.PipelineStepPort;
 import com.biopatternsg.domain.port.out.TriggerInferences;
-import com.biopatternsg.application.services.PipelineService;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
 import com.biopatternsg.infrastructure.session.SessionUtil;
@@ -38,15 +38,15 @@ import java.util.Objects;
 public class InferencesAdapter implements TriggerInferences {
 
     private final InferencesRestClient inferencesRestClient;
-    private final PipelineService pipelineService;
+    private final PipelineStepPort pipelineStepPort;
     private final SessionUtil sessionUtil;
 
     @Inject
     public InferencesAdapter(@RestClient InferencesRestClient inferencesRestClient,
-                             PipelineService pipelineService,
+                             PipelineStepPort pipelineStepPort,
                              SessionUtil sessionUtil) {
         this.inferencesRestClient = inferencesRestClient;
-        this.pipelineService = pipelineService;
+        this.pipelineStepPort = pipelineStepPort;
         this.sessionUtil = sessionUtil;
     }
 
@@ -62,7 +62,7 @@ public class InferencesAdapter implements TriggerInferences {
         }
 
         if (userId == null || userId.isBlank()) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
             log.error("Cannot trigger FIND_ROLES for pipeline {}: userId is missing or empty in session context", pipelineConfig.getId());
             return;
         }
@@ -88,11 +88,11 @@ public class InferencesAdapter implements TriggerInferences {
         );
 
         try {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.IN_PROGRESS);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.IN_PROGRESS);
             inferencesRestClient.findRoles(request, userId);
             log.info("Inferences API findRoles called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
+            pipelineStepPort.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
             log.error("Error calling Inferences API findRoles for pipeline {}", pipelineConfig.getId(), e);
         }
     }
