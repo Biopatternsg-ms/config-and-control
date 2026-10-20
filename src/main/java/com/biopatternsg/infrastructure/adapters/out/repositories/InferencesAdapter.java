@@ -28,6 +28,7 @@ import com.biopatternsg.infrastructure.dtos.PathwayInferenceResponse;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.WebApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -153,6 +154,18 @@ public class InferencesAdapter implements TriggerInferences {
             metrics.put("inferenceStatus", response.status());
 
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.COMPLETED, metrics);
+        } catch (WebApplicationException e) {
+            int statusCode = e.getResponse() != null ? e.getResponse().getStatus() : -1;
+            String errorBody = "";
+            try {
+                if (e.getResponse() != null) {
+                    errorBody = e.getResponse().readEntity(String.class);
+                }
+            } catch (Exception ignored) {
+            }
+            log.error("Error calling Inferences API runPathwayInference for pipeline {} (HTTP {}): {}",
+                    pipelineConfig.getId(), statusCode, errorBody, e);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.FAILED);
         } catch (Exception e) {
             log.error("Error calling Inferences API runPathwayInference for pipeline {}", pipelineConfig.getId(), e);
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.FAILED);

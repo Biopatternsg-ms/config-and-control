@@ -15,13 +15,17 @@
  */
 package com.biopatternsg.infrastructure.dtos;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record PathwayInferenceResponse(
         String status,
         String pipelineId,
-        int pathwaysCount,
+        @JsonAlias({"generatedPathwaysCount", "pathwaysCount"}) int pathwaysCount,
         long executionTimeMs,
-        int graphNodesCount,
-        int graphEdgesCount,
+        @JsonAlias({"uniqueNodesCount", "graphNodesCount"}) int graphNodesCount,
+        @JsonAlias({"uniqueEdgesCount", "graphEdgesCount"}) int graphEdgesCount,
         String message
 ) {
 }
