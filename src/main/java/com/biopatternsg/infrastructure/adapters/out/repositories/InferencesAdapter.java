@@ -23,6 +23,8 @@ import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceResponse;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -30,7 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -94,6 +98,64 @@ public class InferencesAdapter implements TriggerInferences {
         } catch (Exception e) {
             pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
             log.error("Error calling Inferences API findRoles for pipeline {}", pipelineConfig.getId(), e);
+        }
+    }
+
+    @Override
+    public void executeInferPathways(PipelineConfig pipelineConfig) {
+        String userId = null;
+        try {
+            if (sessionUtil != null && sessionUtil.getContext() != null && sessionUtil.getContext().containsKey("x-user-id")) {
+                userId = sessionUtil.getUserId();
+            }
+        } catch (Exception e) {
+            log.warn("Could not retrieve userId from sessionUtil for pipeline {}: {}", pipelineConfig.getId(), e.getMessage());
+        }
+
+        if (userId == null || userId.isBlank()) {
+            userId = "anonymous";
+        }
+
+        List<String> alignedObjects = pipelineConfig.getAlignedExpertObjects();
+        if (alignedObjects == null || alignedObjects.isEmpty()) {
+            if (pipelineConfig.getExpertObjects() != null) {
+                alignedObjects = pipelineConfig.getExpertObjects().stream()
+                        .map(ExpertObjectConfig::getSymbol)
+                        .filter(Objects::nonNull)
+                        .toList();
+            } else {
+                alignedObjects = Collections.emptyList();
+            }
+        }
+
+        log.info("Triggering runPathwayInference for pipeline {} with user: {}, {} aligned objects",
+                pipelineConfig.getId(), userId, alignedObjects.size());
+
+        PathwayInferenceRequest request = new PathwayInferenceRequest(
+                pipelineConfig.getId(),
+                userId,
+                alignedObjects,
+                Collections.emptyList(),
+                false,
+                10
+        );
+
+        try {
+            PathwayInferenceResponse response = inferencesRestClient.runPathwayInference(request, userId);
+            log.info("Inferences API runPathwayInference completed for pipeline {}: status={}, pathwaysCount={}, timeMs={}",
+                    pipelineConfig.getId(), response.status(), response.pathwaysCount(), response.executionTimeMs());
+
+            Map<String, String> metrics = new LinkedHashMap<>();
+            metrics.put("pathwaysCount", String.valueOf(response.pathwaysCount()));
+            metrics.put("executionTimeMs", String.valueOf(response.executionTimeMs()));
+            metrics.put("graphNodesCount", String.valueOf(response.graphNodesCount()));
+            metrics.put("graphEdgesCount", String.valueOf(response.graphEdgesCount()));
+            metrics.put("inferenceStatus", response.status());
+
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.COMPLETED, metrics);
+        } catch (Exception e) {
+            log.error("Error calling Inferences API runPathwayInference for pipeline {}", pipelineConfig.getId(), e);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.FAILED);
         }
     }
 }

@@ -39,11 +39,18 @@ class PipelineStepOrchestratorTest {
 
     static class FakeTriggerInferences implements TriggerInferences {
         AtomicBoolean executeFindRolesCalled = new AtomicBoolean(false);
+        AtomicBoolean executeInferPathwaysCalled = new AtomicBoolean(false);
         AtomicReference<PipelineConfig> capturedConfig = new AtomicReference<>();
 
         @Override
         public void executeFindRoles(PipelineConfig pipelineConfig) {
             executeFindRolesCalled.set(true);
+            capturedConfig.set(pipelineConfig);
+        }
+
+        @Override
+        public void executeInferPathways(PipelineConfig pipelineConfig) {
+            executeInferPathwaysCalled.set(true);
             capturedConfig.set(pipelineConfig);
         }
     }
@@ -159,11 +166,15 @@ class PipelineStepOrchestratorTest {
     }
 
     @Test
-    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator handles it gracefully without exception")
-    void orchestrate_updateBiologicalObjects_handledGracefully() {
+    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator triggers executeInferPathways on TriggerInferences")
+    void orchestrate_updateBiologicalObjects_triggersInferPathways() {
         PipelineConfig config = PipelineConfig.builder().id("pipe-101-bio").build();
 
-        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS));
+        orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS);
+
+        assertTrue(triggerInferences.executeInferPathwaysCalled.get(),
+                "executeInferPathways must be invoked when UPDATE_BIOLOGICAL_OBJECTS completes");
+        assertEquals("pipe-101-bio", triggerInferences.capturedConfig.get().getId());
     }
 
     @Test
