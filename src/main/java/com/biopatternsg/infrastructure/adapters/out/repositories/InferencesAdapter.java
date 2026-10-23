@@ -153,7 +153,7 @@ public class InferencesAdapter implements TriggerInferences {
             metrics.put("graphEdgesCount", String.valueOf(response.graphEdgesCount()));
             metrics.put("inferenceStatus", response.status());
 
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.COMPLETED, metrics);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.COMPLETED, metrics);
         } catch (WebApplicationException e) {
             int statusCode = e.getResponse() != null ? e.getResponse().getStatus() : -1;
             String errorBody = "";
@@ -165,10 +165,10 @@ public class InferencesAdapter implements TriggerInferences {
             }
             log.error("Error calling Inferences API runPathwayInference for pipeline {} (HTTP {}): {}",
                     pipelineConfig.getId(), statusCode, errorBody, e);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.FAILED);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.FAILED);
         } catch (Exception e) {
             log.error("Error calling Inferences API runPathwayInference for pipeline {}", pipelineConfig.getId(), e);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.FAILED);
+            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.FAILED);
         }
     }
 }

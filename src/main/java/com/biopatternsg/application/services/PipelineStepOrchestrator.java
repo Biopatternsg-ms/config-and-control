@@ -75,8 +75,14 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.IN_PROGRESS);
             }
             case UPDATE_BIOLOGICAL_OBJECTS -> {
-                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}, triggering pathway inference", pipelineConfig.getId());
-                triggerInferences.executeInferPathways(pipelineConfig);
+                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}, setting SELECT_CLOSING_OBJECTS to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SELECT_CLOSING_OBJECTS, Status.IN_PROGRESS);
+            }
+            case SELECT_CLOSING_OBJECTS -> {
+                log.info("Step SELECT_CLOSING_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
+            }
+            case INFER_PATHWAYS -> {
+                log.info("Step INFER_PATHWAYS completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");

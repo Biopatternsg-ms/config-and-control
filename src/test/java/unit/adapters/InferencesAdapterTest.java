@@ -297,7 +297,7 @@ class InferencesAdapterTest {
         assertEquals(1, pipelineService.updates.size());
         StepUpdateRecord record = pipelineService.updates.get(0);
         assertEquals("pipe-infer-1", record.pipelineId);
-        assertEquals(PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, record.step);
+        assertEquals(PipelineSteps.INFER_PATHWAYS, record.step);
         assertEquals(Status.COMPLETED, record.status);
     }
 
@@ -315,7 +315,7 @@ class InferencesAdapterTest {
         assertEquals(1, pipelineService.updates.size());
         StepUpdateRecord record = pipelineService.updates.get(0);
         assertEquals("pipe-infer-err", record.pipelineId);
-        assertEquals(PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, record.step);
+        assertEquals(PipelineSteps.INFER_PATHWAYS, record.step);
         assertEquals(Status.FAILED, record.status);
     }
 

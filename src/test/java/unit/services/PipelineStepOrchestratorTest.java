@@ -166,16 +166,35 @@ class PipelineStepOrchestratorTest {
     }
 
     @Test
-    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator triggers executeInferPathways on TriggerInferences")
-    void orchestrate_updateBiologicalObjects_triggersInferPathways() {
+    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator sets SELECT_CLOSING_OBJECTS to IN_PROGRESS")
+    void orchestrate_updateBiologicalObjects_setsSelectClosingObjectsInProgress() {
         PipelineConfig config = PipelineConfig.builder().id("pipe-101-bio").build();
 
         orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS);
 
-        assertTrue(triggerInferences.executeInferPathwaysCalled.get(),
-                "executeInferPathways must be invoked when UPDATE_BIOLOGICAL_OBJECTS completes");
-        assertEquals("pipe-101-bio", triggerInferences.capturedConfig.get().getId());
+        assertEquals(1, pipelineService.stepRecords.size());
+        StepRecord record = pipelineService.stepRecords.get(0);
+        assertEquals("pipe-101-bio", record.id);
+        assertEquals(PipelineSteps.SELECT_CLOSING_OBJECTS, record.step);
+        assertEquals(Status.IN_PROGRESS, record.status);
     }
+
+    @Test
+    @DisplayName("When SELECT_CLOSING_OBJECTS completes, orchestrator handles it gracefully")
+    void orchestrate_selectClosingObjects_handledGracefully() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-101-closing").build();
+
+        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.SELECT_CLOSING_OBJECTS));
+    }
+
+    @Test
+    @DisplayName("When INFER_PATHWAYS completes, orchestrator handles it gracefully")
+    void orchestrate_inferPathways_handledGracefully() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-101-infer").build();
+
+        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.INFER_PATHWAYS));
+    }
+
 
     @Test
     @DisplayName("When GENERATE_ALIGNED_OBJECTS completes, orchestrator sets UPDATE_ALIGNED_OBJECTS to IN_PROGRESS")
