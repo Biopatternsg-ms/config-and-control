@@ -19,4 +19,5 @@ import com.biopatternsg.domain.models.PipelineConfig;
 
 public interface TriggerInferences {
     void executeFindRoles(PipelineConfig pipelineConfig);
+    void executeInferPathways(PipelineConfig pipelineConfig);
 }

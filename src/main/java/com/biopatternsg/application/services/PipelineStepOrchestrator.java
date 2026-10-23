@@ -18,6 +18,7 @@ package com.biopatternsg.application.services;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
@@ -66,7 +67,11 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.CONFIGURE_INFERENCES, Status.IN_PROGRESS);
             }
             case CONFIGURE_INFERENCES -> {
-                log.info("Step CONFIGURE_INFERENCES completed successfully for pipeline {}, triggering FIND_ROLES", pipelineConfig.getId());
+                log.info("Step CONFIGURE_INFERENCES completed successfully for pipeline {}, resetting downstream steps and triggering FIND_ROLES", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.PENDING);
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.PENDING);
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SELECT_CLOSING_OBJECTS, Status.PENDING);
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.PENDING);
                 triggerInferences.executeFindRoles(pipelineConfig);
             }
             case FIND_ROLES -> {
@@ -74,7 +79,14 @@ public class PipelineStepOrchestrator {
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.IN_PROGRESS);
             }
             case UPDATE_BIOLOGICAL_OBJECTS -> {
-                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
+                log.info("Step UPDATE_BIOLOGICAL_OBJECTS completed successfully for pipeline {}, setting SELECT_CLOSING_OBJECTS to IN_PROGRESS", pipelineConfig.getId());
+                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SELECT_CLOSING_OBJECTS, Status.IN_PROGRESS);
+            }
+            case SELECT_CLOSING_OBJECTS -> {
+                log.info("Step SELECT_CLOSING_OBJECTS completed successfully for pipeline {}", pipelineConfig.getId());
+            }
+            case INFER_PATHWAYS -> {
+                log.info("Step INFER_PATHWAYS completed successfully for pipeline {}", pipelineConfig.getId());
             }
             default -> {
                 log.info("Step is unknown, doing nothing");

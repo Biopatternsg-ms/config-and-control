@@ -21,7 +21,7 @@ import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.services.PipelineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,11 +38,18 @@ class PipelineStepOrchestratorTest {
 
     static class FakeTriggerInferences implements TriggerInferences {
         AtomicBoolean executeFindRolesCalled = new AtomicBoolean(false);
+        AtomicBoolean executeInferPathwaysCalled = new AtomicBoolean(false);
         AtomicReference<PipelineConfig> capturedConfig = new AtomicReference<>();
 
         @Override
         public void executeFindRoles(PipelineConfig pipelineConfig) {
             executeFindRolesCalled.set(true);
+            capturedConfig.set(pipelineConfig);
+        }
+
+        @Override
+        public void executeInferPathways(PipelineConfig pipelineConfig) {
+            executeInferPathwaysCalled.set(true);
             capturedConfig.set(pipelineConfig);
         }
     }
@@ -158,12 +165,35 @@ class PipelineStepOrchestratorTest {
     }
 
     @Test
-    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator handles it gracefully without exception")
-    void orchestrate_updateBiologicalObjects_handledGracefully() {
+    @DisplayName("When UPDATE_BIOLOGICAL_OBJECTS completes, orchestrator sets SELECT_CLOSING_OBJECTS to IN_PROGRESS")
+    void orchestrate_updateBiologicalObjects_setsSelectClosingObjectsInProgress() {
         PipelineConfig config = PipelineConfig.builder().id("pipe-101-bio").build();
 
-        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS));
+        orchestrator.orchestrate(config, PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS);
+
+        assertEquals(1, pipelineService.stepRecords.size());
+        StepRecord record = pipelineService.stepRecords.get(0);
+        assertEquals("pipe-101-bio", record.id);
+        assertEquals(PipelineSteps.SELECT_CLOSING_OBJECTS, record.step);
+        assertEquals(Status.IN_PROGRESS, record.status);
     }
+
+    @Test
+    @DisplayName("When SELECT_CLOSING_OBJECTS completes, orchestrator handles it gracefully")
+    void orchestrate_selectClosingObjects_handledGracefully() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-101-closing").build();
+
+        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.SELECT_CLOSING_OBJECTS));
+    }
+
+    @Test
+    @DisplayName("When INFER_PATHWAYS completes, orchestrator handles it gracefully")
+    void orchestrate_inferPathways_handledGracefully() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-101-infer").build();
+
+        assertDoesNotThrow(() -> orchestrator.orchestrate(config, PipelineSteps.INFER_PATHWAYS));
+    }
+
 
     @Test
     @DisplayName("When GENERATE_ALIGNED_OBJECTS completes, orchestrator sets UPDATE_ALIGNED_OBJECTS to IN_PROGRESS")
