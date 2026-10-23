@@ -20,7 +20,7 @@ import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
-import com.biopatternsg.domain.services.PipelineService;
+import com.biopatternsg.application.services.PipelineService;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
 import com.biopatternsg.infrastructure.dtos.PathwayInferenceRequest;
