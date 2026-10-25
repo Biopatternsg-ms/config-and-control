@@ -68,7 +68,6 @@ public class PipelineStepOrchestrator {
             }
             case CONFIGURE_INFERENCES -> {
                 log.info("Step CONFIGURE_INFERENCES completed successfully for pipeline {}, resetting downstream steps and triggering FIND_ROLES", pipelineConfig.getId());
-                pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.PENDING);
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.UPDATE_BIOLOGICAL_OBJECTS, Status.PENDING);
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.SELECT_CLOSING_OBJECTS, Status.PENDING);
                 pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.PENDING);
