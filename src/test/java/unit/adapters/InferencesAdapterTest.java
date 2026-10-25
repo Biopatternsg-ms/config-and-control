@@ -19,10 +19,12 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.infrastructure.adapters.out.repositories.InferencesAdapter;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceResponse;
 import com.biopatternsg.infrastructure.session.SessionUtil;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -58,6 +60,21 @@ class InferencesAdapterTest {
             if (shouldThrow) {
                 throw new RuntimeException("Inferences microservice error");
             }
+        }
+
+        AtomicBoolean runPathwayInferenceCalled = new AtomicBoolean(false);
+        AtomicReference<PathwayInferenceRequest> capturedPathwayRequest = new AtomicReference<>();
+
+        @Override
+        public PathwayInferenceResponse runPathwayInference(PathwayInferenceRequest request, String userId) {
+            runPathwayInferenceCalled.set(true);
+            capturedPathwayRequest.set(request);
+            capturedUserId.set(userId);
+            executionOrder = callOrder.incrementAndGet();
+            if (shouldThrow) {
+                throw new RuntimeException("Inferences microservice error");
+            }
+            return new PathwayInferenceResponse("SUCCESS", request.pipelineId(), 17766, 420, 50, 120, "OK");
         }
     }
 
@@ -260,5 +277,62 @@ class InferencesAdapterTest {
 
         assertTrue(restClient.findRolesCalled.get());
         assertEquals(List.of(), restClient.capturedRequest.get().alignedObjects());
+    }
+
+    @Test
+    @DisplayName("executeInferPathways should call runPathwayInference and update step with metrics")
+    void executeInferPathways_callsRestClientAndSetsMetrics() {
+        PipelineConfig config = PipelineConfig.builder()
+                .id("pipe-infer-1")
+                .alignedExpertObjects(List.of("IFNA1", "IRF3"))
+                .build();
+
+        adapter.executeInferPathways(config);
+
+        assertTrue(restClient.runPathwayInferenceCalled.get());
+        assertEquals("pipe-infer-1", restClient.capturedPathwayRequest.get().pipelineId());
+        assertEquals(List.of("IFNA1", "IRF3"), restClient.capturedPathwayRequest.get().restrictedObjects());
+        assertEquals("test-user-123", restClient.capturedUserId.get());
+
+        assertEquals(1, pipelineService.updates.size());
+        StepUpdateRecord record = pipelineService.updates.get(0);
+        assertEquals("pipe-infer-1", record.pipelineId);
+        assertEquals(PipelineSteps.INFER_PATHWAYS, record.step);
+        assertEquals(Status.COMPLETED, record.status);
+    }
+
+    @Test
+    @DisplayName("executeInferPathways should mark FAILED when REST client throws exception")
+    void executeInferPathways_restClientThrows_marksFailed() {
+        restClient.shouldThrow = true;
+        PipelineConfig config = PipelineConfig.builder()
+                .id("pipe-infer-err")
+                .alignedExpertObjects(List.of("TP53"))
+                .build();
+
+        adapter.executeInferPathways(config);
+
+        assertEquals(1, pipelineService.updates.size());
+        StepUpdateRecord record = pipelineService.updates.get(0);
+        assertEquals("pipe-infer-err", record.pipelineId);
+        assertEquals(PipelineSteps.INFER_PATHWAYS, record.step);
+        assertEquals(Status.FAILED, record.status);
+    }
+
+    @Test
+    @DisplayName("executeInferPathways should fall back to anonymous when user is missing")
+    void executeInferPathways_missingUser_fallsBackToAnonymous() {
+        sessionUtil.setContext(new MultivaluedHashMap<>());
+        PipelineConfig config = PipelineConfig.builder()
+                .id("pipe-anon")
+                .alignedExpertObjects(List.of("TP53"))
+                .build();
+
+        adapter.executeInferPathways(config);
+
+        assertTrue(restClient.runPathwayInferenceCalled.get());
+        assertEquals("anonymous", restClient.capturedUserId.get());
+        assertEquals("anonymous", restClient.capturedPathwayRequest.get().user());
+        assertEquals(Status.COMPLETED, pipelineService.updates.get(0).status);
     }
 }

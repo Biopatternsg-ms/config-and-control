@@ -245,6 +245,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case CONFIGURE_INFERENCES -> "Configure Inferences";
             case FIND_ROLES -> "Find Biological Roles";
             case UPDATE_BIOLOGICAL_OBJECTS -> "Update Biological Objects";
+            case SELECT_CLOSING_OBJECTS -> "Select Closing Objects";
+            case INFER_PATHWAYS -> "Infer Biological Pathways";
         };
     }
 
@@ -264,6 +266,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case CONFIGURE_INFERENCES -> "Configures biological restriction level for inference generation.";
             case FIND_ROLES -> "Identifies biological roles and classifications for aligned entities.";
             case UPDATE_BIOLOGICAL_OBJECTS -> "Manual review and editing of biological roles and biotypes for entities.";
+            case SELECT_CLOSING_OBJECTS -> "Selection of target closing objects to finalize inferred pathways.";
+            case INFER_PATHWAYS -> "Executes SWI-Prolog reasoning engine to infer biological signaling pathways.";
         };
     }
 
@@ -276,6 +280,8 @@ public class GetPipelineExecutionUseCase implements GetPipelineExecution {
             case COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR -> "FileText";
             case BUILD_KNOWLEDGE_BASE, CONFIGURE_INFERENCES, FIND_ROLES -> "Activity";
             case GENERATE_ALIGNED_OBJECTS, UPDATE_ALIGNED_OBJECTS, UPDATE_BIOLOGICAL_OBJECTS -> "FileText";
+            case SELECT_CLOSING_OBJECTS -> "Target";
+            case INFER_PATHWAYS -> "Activity";
         };
     }
 

@@ -16,15 +16,26 @@
 package com.biopatternsg.infrastructure.clients;
 
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceRequest;
+import com.biopatternsg.infrastructure.dtos.PathwayInferenceResponse;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey = "inferences-api")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public interface InferencesRestClient {
 
     @POST
     @Path("/inferences/find-roles")
     void findRoles(FindRolesRequest request, @HeaderParam("x-user-id") String userId);
+
+    @POST
+    @Path("/inferences/pathways/run")
+    PathwayInferenceResponse runPathwayInference(PathwayInferenceRequest request, @HeaderParam("x-user-id") String userId);
 }
