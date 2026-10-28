@@ -16,7 +16,7 @@
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.infrastructure.clients.BiologicalObjectHttpClient;
 import com.biopatternsg.infrastructure.dtos.LaunchPipelineInternalRequest;
@@ -44,14 +44,19 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
     @Override
     @Retry
     public String launch(PipelineConfig pipelineConfig) {
+        return launchConsole(pipelineConfig, sessionUtil.getUserId());
+    }
 
+    @Override
+    @Retry
+    public String launchConsole(PipelineConfig pipelineConfig, String userId) {
         var pipelineBiologicalObject = new LaunchPipelineInternalRequest(
                 pipelineConfig.getId(),
                 pipelineConfig.getLevels(),
                 pipelineConfig.getMaxComplexes(),
                 pipelineConfig.getExpertObjects(),
                 pipelineConfig.getTranscriptionFactorConfig());
-        return biologicalObjectHttpClient.launch(pipelineBiologicalObject, sessionUtil.getUserId());
+        return biologicalObjectHttpClient.launch(pipelineBiologicalObject, userId);
     }
 
 }

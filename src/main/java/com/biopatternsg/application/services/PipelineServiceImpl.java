@@ -20,6 +20,7 @@ import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
+import com.biopatternsg.domain.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
@@ -27,14 +28,16 @@ import java.util.Map;
 
 @ApplicationScoped
 @RequiredArgsConstructor
-public class PipelineService {
+public class PipelineServiceImpl implements PipelineService {
 
     private final PipelineRepository pipelineRepository;
 
+    @Override
     public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
         return updateStep(id, step, status, null);
     }
 
+    @Override
     public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
         var pipelineConfig = pipelineRepository.findById(id);
         if (pipelineConfig == null) {

@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.mongo_db.repositories;
 
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
@@ -82,5 +83,14 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
             : find(query).page(page, size).list();
 
         return new ReportFormat<>(count, list);
+    }
+
+    public List<PipelineCollection> findInProgressBySteps(List<PipelineSteps> steps) {
+        if (steps == null || steps.isEmpty()) {
+            return List.of();
+        }
+        return find("{'step': {'$in': :steps}, 'statuses': {'$exists': true, '$ne': []}, '$expr': {'$eq': [{'$arrayElemAt': ['$statuses.status', -1]}, 'IN_PROGRESS']}}",
+                Parameters.with("steps", steps))
+                .list();
     }
 }
