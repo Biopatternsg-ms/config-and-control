@@ -85,11 +85,11 @@ public class PipelineRepositoryDB implements PanacheMongoRepository<PipelineColl
         return new ReportFormat<>(count, list);
     }
 
-    public List<PipelineCollection> findInProgressBySteps(List<PipelineSteps> steps) {
+    public List<PipelineCollection> findIncompleteSteps(List<PipelineSteps> steps) {
         if (steps == null || steps.isEmpty()) {
             return List.of();
         }
-        return find("{'step': {'$in': :steps}, 'statuses': {'$exists': true, '$ne': []}, '$expr': {'$eq': [{'$arrayElemAt': ['$statuses.status', -1]}, 'IN_PROGRESS']}}",
+        return find("{'step': {'$in': :steps}, 'statuses': {'$exists': true, '$ne': []}, '$expr': {'$in': [{'$arrayElemAt': ['$statuses.status', -1]}, ['IN_PROGRESS', 'FAILED']]}}",
                 Parameters.with("steps", steps))
                 .list();
     }

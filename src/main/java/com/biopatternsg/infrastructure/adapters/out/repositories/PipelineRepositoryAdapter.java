@@ -86,7 +86,7 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
 
     @Override
     public List<PipelineConfig> findInProgressBySteps(List<PipelineSteps> steps) {
-        var collections = pipelineRepositoryDB.findInProgressBySteps(steps);
+        var collections = pipelineRepositoryDB.findIncompleteSteps(steps);
         if (collections == null) {
             return List.of();
         }

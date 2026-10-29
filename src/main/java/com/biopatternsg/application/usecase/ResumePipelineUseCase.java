@@ -44,6 +44,7 @@ public class ResumePipelineUseCase implements ResumePipeline {
     private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     private static final List<PipelineSteps> BIOLOGICAL_STEPS = List.of(
+            PipelineSteps.LAUNCH,
             PipelineSteps.TRANSCRIPTION_FACTOR,
             PipelineSteps.EXPERT_OBJECTS,
             PipelineSteps.SEARCH_LEVELS

@@ -194,7 +194,7 @@ class ResumePipelineUseCaseTest {
         assertTrue(summary.getFailedPipelineIds().isEmpty());
         assertTrue(summary.getErrors().isEmpty());
 
-        assertEquals(List.of(PipelineSteps.TRANSCRIPTION_FACTOR, PipelineSteps.EXPERT_OBJECTS, PipelineSteps.SEARCH_LEVELS),
+        assertEquals(List.of(PipelineSteps.LAUNCH, PipelineSteps.TRANSCRIPTION_FACTOR, PipelineSteps.EXPERT_OBJECTS, PipelineSteps.SEARCH_LEVELS),
                 pipelineRepository.capturedSteps);
         assertEquals(2, biologicalObjectRepository.launchedPipelines.size());
         assertEquals("user-123", biologicalObjectRepository.capturedUserIds.get("pipe-1"));
