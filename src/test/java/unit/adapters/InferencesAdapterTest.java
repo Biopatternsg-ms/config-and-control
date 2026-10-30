@@ -19,7 +19,7 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.infrastructure.adapters.out.repositories.InferencesAdapter;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
@@ -75,12 +75,11 @@ class InferencesAdapterTest {
         }
     }
 
-    static class FakePipelineService extends PipelineService {
+    static class FakePipelineService implements PipelineService {
         final List<StepUpdateRecord> updates = new ArrayList<>();
         final AtomicInteger callOrder;
 
         FakePipelineService(AtomicInteger callOrder) {
-            super(null);
             this.callOrder = callOrder;
         }
 

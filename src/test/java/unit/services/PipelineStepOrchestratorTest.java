@@ -21,7 +21,7 @@ import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.application.services.PipelineService;
+import com.biopatternsg.domain.services.PipelineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,12 +92,10 @@ class PipelineStepOrchestratorTest {
         }
     }
 
-    static class FakePipelineService extends PipelineService {
+    static class FakePipelineService implements PipelineService {
         final List<StepRecord> stepRecords = new ArrayList<>();
 
-        FakePipelineService() {
-            super(null);
-        }
+        
 
         @Override
         public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
