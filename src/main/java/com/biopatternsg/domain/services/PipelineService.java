@@ -17,32 +17,13 @@ package com.biopatternsg.domain.services;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
-import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import jakarta.enterprise.context.ApplicationScoped;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-@ApplicationScoped
-@RequiredArgsConstructor
-public class PipelineService {
+public interface PipelineService {
 
-    private final PipelineRepository pipelineRepository;
+    PipelineConfig updateStep(String id, PipelineSteps step, Status status);
 
-    public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
-        return updateStep(id, step, status, null);
-    }
-
-    public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
-        var pipelineConfig = pipelineRepository.findById(id);
-        if (pipelineConfig == null) {
-            throw new UnprocessableEntityException("The pipeline don't exists");
-        }
-
-        pipelineConfig.setStep(step);
-        pipelineConfig.addStatusForStep(step, status, metrics);
-        return pipelineRepository.save(pipelineConfig);
-    }
+    PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics);
 }

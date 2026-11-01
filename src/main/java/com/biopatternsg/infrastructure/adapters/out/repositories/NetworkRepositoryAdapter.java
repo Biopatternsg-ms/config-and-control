@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
+import org.bson.types.ObjectId;
 import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
@@ -42,8 +43,21 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
 
     @Override
     public NetworkConfig findById(String id) {
+        if (id == null || !ObjectId.isValid(id)) {
+            return null;
+        }
+        String userId = null;
+        try {
+            if (sessionUtil != null && sessionUtil.getContext() != null && sessionUtil.getContext().containsKey("x-user-id")) {
+                userId = sessionUtil.getUserId();
+            }
+        } catch (Exception ignored) {
+        }
 
-        var networkCollection = networkRepositoryDB.findByIdAndIdUser(id, sessionUtil.getUserId());
+        var networkCollection = (userId != null && !userId.isBlank())
+                ? networkRepositoryDB.findByIdAndIdUser(id, userId)
+                : networkRepositoryDB.findById(new ObjectId(id));
+
         return NetworkMapper.toNetworkConfig(networkCollection);
     }
 

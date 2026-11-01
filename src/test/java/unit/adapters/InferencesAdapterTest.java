@@ -92,12 +92,11 @@ class InferencesAdapterTest {
         }
     }
 
-    static class FakePipelineService extends PipelineService {
+    static class FakePipelineService implements PipelineService {
         final List<StepUpdateRecord> updates = new ArrayList<>();
         final AtomicInteger callOrder;
 
         FakePipelineService(AtomicInteger callOrder) {
-            super(null);
             this.callOrder = callOrder;
         }
 

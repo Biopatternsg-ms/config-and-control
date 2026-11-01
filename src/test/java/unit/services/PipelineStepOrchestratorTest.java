@@ -99,12 +99,10 @@ class PipelineStepOrchestratorTest {
         }
     }
 
-    static class FakePipelineService extends PipelineService {
+    static class FakePipelineService implements PipelineService {
         final List<StepRecord> stepRecords = new ArrayList<>();
 
-        FakePipelineService() {
-            super(null);
-        }
+        
 
         @Override
         public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {

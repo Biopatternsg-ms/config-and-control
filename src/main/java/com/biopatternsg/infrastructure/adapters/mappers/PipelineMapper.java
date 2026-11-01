@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.mappers;
 
+import com.biopatternsg.domain.models.PipelineResumeSummary;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.infrastructure.dtos.*;
@@ -187,5 +188,20 @@ public class PipelineMapper {
                 .status(pipelineStepRequest.status())
                 .metrics(pipelineStepRequest.metrics())
                 .build();
+    }
+
+    public static PipelineResumeResponse toResponse(PipelineResumeSummary summary) {
+        if (summary == null) {
+            return null;
+        }
+        return new PipelineResumeResponse(
+                summary.getMicroService(),
+                summary.getTotalFound(),
+                summary.getResumedCount(),
+                summary.getFailedCount(),
+                summary.getResumedPipelineIds(),
+                summary.getFailedPipelineIds(),
+                summary.getErrors()
+        );
     }
 }

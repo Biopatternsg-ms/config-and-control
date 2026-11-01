@@ -77,13 +77,14 @@ com.biopatternsg/
 │   ├── models/                  <-- Entidades y modelos del dominio (POJOs/Lombok)
 │   │   ├── pipeline_config/
 │   │   └── user_registration/
+│   ├── services/                <-- Servicios del dominio (Interfaz PipelineService)
 │   └── port/
 │       ├── in/                  <-- Puertos de Entrada (Interfaces de Use Cases)
 │       └── out/                 <-- Puertos de Salida (Interfaces de integración)
 │           └── repositories/    <-- Puertos de persistencia y servicios
 │
 ├── application/                 <-- Capa de Aplicación
-│   ├── services/                <-- Servicios de aplicación (PipelineService, PipelineStepOrchestrator)
+│   ├── services/                <-- Implementaciones de servicios (PipelineServiceImpl, PipelineStepOrchestrator)
 │   └── usecase/                 <-- Casos de uso concretos (*UseCase.java)
 │
 └── infrastructure/              <-- Capa de Infraestructura (Quarkus, MongoDB, HTTP)
@@ -109,6 +110,7 @@ Cualquier cambio de código realizado por un agente **DEBE** respetar las reglas
 |---|---|
 | **Aislamiento de Dominio** | `com.biopatternsg.domain..` **NO** puede depender de `application..` ni de `infrastructure..`. |
 | **Aislamiento de Aplicación** | `com.biopatternsg.application..` **NO** puede depender de `infrastructure..`. |
+| **Encapsulamiento de Aplicación (layerApplicationTest)** | com.biopatternsg.application.. solo puede ser accedida por clases de la misma capa Application (la comunicación desde Infrastructure se realiza exclusivamente mediante interfaces en domain). |
 | **Acceso a Casos de Uso** | Las implementaciones en `application.usecase..` no deben instanciarse directamente entre capas; se interactúa a través de sus puertos `domain.port.in`. |
 | **Nomenclatura UseCase** | Toda clase en `application.usecase..` debe terminar en `UseCase` (ej. `CreatePipelineUseCase`). |
 | **Nomenclatura Controller** | Toda clase en `infrastructure.adapters.in.restcontrollers..` debe terminar en `Controller` (ej. `PipelineController`). |
@@ -126,13 +128,15 @@ Ubicación: `com.biopatternsg.application.usecase.*` (Documentación detallada c
 | `UpdatePipelineUseCase` | `UpdatePipeline` | Modifica parámetros, niveles y objetos de un pipeline. | [`UpdatePipelineUseCase.md`](use_cases/UpdatePipelineUseCase.md) |
 | `UpdatePipelineStepUseCase` | `UpdatePipelineStep` | Actualiza estado de un paso y orquesta la siguiente fase. | [`UpdatePipelineStepUseCase.md`](use_cases/UpdatePipelineStepUseCase.md) |
 | `FindPipelineUseCase` | `FindPipeline` | Consulta y filtra pipelines por usuario o red. | [`FindPipelineUseCase.md`](use_cases/FindPipelineUseCase.md) |
-| `LaunchPipelineUseCase` | `LaunchPipeline` | Orquesta el inicio de un pipeline disparando servicios externos. | [`LaunchPipelineUseCase.md`](use_cases/LaunchPipelineUseCase.md) |
+| LaunchPipelineUseCase | LaunchPipeline | Orquesta el inicio de un pipeline disparando servicios externos. | [LaunchPipelineUseCase.md](use_cases/LaunchPipelineUseCase.md) |
+| RegenerateAlignedObjectsUseCase | RegenerateAlignedObjects | Reinicia el paso de alineaci�n y re-dispara la generaci�n de objetos alineados. | [RegenerateAlignedObjectsUseCase.md](use_cases/RegenerateAlignedObjectsUseCase.md) |
 | `GetPipelineExecutionUseCase` | `GetPipelineExecution` | Reconstruye estado consolidado, duraciones y métricas. | [`GetPipelineExecutionUseCase.md`](use_cases/GetPipelineExecutionUseCase.md) |
 | `CreateNetworkUseCase` | `CreateNetwork` | Registra una nueva red biológica en base de datos. | [`CreateNetworkUseCase.md`](use_cases/CreateNetworkUseCase.md) |
 | `UpdateNetworkUseCase` | `UpdateNetwork` | Modifica atributos o estado de una red biológica. | [`UpdateNetworkUseCase.md`](use_cases/UpdateNetworkUseCase.md) |
 | `FindNetworkUseCase` | `FindNetwork` | Búsqueda y filtrado de redes por usuario. | [`FindNetworkUseCase.md`](use_cases/FindNetworkUseCase.md) |
 | `UserAuthenticationUseCase` | `UserAuthentication` | Login y refresh token interactuando con Keycloak. | [`UserAuthenticationUseCase.md`](use_cases/UserAuthenticationUseCase.md) |
 | `UserManagementUseCase` | `UserManagement` | Registro, roles y administración de usuarios. | [`UserManagementUseCase.md`](use_cases/UserManagementUseCase.md) |
+| `ResumePipelineUseCase` | `ResumePipeline` | Reanuda pipelines en progreso tras reinicios o interrupciones de servicios. | [`ResumePipelineUseCase.md`](use_cases/ResumePipelineUseCase.md) |
 
 ---
 

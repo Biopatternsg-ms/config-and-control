@@ -27,11 +27,6 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
-import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
-import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.domain.services.PipelineService;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,8 +45,8 @@ public class PipelineController {
     private final FindPipeline findPipeline;
     private final UpdatePipelineStep updatePipelineStep;
     private final GetPipelineExecution getPipelineExecution;
-    private final PipelineService pipelineService;
-    private final TriggerPubmedIntegration triggerPubmedIntegration;
+    private final RegenerateAlignedObjects regenerateAlignedObjects;
+    private final ResumePipeline resumePipeline;
 
     @POST
     @Operation(
@@ -232,12 +227,7 @@ public class PipelineController {
         )
     })
     public Response regenerateAlignedObjects(@PathParam("id") String id){
-        var pipeline = findPipeline.byId(id);
-        if (pipeline == null) {
-            throw new UnprocessableEntityException("The pipeline don't exists");
-        }
-        pipelineService.updateStep(id, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
-        triggerPubmedIntegration.executeGenerateAlignedObjects(pipeline);
+        regenerateAlignedObjects.execute(id);
         return Response.accepted().entity("Regeneration triggered").build();
     }
 
@@ -302,9 +292,9 @@ public class PipelineController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(
-                                    type = SchemaType.OBJECT,
-                                    implementation = PipelineConfig.class,
-                                    description = "Pipeline information obtained"
+                                     type = SchemaType.OBJECT,
+                                     implementation = PipelineConfig.class,
+                                     description = "Pipeline information obtained"
                             )
                     )
             )
@@ -364,5 +354,36 @@ public class PipelineController {
     })
     public ExperimentExecutionResponse getExecutionProgress(@PathParam("id") String id){
         return getPipelineExecution.execute(id);
+    }
+
+    @POST
+    @Path("/resume")
+    @Operation(
+            summary = "Resume pending pipelines",
+            description = "Resumes in-progress pipelines for the specified microservice."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Pipelines evaluated and resumed successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PipelineResumeResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid or missing microService"
+            )
+    })
+    public Response resume(@Valid ResumePipelineRequest request) {
+        if (request == null || request.microService() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(java.util.Map.of("message", "microService is required"))
+                    .build();
+        }
+        var summary = resumePipeline.execute(request.microService());
+        var response = PipelineMapper.toResponse(summary);
+        return Response.ok(response).build();
     }
 }

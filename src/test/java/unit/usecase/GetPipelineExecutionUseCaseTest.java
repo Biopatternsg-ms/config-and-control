@@ -57,6 +57,11 @@ class GetPipelineExecutionUseCaseTest {
         public ReportFormat<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size) {
             return null;
         }
+
+        @Override
+        public List<PipelineConfig> findInProgressBySteps(List<PipelineSteps> steps) {
+            return Collections.emptyList();
+        }
     }
 
     private FakePipelineRepository repository;

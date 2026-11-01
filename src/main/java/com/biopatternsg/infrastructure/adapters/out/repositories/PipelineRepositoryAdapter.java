@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
+import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
@@ -81,5 +82,16 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
         var networkList = networkRepositoryDB.findByUserAndFilters(null,
                 sessionUtil.getUserId(), 0, 0);
         return networkList.list().stream().map(network -> network.id.toString()).toList();
+    }
+
+    @Override
+    public List<PipelineConfig> findInProgressBySteps(List<PipelineSteps> steps) {
+        var collections = pipelineRepositoryDB.findIncompleteSteps(steps);
+        if (collections == null) {
+            return List.of();
+        }
+        return collections.stream()
+                .map(PipelineMapper::collectionToConfig)
+                .toList();
     }
 }
