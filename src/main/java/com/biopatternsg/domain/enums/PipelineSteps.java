@@ -34,7 +34,9 @@ public enum PipelineSteps {
     UPDATE_ALIGNED_OBJECTS("update_aligned_objects", PipelineStage.PUBMED_INTEGRATION),
     CONFIGURE_INFERENCES("configure_inferences", PipelineStage.INFERENCES),
     FIND_ROLES("find_roles", PipelineStage.INFERENCES),
-    UPDATE_BIOLOGICAL_OBJECTS("update_biological_objects", PipelineStage.INFERENCES);
+    UPDATE_BIOLOGICAL_OBJECTS("update_biological_objects", PipelineStage.INFERENCES),
+    SELECT_CLOSING_OBJECTS("select_closing_objects", PipelineStage.INFERENCES),
+    INFER_PATHWAYS("infer_pathways", PipelineStage.INFERENCES);
 
     private final String value;
     private final PipelineStage stage;

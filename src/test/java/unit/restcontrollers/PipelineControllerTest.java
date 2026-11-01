@@ -57,8 +57,7 @@ class PipelineControllerTest {
                 null, // findPipeline
                 null, // updatePipelineStep
                 null, // getPipelineExecution
-                null, // pipelineService
-                null, // triggerPubmedIntegration
+                null, // regenerateAlignedObjects
                 fakeResumePipeline
         );
     }
