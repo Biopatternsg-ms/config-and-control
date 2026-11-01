@@ -126,7 +126,8 @@ Ubicaci贸n: `com.biopatternsg.application.usecase.*` (Documentaci贸n detallada c
 | `UpdatePipelineUseCase` | `UpdatePipeline` | Modifica par谩metros, niveles y objetos de un pipeline. | [`UpdatePipelineUseCase.md`](use_cases/UpdatePipelineUseCase.md) |
 | `UpdatePipelineStepUseCase` | `UpdatePipelineStep` | Actualiza estado de un paso y orquesta la siguiente fase. | [`UpdatePipelineStepUseCase.md`](use_cases/UpdatePipelineStepUseCase.md) |
 | `FindPipelineUseCase` | `FindPipeline` | Consulta y filtra pipelines por usuario o red. | [`FindPipelineUseCase.md`](use_cases/FindPipelineUseCase.md) |
-| `LaunchPipelineUseCase` | `LaunchPipeline` | Orquesta el inicio de un pipeline disparando servicios externos. | [`LaunchPipelineUseCase.md`](use_cases/LaunchPipelineUseCase.md) |
+| LaunchPipelineUseCase | LaunchPipeline | Orquesta el inicio de un pipeline disparando servicios externos. | [LaunchPipelineUseCase.md](use_cases/LaunchPipelineUseCase.md) |
+| RegenerateAlignedObjectsUseCase | RegenerateAlignedObjects | Reinicia el paso de alineaci髇 y re-dispara la generaci髇 de objetos alineados. | [RegenerateAlignedObjectsUseCase.md](use_cases/RegenerateAlignedObjectsUseCase.md) |
 | `GetPipelineExecutionUseCase` | `GetPipelineExecution` | Reconstruye estado consolidado, duraciones y m茅tricas. | [`GetPipelineExecutionUseCase.md`](use_cases/GetPipelineExecutionUseCase.md) |
 | `CreateNetworkUseCase` | `CreateNetwork` | Registra una nueva red biol贸gica en base de datos. | [`CreateNetworkUseCase.md`](use_cases/CreateNetworkUseCase.md) |
 | `UpdateNetworkUseCase` | `UpdateNetwork` | Modifica atributos o estado de una red biol贸gica. | [`UpdateNetworkUseCase.md`](use_cases/UpdateNetworkUseCase.md) |

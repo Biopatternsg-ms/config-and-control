@@ -13,36 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.application.services;
+package com.biopatternsg.application.usecase;
 
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
-import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.port.in.RegenerateAlignedObjects;
+import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
+import com.biopatternsg.domain.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
-
 @ApplicationScoped
 @RequiredArgsConstructor
-public class PipelineService {
+public class RegenerateAlignedObjectsUseCase implements RegenerateAlignedObjects {
 
     private final PipelineRepository pipelineRepository;
+    private final PipelineService pipelineService;
+    private final TriggerPubmedIntegration triggerPubmedIntegration;
 
-    public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
-        return updateStep(id, step, status, null);
-    }
-
-    public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
-        var pipelineConfig = pipelineRepository.findById(id);
-        if (pipelineConfig == null) {
+    @Override
+    public void execute(String pipelineId) {
+        var pipeline = pipelineRepository.findById(pipelineId);
+        if (pipeline == null) {
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
-
-        pipelineConfig.setStep(step);
-        pipelineConfig.addStatusForStep(step, status, metrics);
-        return pipelineRepository.save(pipelineConfig);
+        pipelineService.updateStep(pipelineId, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
+        triggerPubmedIntegration.executeGenerateAlignedObjects(pipeline);
     }
 }

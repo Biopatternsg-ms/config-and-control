@@ -27,11 +27,6 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
-import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
-import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.application.services.PipelineService;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,8 +45,7 @@ public class PipelineController {
     private final FindPipeline findPipeline;
     private final UpdatePipelineStep updatePipelineStep;
     private final GetPipelineExecution getPipelineExecution;
-    private final PipelineService pipelineService;
-    private final TriggerPubmedIntegration triggerPubmedIntegration;
+    private final RegenerateAlignedObjects regenerateAlignedObjects;
 
     @POST
     @Operation(
@@ -232,12 +226,7 @@ public class PipelineController {
         )
     })
     public Response regenerateAlignedObjects(@PathParam("id") String id){
-        var pipeline = findPipeline.byId(id);
-        if (pipeline == null) {
-            throw new UnprocessableEntityException("The pipeline don't exists");
-        }
-        pipelineService.updateStep(id, PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.PENDING);
-        triggerPubmedIntegration.executeGenerateAlignedObjects(pipeline);
+        regenerateAlignedObjects.execute(id);
         return Response.accepted().entity("Regeneration triggered").build();
     }
 
@@ -302,9 +291,9 @@ public class PipelineController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(
-                                    type = SchemaType.OBJECT,
-                                    implementation = PipelineConfig.class,
-                                    description = "Pipeline information obtained"
+                                     type = SchemaType.OBJECT,
+                                     implementation = PipelineConfig.class,
+                                     description = "Pipeline information obtained"
                             )
                     )
             )

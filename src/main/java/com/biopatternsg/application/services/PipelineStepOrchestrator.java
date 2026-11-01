@@ -18,6 +18,7 @@ package com.biopatternsg.application.services;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
