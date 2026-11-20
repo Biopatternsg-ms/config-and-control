@@ -62,6 +62,11 @@ List<ExpertObjectConfig> configs = symbols.stream()
 - Guard collection parameters and return empty collections (`Collections.emptyList()` or `List.of()`) rather than `null` for list return types.
 - Avoid dead/no-op statements (such as standalone `Response.ok().build();` calls whose return value is ignored).
 
+### 3.3. Explicit `toString()` on Domain Models and DTOs (`@ToString`)
+- Every class in `domain.models.*` and `infrastructure.dtos.*` (especially when referenced inside Java `record` types or Lombok `@Builder` classes) **must** define an explicit `toString()` implementation—typically via Lombok's `@ToString` annotation—instead of relying on `Object.toString()`.
+- This prevents `Use of default toString()` static analysis findings (e.g., GitHub Code Quality / CodeQL) and ensures meaningful log/debug representations.
+- Exclude sensitive fields (e.g., passwords, tokens, secrets) with `@ToString.Exclude` whenever applicable.
+
 ---
 
 ## 4. Static Mappers (`com.biopatternsg.infrastructure.adapters.mappers`)

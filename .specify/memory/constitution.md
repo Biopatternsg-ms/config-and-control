@@ -52,6 +52,7 @@ This constitution establishes the mandatory architectural principles, design con
 - **REST Controllers:** Controllers (`infrastructure.adapters.in.restcontrollers.*`) are purely delivery adapters. They MUST NOT contain business logic, entity existence queries, or conditional business branching. Their responsibility is strictly: Receive DTO -> Map to Domain via static mapper -> Execute Use Case -> Map Domain result to Response DTO.
 - **Lambda Purity:** Multi-line business logic, branching conditions, and extensive builders inside lambda expressions (`.map(...)`, `.filter(...)`, `.orElseGet(...)`) are FORBIDDEN. Lambdas must delegate to descriptive private helper methods.
 - **Static Mappers:** Mappers in `infrastructure.adapters.mappers.*` MUST be stateless utility classes with pure static methods (`toModel`, `toEntity`, `toResponse`). No runtime reflection or CDI beans.
+- **Explicit `toString()` on Models & DTOs:** Domain models (`domain.models.*`) and DTOs (`infrastructure.dtos.*`) MUST NOT rely on `Object.toString()`; classes must declare `@ToString` (or an explicit `toString()`, excluding sensitive fields with `@ToString.Exclude`), particularly when embedded in Java `record` types or `@Builder` classes.
 
 ### VI. ArchUnit & Quality Gates Enforcement
 - The automated architecture test suite in `src/test/java/archtest/ArchitectureLayerTest.java` MUST pass without violations on every feature or change:
@@ -90,4 +91,4 @@ This constitution establishes the mandatory architectural principles, design con
 - All Pull Requests, code reviews, and Spec-Kit implementations MUST verify compliance with these principles.
 - Amendments to this constitution require explicit review, version bumping, and recording in the sync impact header.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-16 | **Last Amended**: 2026-10-16
+**Version**: 1.1.0 | **Ratified**: 2026-10-16 | **Last Amended**: 2026-11-20
