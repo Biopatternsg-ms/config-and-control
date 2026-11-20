@@ -21,7 +21,7 @@ import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.port.in.RegenerateAlignedObjects;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.domain.services.PipelineService;
+import com.biopatternsg.application.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 

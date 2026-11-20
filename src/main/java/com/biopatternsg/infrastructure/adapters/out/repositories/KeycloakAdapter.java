@@ -77,7 +77,7 @@ public class KeycloakAdapter implements KeycloakRepository {
     }
 
     @Override
-    public Response register(UserConfig userConfig) {
+    public String register(UserConfig userConfig) {
 
         var credentials = keycloakHttpClient.loginClient(grantTypeClient, clientId, clientSecret);
         var accessToken = "Bearer " + credentials.getAccess_token();
@@ -92,7 +92,7 @@ public class KeycloakAdapter implements KeycloakRepository {
                 .requiredActions(List.of("UPDATE_PASSWORD"))
                 .build();
         
-        try{
+        try {
             Response response = keycloakHttpClient.register(accessToken, newUser);
             if (response.getStatus() == 201) {
                 java.net.URI location = response.getLocation();
@@ -108,10 +108,10 @@ public class KeycloakAdapter implements KeycloakRepository {
                         researcherRole.ifPresent(roleResponse ->
                                 keycloakHttpClient.setRoles(accessToken, userId, List.of(roleResponse)));
                     }
+                    return userId;
                 }
             }
-            
-            return response;
+            throw new KeycloakServiceException(response.getStatus());
         } catch (WebApplicationException e) {
             throw new KeycloakServiceException(e.getResponse().getStatus());
         }

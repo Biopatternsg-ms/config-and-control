@@ -16,12 +16,13 @@
 package unit.services;
 
 import com.biopatternsg.application.services.PipelineStepOrchestrator;
+import com.biopatternsg.application.services.impl.PipelineStepOrchestratorImpl;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
-import com.biopatternsg.domain.services.PipelineService;
+import com.biopatternsg.application.services.PipelineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,7 +129,7 @@ class PipelineStepOrchestratorTest {
         triggerPubmedIntegration = new FakeTriggerPubmedIntegration();
         pipelineService = new FakePipelineService();
 
-        orchestrator = new PipelineStepOrchestrator(
+        orchestrator = new PipelineStepOrchestratorImpl(
                 triggerPubmedIntegration,
                 triggerInferences,
                 null,

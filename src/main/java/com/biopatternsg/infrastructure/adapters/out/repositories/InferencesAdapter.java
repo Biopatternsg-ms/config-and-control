@@ -15,12 +15,9 @@
  */
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
-import com.biopatternsg.domain.enums.PipelineSteps;
-import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.port.out.TriggerInferences;
-import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.infrastructure.clients.InferencesRestClient;
 import com.biopatternsg.infrastructure.dtos.FindRolesRequest;
 import com.biopatternsg.infrastructure.dtos.PathwayInferenceRequest;
@@ -32,26 +29,19 @@ import jakarta.ws.rs.WebApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @ApplicationScoped
 public class InferencesAdapter implements TriggerInferences {
 
     private final InferencesRestClient inferencesRestClient;
-    private final PipelineService pipelineService;
     private final SessionUtil sessionUtil;
 
     @Inject
     public InferencesAdapter(@RestClient InferencesRestClient inferencesRestClient,
-                             PipelineService pipelineService,
                              SessionUtil sessionUtil) {
         this.inferencesRestClient = inferencesRestClient;
-        this.pipelineService = pipelineService;
         this.sessionUtil = sessionUtil;
     }
 
@@ -67,9 +57,8 @@ public class InferencesAdapter implements TriggerInferences {
         }
 
         if (userId == null || userId.isBlank()) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
             log.error("Cannot trigger FIND_ROLES for pipeline {}: userId is missing or empty in session context", pipelineConfig.getId());
-            return;
+            throw new IllegalStateException("userId is missing or empty in session context for pipeline " + pipelineConfig.getId());
         }
 
         List<String> alignedObjects = pipelineConfig.getAlignedExpertObjects();
@@ -93,12 +82,11 @@ public class InferencesAdapter implements TriggerInferences {
         );
 
         try {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.IN_PROGRESS);
             inferencesRestClient.findRoles(request, userId);
             log.info("Inferences API findRoles called successfully for pipeline {}", pipelineConfig.getId());
         } catch (Exception e) {
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.FIND_ROLES, Status.FAILED);
             log.error("Error calling Inferences API findRoles for pipeline {}", pipelineConfig.getId(), e);
+            throw e instanceof RuntimeException re ? re : new RuntimeException(e);
         }
     }
 
@@ -145,15 +133,6 @@ public class InferencesAdapter implements TriggerInferences {
             PathwayInferenceResponse response = inferencesRestClient.runPathwayInference(request, userId);
             log.info("Inferences API runPathwayInference completed for pipeline {}: status={}, pathwaysCount={}, timeMs={}",
                     pipelineConfig.getId(), response.status(), response.pathwaysCount(), response.executionTimeMs());
-
-            Map<String, String> metrics = new LinkedHashMap<>();
-            metrics.put("pathwaysCount", String.valueOf(response.pathwaysCount()));
-            metrics.put("executionTimeMs", String.valueOf(response.executionTimeMs()));
-            metrics.put("graphNodesCount", String.valueOf(response.graphNodesCount()));
-            metrics.put("graphEdgesCount", String.valueOf(response.graphEdgesCount()));
-            metrics.put("inferenceStatus", response.status());
-
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.COMPLETED, metrics);
         } catch (WebApplicationException e) {
             int statusCode = e.getResponse() != null ? e.getResponse().getStatus() : -1;
             String errorBody = "";
@@ -165,10 +144,10 @@ public class InferencesAdapter implements TriggerInferences {
             }
             log.error("Error calling Inferences API runPathwayInference for pipeline {} (HTTP {}): {}",
                     pipelineConfig.getId(), statusCode, errorBody, e);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.FAILED);
+            throw e;
         } catch (Exception e) {
             log.error("Error calling Inferences API runPathwayInference for pipeline {}", pipelineConfig.getId(), e);
-            pipelineService.updateStep(pipelineConfig.getId(), PipelineSteps.INFER_PATHWAYS, Status.FAILED);
+            throw e instanceof RuntimeException re ? re : new RuntimeException(e);
         }
     }
 }
