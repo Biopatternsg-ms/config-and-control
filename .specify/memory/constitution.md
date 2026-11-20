@@ -45,7 +45,7 @@ This constitution establishes the mandatory architectural principles, design con
     3. Step-by-step execution flow.
     4. Mermaid sequence diagram (`sequenceDiagram`).
     5. Error cases and domain exceptions thrown.
-  - The new or modified Use Case MUST be registered in the index table of `.agents/architecture.md`.
+  - The new or modified Use Case MUST be registered in the index tables of both `.agents/use_cases/README.md` and `.agents/architecture.md`.
 
 ### V. Clean Code & Zero Business Logic in Delivery & Lambdas
 - **REST Controllers:** Controllers (`infrastructure.adapters.in.restcontrollers.*`) are purely delivery adapters. They MUST NOT contain business logic, entity existence queries, or conditional business branching. Their responsibility is strictly: Receive DTO -> Map to Domain via static mapper -> Execute Use Case -> Map Domain result to Response DTO.

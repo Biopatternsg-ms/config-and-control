@@ -36,7 +36,9 @@ Implementations (`*UseCase.java`) must remain lean and act primarily as orchestr
   4. Sequence diagram using Mermaid format (`sequenceDiagram`).
   5. Exceptions and validation failure scenarios.
 - **Modifications:** Whenever an existing Use Case signature, flow, or rule is modified, its documentation in `.agents/use_cases/<UseCaseName>.md` must be updated synchronously.
-- **Index Reference:** Register or update the reference in Section 5 of `.agents/architecture.md`.
+- **Mandatory Index References (`README.md` & `architecture.md`):** Whenever a new Use Case documentation file is added (or an existing one is renamed/repurposed), its reference and link **must** be added/updated in both:
+  1. `.agents/use_cases/README.md` (the Use Cases catalog index).
+  2. Section 5 of `.agents/architecture.md`.
 
 ---
 

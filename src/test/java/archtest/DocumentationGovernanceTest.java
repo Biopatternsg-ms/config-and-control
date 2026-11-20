@@ -33,6 +33,7 @@ class DocumentationGovernanceTest {
 
     private static final String ROOT_USE_CASES = "com.biopatternsg.application.usecase";
     private static final Path USE_CASES_DOC_DIR = Path.of(".agents/use_cases");
+    private static final Path USE_CASES_README_MD = Path.of(".agents/use_cases/README.md");
     private static final Path ARCHITECTURE_MD = Path.of(".agents/architecture.md");
 
     @DisplayName("Every concrete UseCase class must have a matching documentation markdown file")
@@ -75,6 +76,28 @@ class DocumentationGovernanceTest {
                     "Architecture doc missing reference to " + uc.getSimpleName());
             assertTrue(content.contains(uc.getSimpleName() + ".md"),
                     "Architecture doc missing link to " + uc.getSimpleName() + ".md");
+        }
+    }
+
+    @DisplayName("Every concrete UseCase must be indexed in .agents/use_cases/README.md")
+    @Test
+    void everyUseCaseMustBeIndexedInUseCasesReadmeTest() throws IOException {
+        assertTrue(Files.exists(USE_CASES_README_MD), ".agents/use_cases/README.md must exist");
+        String content = Files.readString(USE_CASES_README_MD);
+
+        JavaClasses classes = new ClassFileImporter().importPackages(ROOT_USE_CASES);
+        List<JavaClass> useCases = classes.stream()
+                .filter(JavaClass::isTopLevelClass)
+                .filter(c -> c.getSimpleName().endsWith("UseCase"))
+                .toList();
+
+        assertFalse(useCases.isEmpty(), "No UseCase classes discovered");
+
+        for (JavaClass uc : useCases) {
+            assertTrue(content.contains(uc.getSimpleName()),
+                    "use_cases/README.md missing reference to " + uc.getSimpleName());
+            assertTrue(content.contains(uc.getSimpleName() + ".md"),
+                    "use_cases/README.md missing link to " + uc.getSimpleName() + ".md");
         }
     }
 }

@@ -120,7 +120,7 @@ Cualquier cambio de código realizado por un agente **DEBE** respetar las reglas
 
 ## 5. Casos de Uso Principales
 
-Ubicación: `com.biopatternsg.application.usecase.*` (Documentación detallada con diagramas de flujo disponible en [`.agents/use_cases/`](use_cases/)):
+Ubicación: `com.biopatternsg.application.usecase.*` (Catálogo e índice general disponible en [`.agents/use_cases/README.md`](use_cases/README.md)):
 
 | Caso de Uso | Puerto In | Responsabilidad | Documento |
 |---|---|---|---|
@@ -172,7 +172,7 @@ Para el conjunto completo de reglas mandatorias de codificación, clean code y e
 1. **Nuevo Caso de Uso:**
    1. Crear la interfaz del puerto de entrada en `domain/port/in/MiOperacion.java`.
    2. Implementar la clase en `application/usecase/MiOperacionUseCase.java` anotada con `@ApplicationScoped`.
-   3. Documentar el nuevo caso de uso con su diagrama Mermaid en `.agents/use_cases/MiOperacionUseCase.md`.
+   3. Documentar el nuevo caso de uso con su diagrama Mermaid en `.agents/use_cases/MiOperacionUseCase.md` y agregar su referencia en `.agents/use_cases/README.md` y en la sección 5 de `.agents/architecture.md`.
    4. Exponer el endpoint en el controlador respectivo (`infrastructure/adapters/in/restcontrollers/`) inyectando únicamente la interfaz `MiOperacion`.
 2. **Nueva Integración / Repositorio:**
    1. Crear la interfaz del puerto de salida en `domain/port/out/repositories/`.
