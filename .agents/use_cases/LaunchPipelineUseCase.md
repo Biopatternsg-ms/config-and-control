@@ -35,7 +35,7 @@ sequenceDiagram
     participant PipeRepo as PipelineRepository
     participant BioRepo as BiologicalObjectRepository (Client)
 
-    Cliente->>Controller: POST /api/pipeline/{id}/launch
+    Cliente->>Controller: POST /config-and-control/pipelines/launch { "pipelineId": "..." }
     Controller->>UseCase: execute(pipelineId)
     UseCase->>PipeRepo: findById(pipelineId)
     alt Pipeline no existe
@@ -54,7 +54,7 @@ sequenceDiagram
         UseCase->>UseCase: addStatus(COMPLETED)
         UseCase->>PipeRepo: save(pipeline)
         UseCase-->>Controller: void
-        Controller-->>Cliente: 200 OK
+        Controller-->>Cliente: 202 Accepted ("Pipeline launched")
     else Error en Invocación Externa
         BioRepo-->>UseCase: Exception
         UseCase->>UseCase: addStatus(FAILED)
@@ -64,3 +64,12 @@ sequenceDiagram
     end
     end
 ```
+
+---
+
+## 4. Catálogo de Errores y Excepciones de Dominio
+
+| Escenario de Error | Nivel | Manejo y Respuesta |
+|---|---|---|
+| Pipeline no encontrado en BD | Dominio | Lanza `UnprocessableEntityException("The pipeline don't exist")` mapeado a `422 Unprocessable Entity`. |
+| Error en llamada a microservicio `biological-objects` | Infraestructura (Cliente REST) | Se captura, marca el pipeline con estado `FAILED`, persiste y relanza la excepción retornando `500 Internal Server Error`. |
