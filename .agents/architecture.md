@@ -110,7 +110,7 @@ Cualquier cambio de código realizado por un agente **DEBE** respetar las reglas
 |---|---|
 | **Aislamiento de Dominio** | `com.biopatternsg.domain..` **NO** puede depender de `application..` ni de `infrastructure..`. |
 | **Aislamiento de Aplicación** | `com.biopatternsg.application..` **NO** puede depender de `infrastructure..`. |
-| **Encapsulamiento de Aplicación (layerApplicationTest)** | com.biopatternsg.application.. solo puede ser accedida por clases de la misma capa Application (la comunicación desde Infrastructure se realiza exclusivamente mediante interfaces en domain). |
+| **Encapsulamiento de Aplicación (layerApplicationTest)** | `com.biopatternsg.application..` solo puede ser accedida por clases de la misma capa Application (la comunicación desde Infrastructure se realiza exclusivamente mediante interfaces en domain). |
 | **Acceso a Casos de Uso** | Las implementaciones en `application.usecase..` no deben instanciarse directamente entre capas; se interactúa a través de sus puertos `domain.port.in`. |
 | **Nomenclatura UseCase** | Toda clase en `application.usecase..` debe terminar en `UseCase` (ej. `CreatePipelineUseCase`). |
 | **Nomenclatura Controller** | Toda clase en `infrastructure.adapters.in.restcontrollers..` debe terminar en `Controller` (ej. `PipelineController`). |
@@ -120,23 +120,23 @@ Cualquier cambio de código realizado por un agente **DEBE** respetar las reglas
 
 ## 5. Casos de Uso Principales
 
-Ubicación: `com.biopatternsg.application.usecase.*` (Documentación detallada con diagramas de flujo disponible en [`.agents/use_cases/`](use_cases/)):
+Ubicación: `com.biopatternsg.application.usecase.*` (Catálogo e índice general disponible en [`.agents/use_cases/README.md`](use_cases/README.md)):
 
 | Caso de Uso | Puerto In | Responsabilidad | Documento |
 |---|---|---|---|
-| `CreatePipelineUseCase` | `CreatePipeline` | Valida y crea una configuración de pipeline. | [`CreatePipelineUseCase.md`](use_cases/CreatePipelineUseCase.md) |
-| `UpdatePipelineUseCase` | `UpdatePipeline` | Modifica parámetros, niveles y objetos de un pipeline. | [`UpdatePipelineUseCase.md`](use_cases/UpdatePipelineUseCase.md) |
-| `UpdatePipelineStepUseCase` | `UpdatePipelineStep` | Actualiza estado de un paso y orquesta la siguiente fase. | [`UpdatePipelineStepUseCase.md`](use_cases/UpdatePipelineStepUseCase.md) |
-| `FindPipelineUseCase` | `FindPipeline` | Consulta y filtra pipelines por usuario o red. | [`FindPipelineUseCase.md`](use_cases/FindPipelineUseCase.md) |
-| LaunchPipelineUseCase | LaunchPipeline | Orquesta el inicio de un pipeline disparando servicios externos. | [LaunchPipelineUseCase.md](use_cases/LaunchPipelineUseCase.md) |
-| RegenerateAlignedObjectsUseCase | RegenerateAlignedObjects | Reinicia el paso de alineaci�n y re-dispara la generaci�n de objetos alineados. | [RegenerateAlignedObjectsUseCase.md](use_cases/RegenerateAlignedObjectsUseCase.md) |
-| `GetPipelineExecutionUseCase` | `GetPipelineExecution` | Reconstruye estado consolidado, duraciones y métricas. | [`GetPipelineExecutionUseCase.md`](use_cases/GetPipelineExecutionUseCase.md) |
 | `CreateNetworkUseCase` | `CreateNetwork` | Registra una nueva red biológica en base de datos. | [`CreateNetworkUseCase.md`](use_cases/CreateNetworkUseCase.md) |
-| `UpdateNetworkUseCase` | `UpdateNetwork` | Modifica atributos o estado de una red biológica. | [`UpdateNetworkUseCase.md`](use_cases/UpdateNetworkUseCase.md) |
+| `CreatePipelineUseCase` | `CreatePipeline` | Valida y crea una configuración de pipeline. | [`CreatePipelineUseCase.md`](use_cases/CreatePipelineUseCase.md) |
 | `FindNetworkUseCase` | `FindNetwork` | Búsqueda y filtrado de redes por usuario. | [`FindNetworkUseCase.md`](use_cases/FindNetworkUseCase.md) |
+| `FindPipelineUseCase` | `FindPipeline` | Consulta y filtra pipelines por usuario o red. | [`FindPipelineUseCase.md`](use_cases/FindPipelineUseCase.md) |
+| `GetPipelineExecutionUseCase` | `GetPipelineExecution` | Reconstruye estado consolidado, duraciones y métricas. | [`GetPipelineExecutionUseCase.md`](use_cases/GetPipelineExecutionUseCase.md) |
+| `LaunchPipelineUseCase` | `LaunchPipeline` | Orquesta el inicio de un pipeline disparando servicios externos. | [`LaunchPipelineUseCase.md`](use_cases/LaunchPipelineUseCase.md) |
+| `RegenerateAlignedObjectsUseCase` | `RegenerateAlignedObjects` | Reinicia el paso de alineación y re-dispara la generación de objetos alineados. | [`RegenerateAlignedObjectsUseCase.md`](use_cases/RegenerateAlignedObjectsUseCase.md) |
+| `ResumePipelineUseCase` | `ResumePipeline` | Reanuda pipelines en progreso tras reinicios o interrupciones de servicios. | [`ResumePipelineUseCase.md`](use_cases/ResumePipelineUseCase.md) |
+| `UpdateNetworkUseCase` | `UpdateNetwork` | Modifica atributos o estado de una red biológica. | [`UpdateNetworkUseCase.md`](use_cases/UpdateNetworkUseCase.md) |
+| `UpdatePipelineStepUseCase` | `UpdatePipelineStep` | Actualiza estado de un paso y orquesta la siguiente fase. | [`UpdatePipelineStepUseCase.md`](use_cases/UpdatePipelineStepUseCase.md) |
+| `UpdatePipelineUseCase` | `UpdatePipeline` | Modifica parámetros, niveles y objetos de un pipeline. | [`UpdatePipelineUseCase.md`](use_cases/UpdatePipelineUseCase.md) |
 | `UserAuthenticationUseCase` | `UserAuthentication` | Login y refresh token interactuando con Keycloak. | [`UserAuthenticationUseCase.md`](use_cases/UserAuthenticationUseCase.md) |
 | `UserManagementUseCase` | `UserManagement` | Registro, roles y administración de usuarios. | [`UserManagementUseCase.md`](use_cases/UserManagementUseCase.md) |
-| `ResumePipelineUseCase` | `ResumePipeline` | Reanuda pipelines en progreso tras reinicios o interrupciones de servicios. | [`ResumePipelineUseCase.md`](use_cases/ResumePipelineUseCase.md) |
 
 ---
 
@@ -165,18 +165,20 @@ Configuradas en `application.properties`:
 
 ## 8. Guía de Intervención y Estándares de Código
 
-Para el conjunto completo de reglas mandatorias de codificación, clean code y estándares de diseño, consulte el documento:
-👉 [**`.agents/rules.md`**](rules.md)
+Para el conjunto completo de reglas mandatorias de arquitectura y estándares de lenguaje Java, consulte los documentos:
+- 👉 [**`.agents/architecture-rules.md`**](architecture-rules.md) — Reglas de Arquitectura Hexagonal, límites de capas, casos de uso, servicios y documentación.
+- 👉 [**`.agents/java-rules.md`**](java-rules.md) — Reglas de Java 21, Clean Code, lambdas, límite de parámetros y mappers estáticos.
 
 ### Resumen Rápido para Nuevas Funcionalidades:
 1. **Nuevo Caso de Uso:**
    1. Crear la interfaz del puerto de entrada en `domain/port/in/MiOperacion.java`.
    2. Implementar la clase en `application/usecase/MiOperacionUseCase.java` anotada con `@ApplicationScoped`.
-   3. Documentar el nuevo caso de uso con su diagrama Mermaid en `.agents/use_cases/MiOperacionUseCase.md`.
+   3. Documentar el nuevo caso de uso con su diagrama Mermaid en `.agents/use_cases/MiOperacionUseCase.md` y agregar su referencia en `.agents/use_cases/README.md` y en la sección 5 de `.agents/architecture.md`.
    4. Exponer el endpoint en el controlador respectivo (`infrastructure/adapters/in/restcontrollers/`) inyectando únicamente la interfaz `MiOperacion`.
 2. **Nueva Integración / Repositorio:**
    1. Crear la interfaz del puerto de salida en `domain/port/out/repositories/`.
    2. Implementar el adaptador en `infrastructure/adapters/out/repositories/MiAdaptadorAdapter.java`.
 3. **Verificación Obligatoria:**
    - Ejecutar `./mvnw test -Dtest=ArchitectureLayerTest` para comprobar que las reglas de arquitectura no se hayan violado.
+   - Ejecutar `./mvnw test -Dtest=DocumentationGovernanceTest` para asegurar sincronización de documentación.
    - Ejecutar `./mvnw clean compile` para asegurar compilación exitosa.

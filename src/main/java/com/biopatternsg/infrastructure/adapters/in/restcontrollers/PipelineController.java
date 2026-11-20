@@ -17,7 +17,6 @@ package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.enums.UpdatePipelineEnum;
 import com.biopatternsg.domain.models.ExperimentExecutionResponse;
-import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.*;
 import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
@@ -61,7 +60,7 @@ public class PipelineController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = PipelineConfig.class,
+                    implementation = PipelineDetailResponse.class,
                     description = "Created pipeline configuration"
                 )
             )
@@ -69,8 +68,9 @@ public class PipelineController {
     })
     public Response create(@Valid CreatePipelineRequest newPipeline){
 
+        var config = createPipeline.execute(PipelineMapper.requestToCreate(newPipeline));
         return Response.status(Response.Status.CREATED)
-                .entity(createPipeline.execute(PipelineMapper.requestToCreate(newPipeline)))
+                .entity(PipelineMapper.configToDetailResponse(config))
                 .build();
     }
 
@@ -89,16 +89,17 @@ public class PipelineController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = UpdatePipelineDescriptionRequest.class,
+                    implementation = PipelineDetailResponse.class,
                     description = "Updated pipeline configuration"
                 )
             )
         )
     })
-    public PipelineConfig updateDescription(@Valid UpdatePipelineDescriptionRequest updatePipeline){
+    public PipelineDetailResponse updateDescription(@Valid UpdatePipelineDescriptionRequest updatePipeline){
 
-        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+        var config = this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.DESCRIPTION);
+        return PipelineMapper.configToDetailResponse(config);
     }
 
     @PUT
@@ -115,18 +116,17 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UpdatePipelineTranscriptionFactorRequest.class,
+                                    implementation = PipelineDetailResponse.class,
                                     description = "Updated pipeline configuration"
                             )
                     )
             )
     })
-    public PipelineConfig updateTranscriptionFactor(@Valid UpdatePipelineTranscriptionFactorRequest updatePipeline){
+    public PipelineDetailResponse updateTranscriptionFactor(@Valid UpdatePipelineTranscriptionFactorRequest updatePipeline){
 
-        //TODO: Manejar error y responder algo
-
-        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+        var config = this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.TRANSCRIPTION_FACTOR);
+        return PipelineMapper.configToDetailResponse(config);
     }
 
     @PUT
@@ -143,16 +143,17 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UpdatePipelineExpertObjectsRequest.class,
+                                    implementation = PipelineDetailResponse.class,
                                     description = "Updated pipeline configuration"
                             )
                     )
             )
     })
-    public PipelineConfig updateExpertObjects(@Valid UpdatePipelineExpertObjectsRequest updatePipeline){
+    public PipelineDetailResponse updateExpertObjects(@Valid UpdatePipelineExpertObjectsRequest updatePipeline){
 
-        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+        var config = this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.EXPERT_OBJETS);
+        return PipelineMapper.configToDetailResponse(config);
     }
 
     @PUT
@@ -169,16 +170,17 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UpdatePipelineSearchConfigRequest.class,
+                                    implementation = PipelineDetailResponse.class,
                                     description = "Updated pipeline configuration"
                             )
                     )
             )
     })
-    public PipelineConfig updateSearchConfig(@Valid UpdatePipelineSearchConfigRequest updatePipeline){
+    public PipelineDetailResponse updateSearchConfig(@Valid UpdatePipelineSearchConfigRequest updatePipeline){
 
-        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+        var config = this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.SEARCH_CONFIG);
+        return PipelineMapper.configToDetailResponse(config);
     }
 
     @PUT
@@ -195,16 +197,17 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = UpdateAlignedExpertObjectsRequest.class,
+                                    implementation = PipelineDetailResponse.class,
                                     description = "Updated pipeline configuration"
                             )
                     )
             )
     })
-    public PipelineConfig updateAlignedExpertObjects(@Valid UpdateAlignedExpertObjectsRequest updatePipeline){
+    public PipelineDetailResponse updateAlignedExpertObjects(@Valid UpdateAlignedExpertObjectsRequest updatePipeline){
 
-        return this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
+        var config = this.updatePipeline.execute(PipelineMapper.requestToUpdate(updatePipeline),
                 UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS);
+        return PipelineMapper.configToDetailResponse(config);
     }
 
     @POST
@@ -293,16 +296,16 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                      type = SchemaType.OBJECT,
-                                     implementation = PipelineConfig.class,
+                                     implementation = PipelineDetailResponse.class,
                                      description = "Pipeline information obtained"
                             )
                     )
             )
     })
     @Path("/{id}")
-    public PipelineConfig findList(@PathParam("id") String id){
+    public PipelineDetailResponse findList(@PathParam("id") String id){
 
-        return findPipeline.byId(id);
+        return PipelineMapper.configToDetailResponse(findPipeline.byId(id));
     }
 
     @GET
@@ -318,7 +321,7 @@ public class PipelineController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = PipelineResponse.class,
+                                    implementation = ReportFormat.class,
                                     description = "User pipelines obtained"
                             )
                     )
@@ -328,8 +331,7 @@ public class PipelineController {
 
         var modelFormat = findPipeline.byFilters(PipelineMapper.requestToUpdate(pipelineFilters),
                 pipelineFilters.page(), pipelineFilters.size());
-        var responseList = modelFormat.list().stream().map(PipelineMapper::configToResponse).toList();
-        return new ReportFormat<>(modelFormat.count(), responseList);
+        return PipelineMapper.toReportResponse(modelFormat);
     }
 
     @GET
@@ -377,11 +379,6 @@ public class PipelineController {
             )
     })
     public Response resume(@Valid ResumePipelineRequest request) {
-        if (request == null || request.microService() == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(java.util.Map.of("message", "microService is required"))
-                    .build();
-        }
         var summary = resumePipeline.execute(request.microService());
         var response = PipelineMapper.toResponse(summary);
         return Response.ok(response).build();

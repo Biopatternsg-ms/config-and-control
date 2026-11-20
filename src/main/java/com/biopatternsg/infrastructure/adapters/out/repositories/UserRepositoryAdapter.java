@@ -73,7 +73,6 @@ public class UserRepositoryAdapter implements UserRepository {
     public ReportFormat<UserConfig> list(UserConfig filters, int page, int size) {
 
         var reportCollection = userRepositoryDB.findByFilters(filters, page, size);
-        var modelList = reportCollection.list().stream().map(UserMapper::collectionToModel).toList();
-        return new ReportFormat<>(reportCollection.count(), modelList);
+        return UserMapper.toDomainReport(reportCollection);
     }
 }

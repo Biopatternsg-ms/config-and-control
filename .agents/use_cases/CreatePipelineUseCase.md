@@ -1,60 +1,67 @@
-# Caso de Uso: `CreatePipelineUseCase`
+# Use Case: `CreatePipelineUseCase`
 
-- **Clase:** `com.biopatternsg.application.usecase.CreatePipelineUseCase`
-- **Puerto de Entrada:** `com.biopatternsg.domain.port.in.CreatePipeline`
-- **Puertos de Salida:**
+- **Class:** `com.biopatternsg.application.usecase.CreatePipelineUseCase`
+- **Inbound Port:** `com.biopatternsg.domain.port.in.CreatePipeline`
+- **Outbound Ports:**
   - `com.biopatternsg.domain.port.out.repositories.NetworkRepository`
   - `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
-- **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
+- **Invoking Controller:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
-## 1. Propósito
-Crea una nueva configuración de pipeline (`PipelineConfig`) asociada a una red biológica específica, inicializando los pasos del pipeline (`PipelineSteps`) en sus estados correspondientes (`CONFIG` en `IN_PROGRESS` y el resto en `PENDING`).
+## 1. Purpose
+Creates a new pipeline configuration (`PipelineConfig`) linked to a specific biological network, initializing all pipeline steps (`PipelineSteps`) to their starting states (`CONFIG` set to `IN_PROGRESS` and all remaining steps set to `PENDING`).
 
 ---
 
-## 2. Flujo de Ejecución
+## 2. Execution Flow
 
-1. Recibe el objeto `PipelineConfig` con `networkId`, `name`, `description`, etc.
-2. Valida que la red padre exista llamando a `NetworkRepository.findById(pipelineConfig.networkId)`. Si no existe, lanza `UnprocessableEntityException("The network don't exists")`.
-3. Valida que no exista un pipeline con el mismo nombre dentro de esa misma red (`PipelineRepository.findByNameExists(networkId, name)`). Si ya existe, lanza `UnprocessableEntityException("The pipeline name already exists")`.
-4. Inicializa todos los pasos definidos en `PipelineSteps`:
+1. Receives a `PipelineConfig` domain object containing `networkId`, `name`, `description`, etc.
+2. Validates that the parent network exists via `NetworkRepository.findById(pipelineConfig.networkId)`. If not found, throws `UnprocessableEntityException("The network don't exists")`.
+3. Validates that no pipeline with the same name already exists within that network (`PipelineRepository.findByNameExists(networkId, name)`). If a match is found, throws `UnprocessableEntityException("The pipeline name already exists")`.
+4. Initializes all steps defined in `PipelineSteps`:
    - `PipelineSteps.CONFIG` -> `Status.IN_PROGRESS`.
-   - Demás pasos -> `Status.PENDING`.
-5. Establece el paso activo inicial en `PipelineSteps.CONFIG`.
-6. Guarda la configuración en base de datos mediante `PipelineRepository.save(...)` y retorna el objeto creado.
+   - All other steps -> `Status.PENDING`.
+5. Sets the active step to `PipelineSteps.CONFIG`.
+6. Persists the configuration via `PipelineRepository.save(...)` and returns the created domain object.
 
 ---
 
-## 3. Diagrama de Flujo (Mermaid)
+## 3. Sequence Diagram (Mermaid)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as API Client / Frontend
+    actor Client as API Client / Frontend
     participant Controller as PipelineController
     participant UseCase as CreatePipelineUseCase
     participant NetRepo as NetworkRepository
     participant PipeRepo as PipelineRepository
 
-    Cliente->>Controller: POST /api/pipeline (CreatePipelineRequest)
+    Client->>Controller: POST /config-and-control/pipelines (CreatePipelineRequest)
     Controller->>UseCase: execute(pipelineConfig)
     UseCase->>NetRepo: findById(pipelineConfig.networkId)
-    alt Red no existe
+    alt Network does not exist
         NetRepo-->>UseCase: null
         UseCase-->>Controller: throw UnprocessableEntityException("The network don't exists")
-        Controller-->>Cliente: 422 Unprocessable Entity
+        Controller-->>Client: 422 Unprocessable Entity
     end
     UseCase->>PipeRepo: findByNameExists(networkId, name)
-    alt Nombre duplicado en red
+    alt Duplicate pipeline name in network
         PipeRepo-->>UseCase: existingPipeline
         UseCase-->>Controller: throw UnprocessableEntityException("The pipeline name already exists")
-        Controller-->>Cliente: 422 Unprocessable Entity
+        Controller-->>Client: 422 Unprocessable Entity
     end
     UseCase->>UseCase: initialize CONFIG (IN_PROGRESS) and others (PENDING)
     UseCase->>PipeRepo: save(pipelineConfig)
     PipeRepo-->>UseCase: saved PipelineConfig
     UseCase-->>Controller: saved PipelineConfig
-    Controller-->>Cliente: 201 Created / 200 OK
+    Controller-->>Client: 201 Created
 ```
+
+---
+
+## 4. Error Cases
+
+- **Parent Network Not Found:** Throws `UnprocessableEntityException("The network don't exists")`.
+- **Duplicate Pipeline Name in Network:** Throws `UnprocessableEntityException("The pipeline name already exists")`.

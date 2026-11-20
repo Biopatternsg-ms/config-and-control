@@ -65,8 +65,7 @@ public class AdminController {
 
         var modelFormat = userManagement.listUsers(UserMapper.filtersToModel(userFilters),
                 userFilters.page(), userFilters.size());
-        var responseList = modelFormat.list().stream().map(UserMapper::modelToResponse).toList();
-        return new ReportFormat<>(modelFormat.count(), responseList);
+        return UserMapper.toReportResponse(modelFormat);
     }
 
     @POST

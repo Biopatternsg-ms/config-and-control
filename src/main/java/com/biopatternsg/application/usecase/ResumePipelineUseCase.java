@@ -21,10 +21,10 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.PipelineResumeSummary;
 import com.biopatternsg.domain.port.in.ResumePipeline;
-import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.domain.port.out.repositories.NetworkRepository;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +40,6 @@ public class ResumePipelineUseCase implements ResumePipeline {
 
     private final PipelineRepository pipelineRepository;
     private final NetworkRepository networkRepository;
-    private final BiologicalObjectRepository biologicalObjectRepository;
     private final PipelineStepOrchestrator pipelineStepOrchestrator;
 
     private static final List<PipelineSteps> BIOLOGICAL_STEPS = List.of(
@@ -58,6 +57,34 @@ public class ResumePipelineUseCase implements ResumePipeline {
             PipelineSteps.GENERATE_ALIGNED_OBJECTS
     );
 
+    @Getter
+    public static class PipelineResumptionBatch {
+        private final List<String> resumedPipelineIds = new ArrayList<>();
+        private final List<String> failedPipelineIds = new ArrayList<>();
+        private final Map<String, String> errors = new HashMap<>();
+
+        public void recordSuccess(String pipelineId) {
+            this.resumedPipelineIds.add(pipelineId);
+        }
+
+        public void recordFailure(String pipelineId, String reason) {
+            this.failedPipelineIds.add(pipelineId);
+            this.errors.put(pipelineId, reason);
+        }
+
+        public PipelineResumeSummary toSummary(MicroService microService, int totalFound) {
+            return PipelineResumeSummary.builder()
+                    .microService(microService)
+                    .totalFound(totalFound)
+                    .resumedCount(resumedPipelineIds.size())
+                    .failedCount(failedPipelineIds.size())
+                    .resumedPipelineIds(resumedPipelineIds)
+                    .failedPipelineIds(failedPipelineIds)
+                    .errors(errors)
+                    .build();
+        }
+    }
+
     @Override
     public PipelineResumeSummary execute(MicroService microService) {
         log.info("Starting pipeline resumption for microService: {}", microService);
@@ -73,24 +100,12 @@ public class ResumePipelineUseCase implements ResumePipeline {
 
         log.info("Found {} candidate pipelines in progress for microService {}", candidates.size(), microService);
 
-        List<String> resumedPipelineIds = new ArrayList<>();
-        List<String> failedPipelineIds = new ArrayList<>();
-        Map<String, String> errors = new HashMap<>();
-
+        PipelineResumptionBatch batch = new PipelineResumptionBatch();
         for (PipelineConfig pipeline : candidates) {
-            processPipeline(pipeline, microService, resumedPipelineIds, failedPipelineIds, errors);
+            processPipeline(pipeline, microService, batch);
         }
 
-        PipelineResumeSummary summary = PipelineResumeSummary.builder()
-                .microService(microService)
-                .totalFound(candidates.size())
-                .resumedCount(resumedPipelineIds.size())
-                .failedCount(failedPipelineIds.size())
-                .resumedPipelineIds(resumedPipelineIds)
-                .failedPipelineIds(failedPipelineIds)
-                .errors(errors)
-                .build();
-
+        PipelineResumeSummary summary = batch.toSummary(microService, candidates.size());
         log.info("Resumption batch completed for {}: total={}, resumed={}, failed={}",
                 microService, summary.getTotalFound(), summary.getResumedCount(), summary.getFailedCount());
 
@@ -99,33 +114,25 @@ public class ResumePipelineUseCase implements ResumePipeline {
 
     private void processPipeline(PipelineConfig pipeline,
                                  MicroService microService,
-                                 List<String> resumedPipelineIds,
-                                 List<String> failedPipelineIds,
-                                 Map<String, String> errors) {
+                                 PipelineResumptionBatch batch) {
         String pipelineId = pipeline.getId();
         try {
             String userId = resolveUserId(pipeline);
             if (userId == null || userId.isBlank()) {
-                failedPipelineIds.add(pipelineId);
-                errors.put(pipelineId, "Cannot resolve userId for network: " + pipeline.getNetworkId());
+                String errorMsg = "Cannot resolve userId for network: " + pipeline.getNetworkId();
+                batch.recordFailure(pipelineId, errorMsg);
                 log.warn("Cannot resume pipeline {}: userId is missing or empty for network {}",
                         pipelineId, pipeline.getNetworkId());
                 return;
             }
 
-            if (microService == MicroService.SEARCH_BIOLOGICAL_OBJECTS) {
-                resumeBiologicalPipeline(pipeline, userId);
-            } else {
-                resumePubmedPipeline(pipeline);
-            }
-
-            resumedPipelineIds.add(pipelineId);
+            pipelineStepOrchestrator.resumePipeline(pipeline, userId, microService);
+            batch.recordSuccess(pipelineId);
             log.info("Successfully resumed pipeline {} for {}", pipelineId, microService);
 
         } catch (Exception e) {
-            failedPipelineIds.add(pipelineId);
             String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            errors.put(pipelineId, errorMsg);
+            batch.recordFailure(pipelineId, errorMsg);
             log.error("Failed to resume pipeline {}: {}", pipelineId, errorMsg, e);
         }
     }
@@ -136,31 +143,5 @@ public class ResumePipelineUseCase implements ResumePipeline {
         }
         var network = networkRepository.findById(pipeline.getNetworkId());
         return network != null ? network.getUserId() : null;
-    }
-
-    private void resumeBiologicalPipeline(PipelineConfig pipeline, String userId) {
-        biologicalObjectRepository.launchConsole(pipeline, userId);
-    }
-
-    private void resumePubmedPipeline(PipelineConfig pipeline) {
-        PipelineSteps previousStep = resolvePreviousStep(pipeline.getStep());
-        if (previousStep == null) {
-            throw new IllegalStateException("Cannot determine predecessor step for step: " + pipeline.getStep());
-        }
-        pipelineStepOrchestrator.orchestrate(pipeline, previousStep);
-    }
-
-    private PipelineSteps resolvePreviousStep(PipelineSteps currentStep) {
-        if (currentStep == null) {
-            return null;
-        }
-        return switch (currentStep) {
-            case COMBINATIONS -> PipelineSteps.SEARCH_LEVELS;
-            case SEARCH_PUBMED_IDS -> PipelineSteps.COMBINATIONS;
-            case SEARCH_PUBTATOR -> PipelineSteps.SEARCH_PUBMED_IDS;
-            case BUILD_KNOWLEDGE_BASE -> PipelineSteps.SEARCH_PUBTATOR;
-            case GENERATE_ALIGNED_OBJECTS -> PipelineSteps.BUILD_KNOWLEDGE_BASE;
-            default -> null;
-        };
     }
 }

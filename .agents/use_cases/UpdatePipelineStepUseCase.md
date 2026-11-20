@@ -1,47 +1,53 @@
-# Caso de Uso: `UpdatePipelineStepUseCase`
+# Use Case: `UpdatePipelineStepUseCase`
 
-- **Clase:** `com.biopatternsg.application.usecase.UpdatePipelineStepUseCase`
-- **Puerto de Entrada:** `com.biopatternsg.domain.port.in.UpdatePipelineStep`
-- **Servicios de Aplicación Involucrados:**
-  - `com.biopatternsg.application.services.PipelineService`
+- **Class:** `com.biopatternsg.application.usecase.UpdatePipelineStepUseCase`
+- **Inbound Port:** `com.biopatternsg.domain.port.in.UpdatePipelineStep`
+- **Application Services Involved:**
+  - `PipelineService`
   - `com.biopatternsg.application.services.PipelineStepOrchestrator`
-- **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
+- **Invoking Controller:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
-## 1. Propósito
-Actualiza el estado de ejecución y métricas de un paso particular (`PipelineSteps`) dentro del pipeline (ej. `IN_PROGRESS`, `COMPLETED`, `FAILED`). Si el estado pasa a `COMPLETED`, dispara automáticamente el orquestador (`PipelineStepOrchestrator`) para transicionar o disparar la siguiente fase del pipeline biológico.
+## 1. Purpose
+Updates the execution status and metrics of a specific step (`PipelineSteps`) within a pipeline (e.g., `IN_PROGRESS`, `COMPLETED`, `FAILED`). When a step transitions to `COMPLETED`, it automatically invokes `PipelineStepOrchestrator` to advance or trigger the next phase of the biological pipeline.
 
 ---
 
-## 2. Flujo de Ejecución
+## 2. Execution Flow
 
-1. Recibe el `pipelineId` y el objeto `PipelineStatus` (con `step`, `status` y `metrics`).
-2. Llama a `PipelineService.updateStep(pipelineId, step, status, metrics)` para registrar el progreso y persistir el nuevo estado en el histórico.
-3. Si `status == Status.COMPLETED`, invoca a `PipelineStepOrchestrator.orchestrate(pipelineConfig, step)` para desencadenar el siguiente paso correspondiente en los servicios externos (`inferences`, `pubmed-integration`, etc.).
-4. Registra en el log la actualización del paso.
+1. Receives `pipelineId` and the `PipelineStatus` domain object (containing `step`, `status`, and `metrics`).
+2. Calls `PipelineService.updateStep(...)` to record the step status and metrics and persist the updated history.
+3. If `status == Status.COMPLETED`, invokes `PipelineStepOrchestrator.orchestrate(pipelineConfig, step)` to trigger the next corresponding phase across external microservices (`inferences`, `pubmed-integration`, etc.).
+4. Logs the step update completion.
 
 ---
 
-## 3. Diagrama de Flujo (Mermaid)
+## 3. Sequence Diagram (Mermaid)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Service as External Worker / Service
+    actor Service as External Worker / Microservice
     participant Controller as PipelineController
     participant UseCase as UpdatePipelineStepUseCase
     participant PipeService as PipelineService
     participant Orchestrator as PipelineStepOrchestrator
 
-    Service->>Controller: PATCH /api/pipeline/{id}/step (PipelineStatus)
+    Service->>Controller: PATCH /config-and-control/pipelines/update-step (PipelineStepRequest)
     Controller->>UseCase: execute(pipelineId, pipelineStatus)
-    UseCase->>PipeService: updateStep(pipelineId, step, status, metrics)
+    UseCase->>PipeService: updateStep(pipelineId, pipelineStatus)
     PipeService-->>UseCase: updated PipelineConfig
-    alt Status es COMPLETED
+    alt Status is COMPLETED
         UseCase->>Orchestrator: orchestrate(pipelineConfig, step)
-        Note over Orchestrator: Dispara llamadas asíncronas / siguientes fases
+        Note over Orchestrator: Triggers asynchronous calls / downstream phases
     end
     UseCase-->>Controller: void
-    Controller-->>Service: 200 OK / 204 No Content
+    Controller-->>Service: 202 Accepted ("updated")
 ```
+
+---
+
+## 4. Error Cases
+
+- **Non-existent Pipeline:** `PipelineService` throws `UnprocessableEntityException("The pipeline don't exists")` if `pipelineId` does not exist.

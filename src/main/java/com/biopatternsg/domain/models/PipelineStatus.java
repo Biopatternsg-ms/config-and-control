@@ -27,6 +27,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
+@ToString
 public class PipelineStatus {
     private PipelineSteps step;
     private Status status;

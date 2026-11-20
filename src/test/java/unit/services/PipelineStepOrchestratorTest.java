@@ -17,11 +17,14 @@ package unit.services;
 
 import com.biopatternsg.application.services.PipelineStepOrchestrator;
 import com.biopatternsg.application.services.impl.PipelineStepOrchestratorImpl;
+import com.biopatternsg.domain.enums.MicroService;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.domain.port.out.TriggerInferences;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
+import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.application.services.PipelineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -88,6 +91,23 @@ class PipelineStepOrchestratorTest {
         }
     }
 
+    static class FakeBiologicalObjectRepository implements BiologicalObjectRepository {
+        AtomicBoolean launchConsoleCalled = new AtomicBoolean(false);
+        AtomicReference<String> capturedUserId = new AtomicReference<>();
+
+        @Override
+        public String launch(PipelineConfig pipelineConfig) {
+            return null;
+        }
+
+        @Override
+        public String launchConsole(PipelineConfig pipelineConfig, String userId) {
+            launchConsoleCalled.set(true);
+            capturedUserId.set(userId);
+            return "OK";
+        }
+    }
+
     static class StepRecord {
         final String id;
         final PipelineSteps step;
@@ -112,14 +132,15 @@ class PipelineStepOrchestratorTest {
         }
 
         @Override
-        public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
-            stepRecords.add(new StepRecord(id, step, status));
+        public PipelineConfig updateStep(String id, PipelineStatus statusUpdate) {
+            stepRecords.add(new StepRecord(id, statusUpdate.getStep(), statusUpdate.getStatus()));
             return PipelineConfig.builder().id(id).build();
         }
     }
 
     private FakeTriggerInferences triggerInferences;
     private FakeTriggerPubmedIntegration triggerPubmedIntegration;
+    private FakeBiologicalObjectRepository biologicalObjectRepository;
     private FakePipelineService pipelineService;
     private PipelineStepOrchestrator orchestrator;
 
@@ -127,12 +148,13 @@ class PipelineStepOrchestratorTest {
     void setUp() {
         triggerInferences = new FakeTriggerInferences();
         triggerPubmedIntegration = new FakeTriggerPubmedIntegration();
+        biologicalObjectRepository = new FakeBiologicalObjectRepository();
         pipelineService = new FakePipelineService();
 
         orchestrator = new PipelineStepOrchestratorImpl(
                 triggerPubmedIntegration,
                 triggerInferences,
-                null,
+                biologicalObjectRepository,
                 pipelineService
         );
     }
@@ -220,5 +242,36 @@ class PipelineStepOrchestratorTest {
         assertEquals("pipe-103", record.id);
         assertEquals(PipelineSteps.CONFIGURE_INFERENCES, record.step);
         assertEquals(Status.IN_PROGRESS, record.status);
+    }
+
+    @Test
+    @DisplayName("resumePipeline with SEARCH_BIOLOGICAL_OBJECTS invokes biologicalObjectRepository.launchConsole")
+    void resumePipeline_biologicalObjects_invokesLaunchConsole() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-bio").step(PipelineSteps.TRANSCRIPTION_FACTOR).build();
+
+        orchestrator.resumePipeline(config, "user-42", MicroService.SEARCH_BIOLOGICAL_OBJECTS);
+
+        assertTrue(biologicalObjectRepository.launchConsoleCalled.get());
+        assertEquals("user-42", biologicalObjectRepository.capturedUserId.get());
+    }
+
+    @Test
+    @DisplayName("resumePipeline with PUBMED_INTEGRATION resolves predecessor step and orchestrates")
+    void resumePipeline_pubmedIntegration_resolvesPredecessorAndOrchestrates() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-pm").step(PipelineSteps.SEARCH_PUBMED_IDS).build();
+
+        orchestrator.resumePipeline(config, "user-42", MicroService.PUBMED_INTEGRATION);
+
+        assertTrue(triggerPubmedIntegration.executeSearchPubmedIdsCalled.get());
+    }
+
+    @Test
+    @DisplayName("resumePipeline with unknown predecessor step throws IllegalStateException")
+    void resumePipeline_unknownPredecessor_throwsException() {
+        PipelineConfig config = PipelineConfig.builder().id("pipe-err").step(PipelineSteps.CONFIG).build();
+
+        assertThrows(IllegalStateException.class, () ->
+                orchestrator.resumePipeline(config, "user-42", MicroService.PUBMED_INTEGRATION)
+        );
     }
 }

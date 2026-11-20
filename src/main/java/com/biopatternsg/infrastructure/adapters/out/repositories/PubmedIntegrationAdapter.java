@@ -18,6 +18,7 @@ package com.biopatternsg.infrastructure.adapters.out.repositories;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.port.out.TriggerPubmedIntegration;
+import com.biopatternsg.infrastructure.adapters.mappers.PipelineMapper;
 import com.biopatternsg.infrastructure.clients.PubmedRestClient;
 import com.biopatternsg.infrastructure.dtos.BuildPairsRequest;
 import com.biopatternsg.infrastructure.dtos.GenerateAlignedObjectsRequest;
@@ -116,16 +117,9 @@ public class PubmedIntegrationAdapter implements TriggerPubmedIntegration {
 
     @Override
     public void executeGenerateAlignedObjects(PipelineConfig pipelineConfig) {
-        List<ExpertObjectConfig> expertObjects = pipelineConfig.getExpertObjects();
-        if (pipelineConfig.getAlignedExpertObjects() != null && !pipelineConfig.getAlignedExpertObjects().isEmpty()) {
-            expertObjects = pipelineConfig.getAlignedExpertObjects().stream()
-                    .map(symbol -> {
-                        ExpertObjectConfig config = new ExpertObjectConfig();
-                        config.setSymbol(symbol);
-                        return config;
-                    })
-                    .toList();
-        }
+        List<ExpertObjectConfig> expertObjects = (pipelineConfig.getAlignedExpertObjects() != null && !pipelineConfig.getAlignedExpertObjects().isEmpty())
+                ? PipelineMapper.symbolsToExpertObjects(pipelineConfig.getAlignedExpertObjects())
+                : pipelineConfig.getExpertObjects();
 
         GenerateAlignedObjectsRequest request = new GenerateAlignedObjectsRequest(
                 pipelineConfig.getId(),

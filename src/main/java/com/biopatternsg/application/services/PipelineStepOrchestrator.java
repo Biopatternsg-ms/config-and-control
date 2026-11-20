@@ -15,10 +15,13 @@
  */
 package com.biopatternsg.application.services;
 
+import com.biopatternsg.domain.enums.MicroService;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.models.PipelineConfig;
 
 public interface PipelineStepOrchestrator {
 
     void orchestrate(PipelineConfig pipelineConfig, PipelineSteps step);
+
+    void resumePipeline(PipelineConfig pipeline, String userId, MicroService microService);
 }

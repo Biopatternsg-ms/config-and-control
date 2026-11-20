@@ -73,8 +73,7 @@ public class PipelineRepositoryAdapter implements PipelineRepository {
     public ReportFormat<PipelineConfig> findByFilters(PipelineConfig findPipeline, int page, int size) {
 
         var reportCollection = pipelineRepositoryDB.findByUserAndFilters(findPipeline, networkIdList(), page, size);
-        var modelList = reportCollection.list().stream().map(PipelineMapper::collectionToConfig).toList();
-        return new ReportFormat<>(reportCollection.count(),modelList);
+        return PipelineMapper.toDomainReport(reportCollection);
     }
 
     private List<String> networkIdList(){

@@ -17,6 +17,7 @@ package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
 import com.biopatternsg.domain.port.in.UserAuthentication;
 import com.biopatternsg.domain.port.in.UserManagement;
+import com.biopatternsg.infrastructure.adapters.mappers.KeycloakEventMapper;
 import com.biopatternsg.infrastructure.dtos.LoginRequest;
 import com.biopatternsg.infrastructure.dtos.RecoveryPasswordRequest;
 import com.biopatternsg.infrastructure.dtos.RefreshTokenRequest;
@@ -130,27 +131,16 @@ public class UserController {
     )
     public Response handleKeycloakEvent(KeycloakEventNotification event) {
 
-        log.info("Keycloak webhook event received. Payload: {}", event);
+        log.info("Keycloak webhook event received: {}", event != null ? event.type() : "null");
 
-        boolean isVerifyEmail = event != null && (
-                "VERIFY_EMAIL".equalsIgnoreCase(event.type()) ||
-                ("CUSTOM_REQUIRED_ACTION".equalsIgnoreCase(event.type())
-                        && event.details() != null
-                        && "VERIFY_EMAIL".equalsIgnoreCase(String.valueOf(event.details().get("custom_required_action"))))
-        );
-
-        if (isVerifyEmail) {
-            String targetId = (event.userId() != null && !event.userId().isBlank())
-                    ? event.userId()
-                    : (event.details() != null ? String.valueOf(event.details().get("username")) : null);
-
-            if (targetId != null && !targetId.isBlank() && !"null".equalsIgnoreCase(targetId)) {
-                log.info("Processing email verification event for identifier: {}", targetId);
-                userManagement.processEmailVerification(targetId);
-            }
-        }
+        KeycloakEventMapper.extractEmailVerificationTargetId(event)
+                .ifPresent(this::dispatchEmailVerification);
 
         return Response.ok().build();
     }
 
+    private void dispatchEmailVerification(String targetId) {
+        log.info("Processing email verification event for identifier: {}", targetId);
+        userManagement.processEmailVerification(targetId);
+    }
 }

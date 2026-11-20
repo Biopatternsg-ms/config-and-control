@@ -80,7 +80,6 @@ public class NetworkRepositoryAdapter implements NetworkRepository {
 
         var reportCollection = networkRepositoryDB.findByUserAndFilters(findNetwork,
                 sessionUtil.getUserId(), page, size);
-        var modelList = reportCollection.list().stream().map(NetworkMapper::toNetworkConfig).toList();
-        return new ReportFormat<> (reportCollection.count(), modelList);
+        return NetworkMapper.toDomainReport(reportCollection);
     }
 }
