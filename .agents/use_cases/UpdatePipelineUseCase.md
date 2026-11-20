@@ -1,72 +1,71 @@
-# Caso de Uso: `UpdatePipelineUseCase`
+# Use Case: `UpdatePipelineUseCase`
 
-- **Clase:** `com.biopatternsg.application.usecase.UpdatePipelineUseCase`
-- **Puerto de Entrada:** `com.biopatternsg.domain.port.in.UpdatePipeline`
-- **Puerto de Salida:** `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
-- **Servicios de Aplicación Involucrados:** `com.biopatternsg.application.services.PipelineStepOrchestrator`
-- **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
-
----
-
-## 1. Propósito
-Actúa como un **orquestador liviano** (Principio II de la Constitución) que coordina la actualización modular de secciones específicas de un pipeline de acuerdo al enumerado `UpdatePipelineEnum`:
-- `DESCRIPTION`: Modifica nombre y descripción.
-- `TRANSCRIPTION_FACTOR`: Configura factores de transcripción.
-- `EXPERT_OBJETS`: Configura objetos expertos.
-- `SEARCH_CONFIG`: Actualiza filtros y parámetros de búsqueda, delegando la verificación de completitud a la invariante de dominio `pipelineCurrent.applyConfigCompletionIfEligible()`.
-- `ALIGNED_EXPERT_OBJECTS`: Confirma objetos alineados y genera métricas delegando a la invariante de dominio `pipelineCurrent.applyAlignedObjectsConfirmation(...)`, detonando la orquestación del siguiente paso.
+- **Class:** `com.biopatternsg.application.usecase.UpdatePipelineUseCase`
+- **Inbound Port:** `com.biopatternsg.domain.port.in.UpdatePipeline`
+- **Outbound Port:** `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
+- **Application Services Involved:** `com.biopatternsg.application.services.PipelineStepOrchestrator`
+- **Invoking Controller:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
-## 2. Flujo de Ejecución
-
-1. Valida que el pipeline exista en el repositorio (`PipelineRepository.findById(id)`).
-2. Valida unicidad de nombre dentro de la misma red (`PipelineRepository.findByNameExists(networkId, name)`).
-3. Aplica los cambios delegando a invariantes de dominio en `PipelineConfig`:
-   - `ALIGNED_EXPERT_OBJECTS`: Invoca `pipelineCurrent.applyAlignedObjectsConfirmation(...)`.
-   - `SEARCH_CONFIG`: Actualiza parámetros y evalúa completitud mediante `pipelineCurrent.applyConfigCompletionIfEligible()`.
-   - `DESCRIPTION`, `TRANSCRIPTION_FACTOR`, `EXPERT_OBJETS`: Actualiza las propiedades correspondientes.
-4. Persiste el pipeline actualizado mediante `PipelineRepository.save(pipelineCurrent)`.
-5. Si el tipo de actualización fue `ALIGNED_EXPERT_OBJECTS`, invoca `pipelineStepOrchestrator.orchestrate(savedPipeline, PipelineSteps.UPDATE_ALIGNED_OBJECTS)`.
-6. Retorna el `PipelineConfig` persistido.
+## 1. Purpose
+Acts as a **lightweight orchestrator** (Constitution Principle II) that coordinates modular updates to specific sections of a pipeline configuration according to `UpdatePipelineEnum`:
+- `DESCRIPTION`: Updates the pipeline description.
+- `TRANSCRIPTION_FACTOR`: Configures transcription factor parameters and sources.
+- `EXPERT_OBJETS`: Configures expert biological objects.
+- `SEARCH_CONFIG`: Updates search levels, `retMax`, `maxComplexes`, and `useOnlyPrincipalName`, evaluating whether `PipelineSteps.CONFIG` is eligible to transition to `Status.COMPLETED`.
+- `ALIGNED_EXPERT_OBJECTS`: Confirms aligned expert objects, records alignment metrics, marks `UPDATE_ALIGNED_OBJECTS` as `COMPLETED`, and triggers `PipelineStepOrchestrator` for the next phase.
 
 ---
 
-## 3. Diagrama de Flujo (Mermaid)
+## 2. Execution Flow
+
+1. Validates that the pipeline exists in the repository (`PipelineRepository.findById(id)`). If not found, throws `UnprocessableEntityException("The pipeline don't exists")`.
+2. Validates name uniqueness within the same network (`PipelineRepository.findByNameExists(networkId, name)`). If a distinct pipeline already has that name, throws `UnprocessableEntityException("The pipeline name already exists")`.
+3. Applies the section update according to `UpdatePipelineEnum`:
+   - `ALIGNED_EXPERT_OBJECTS`: Updates aligned objects, records metrics, and sets `UPDATE_ALIGNED_OBJECTS` to `COMPLETED`.
+   - `SEARCH_CONFIG`: Updates search configuration fields and transitions `CONFIG` to `COMPLETED` if all required fields are populated.
+   - `DESCRIPTION`, `TRANSCRIPTION_FACTOR`, `EXPERT_OBJETS`: Updates the respective properties on `pipelineCurrent`.
+4. Persists the updated pipeline via `PipelineRepository.save(pipelineCurrent)`.
+5. If `pipelineEnum == UpdatePipelineEnum.ALIGNED_EXPERT_OBJECTS`, invokes `pipelineStepOrchestrator.orchestrate(savedPipeline, PipelineSteps.UPDATE_ALIGNED_OBJECTS)`.
+6. Returns the persisted `PipelineConfig`.
+
+---
+
+## 3. Sequence Diagram (Mermaid)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as API Client / Frontend
+    actor Client as API Client / Frontend
     participant Controller as PipelineController
     participant UseCase as UpdatePipelineUseCase
-    participant Model as PipelineConfig (Dominio)
+    participant Model as PipelineConfig (Domain)
     participant Repo as PipelineRepository
     participant Orchestrator as PipelineStepOrchestrator
 
-    Cliente->>Controller: PUT /api/pipeline/{type} (UpdatePipelineRequest)
+    Client->>Controller: PUT /config-and-control/pipelines/{section} (UpdatePipelineRequest)
     Controller->>UseCase: execute(pipelineConfig, updateEnum)
     UseCase->>Repo: findById(id)
-    alt Pipeline no existe
+    alt Pipeline does not exist
         Repo-->>UseCase: null
         UseCase-->>Controller: throw UnprocessableEntityException
-        Controller-->>Cliente: 422 Unprocessable Entity
+        Controller-->>Client: 422 Unprocessable Entity
     end
-    alt Validación de nombre
-        UseCase->>Repo: findByNameExists(networkId, name)
-        opt Nombre ocupado por otro ID
-            UseCase-->>Controller: throw UnprocessableEntityException
-        end
+    UseCase->>Repo: findByNameExists(networkId, name)
+    opt Name already taken by another pipeline ID
+        UseCase-->>Controller: throw UnprocessableEntityException
+        Controller-->>Client: 422 Unprocessable Entity
     end
     alt Switch UpdatePipelineEnum
         opt ALIGNED_EXPERT_OBJECTS
-            UseCase->>Model: applyAlignedObjectsConfirmation(alignedObjects)
+            UseCase->>Model: apply aligned objects & COMPLETED status with metrics
         end
         opt SEARCH_CONFIG
-            UseCase->>Model: applyConfigCompletionIfEligible()
+            UseCase->>Model: update search parameters & evaluate CONFIG completion
         end
-        opt Otros tipos
-            UseCase->>Model: setters directos
+        opt Other sections
+            UseCase->>Model: update description / transcriptionFactor / expertObjects
         end
     end
     UseCase->>Repo: save(pipelineCurrent)
@@ -75,12 +74,12 @@ sequenceDiagram
         UseCase->>Orchestrator: orchestrate(savedPipeline, UPDATE_ALIGNED_OBJECTS)
     end
     UseCase-->>Controller: saved PipelineConfig
-    Controller-->>Cliente: 200 OK
+    Controller-->>Client: 200 OK
 ```
 
 ---
 
-## 4. Casos de Error
+## 4. Error Cases
 
-- **Pipeline Inexistente:** Se lanza `UnprocessableEntityException("The pipeline don't exists")` si el ID no se encuentra en el repositorio.
-- **Colisión de Nombres:** Se lanza `UnprocessableEntityException("The pipeline name already exists")` si ya existe otro pipeline con el mismo nombre en la red.
+- **Non-existent Pipeline:** Throws `UnprocessableEntityException("The pipeline don't exists")` if the ID is not found in the repository.
+- **Name Collision:** Throws `UnprocessableEntityException("The pipeline name already exists")` if another pipeline with the same name already exists in the network.

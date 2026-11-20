@@ -1,53 +1,59 @@
-# Caso de Uso: `RegenerateAlignedObjectsUseCase`
+# Use Case: `RegenerateAlignedObjectsUseCase`
 
-- **Clase:** `com.biopatternsg.application.usecase.RegenerateAlignedObjectsUseCase`
-- **Puerto de Entrada:** `com.biopatternsg.domain.port.in.RegenerateAlignedObjects`
-- **Puertos de Salida:**
+- **Class:** `com.biopatternsg.application.usecase.RegenerateAlignedObjectsUseCase`
+- **Inbound Port:** `com.biopatternsg.domain.port.in.RegenerateAlignedObjects`
+- **Outbound Ports:**
   - `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
   - `com.biopatternsg.domain.port.out.TriggerPubmedIntegration`
-- **Servicios de Dominio Involucrados:**
-  - `com.biopatternsg.domain.services.PipelineService`
-- **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
+- **Application / Domain Services Involved:**
+  - `PipelineService`
+- **Invoking Controller:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
-## 1. Propósito
-Reinicia el paso de confirmación de objetos expertos alineados (`UPDATE_ALIGNED_OBJECTS`) a estado `PENDING` y vuelve a disparar la generación de objetos alineados en el servicio externo `pubmed-integration`.
+## 1. Purpose
+Resets the manual expert object alignment confirmation step (`UPDATE_ALIGNED_OBJECTS`) to `PENDING` and re-triggers aligned object generation in the external `pubmed-integration` microservice.
 
 ---
 
-## 2. Flujo de Ejecución
+## 2. Execution Flow
 
-1. Recibe el `pipelineId`.
-2. Busca el pipeline en `PipelineRepository.findById(pipelineId)`. Si no existe, lanza `UnprocessableEntityException("The pipeline don't exists")`.
-3. Actualiza el paso `PipelineSteps.UPDATE_ALIGNED_OBJECTS` a `Status.PENDING` mediante `PipelineService.updateStep(...)`.
-4. Dispara la generación llamando a `TriggerPubmedIntegration.executeGenerateAlignedObjects(pipeline)`.
+1. Receives `pipelineId`.
+2. Looks up the pipeline via `PipelineRepository.findById(pipelineId)`. If not found, throws `UnprocessableEntityException("The pipeline don't exists")`.
+3. Resets the `PipelineSteps.UPDATE_ALIGNED_OBJECTS` step to `Status.PENDING` via `PipelineService.updateStep(...)`.
+4. Triggers aligned objects generation by calling `TriggerPubmedIntegration.executeGenerateAlignedObjects(pipeline)`.
 
 ---
 
-## 3. Diagrama de Flujo (Mermaid)
+## 3. Sequence Diagram (Mermaid)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Cliente as API Client / Frontend
+    actor Client as API Client / Frontend
     participant Controller as PipelineController
     participant UseCase as RegenerateAlignedObjectsUseCase
     participant PipeRepo as PipelineRepository
     participant PipeService as PipelineService
     participant PubmedAdapter as TriggerPubmedIntegration
 
-    Cliente->>Controller: POST /config-and-control/pipelines/{id}/regenerate-aligned-objects
+    Client->>Controller: POST /config-and-control/pipelines/{id}/regenerate-aligned-objects
     Controller->>UseCase: execute(pipelineId)
     UseCase->>PipeRepo: findById(pipelineId)
-    alt Pipeline no existe
+    alt Pipeline does not exist
         PipeRepo-->>UseCase: null
         UseCase-->>Controller: throw UnprocessableEntityException
-        Controller-->>Cliente: 422 Unprocessable Entity
+        Controller-->>Client: 422 Unprocessable Entity
     end
     PipeRepo-->>UseCase: PipelineConfig
     UseCase->>PipeService: updateStep(id, UPDATE_ALIGNED_OBJECTS, PENDING)
     UseCase->>PubmedAdapter: executeGenerateAlignedObjects(pipeline)
     UseCase-->>Controller: void
-    Controller-->>Cliente: 202 Accepted ("Regeneration triggered")
+    Controller-->>Client: 202 Accepted ("Regeneration triggered")
 ```
+
+---
+
+## 4. Error Cases
+
+- **Non-existent Pipeline:** Throws `UnprocessableEntityException("The pipeline don't exists")` if `pipelineId` is not found in the repository.

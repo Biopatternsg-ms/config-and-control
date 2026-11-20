@@ -40,13 +40,14 @@ Implementations (`*UseCase.java`) must remain lean and act purely as orchestrato
 - Delegate complex multi-step lifecycle transitions, metric aggregations, or asynchronous orchestrations to **Application Services** (e.g., `PipelineStepOrchestrator`, `PipelineService`, `PipelineExecutionService`).
 
 ### 2.3. Mandatory Use Case Documentation (`.agents/use_cases/`)
-- **New Use Cases:** Whenever a new Use Case is created, a corresponding markdown document must be created under `.agents/use_cases/<UseCaseName>.md` describing:
+- **Mandatory English Language:** All Use Case documentation files under `.agents/use_cases/` (including `README.md` and every `<UseCaseName>.md` file) **must be written strictly in English**.
+- **New Use Cases:** Whenever a new Use Case is created, a corresponding markdown document must be created in English under `.agents/use_cases/<UseCaseName>.md` describing:
   1. Business problem and purpose.
   2. Input and output contracts (Inbound port, Outbound ports, Application Services).
   3. Step-by-step execution flow.
   4. Sequence diagram using Mermaid format (`sequenceDiagram`).
   5. Exceptions and validation failure scenarios.
-- **Modifications:** Whenever an existing Use Case signature, flow, or rule is modified, its documentation in `.agents/use_cases/<UseCaseName>.md` must be updated synchronously.
+- **Modifications:** Whenever an existing Use Case signature, flow, or rule is modified, its documentation in `.agents/use_cases/<UseCaseName>.md` must be updated synchronously in English.
 - **Mandatory Index References (`README.md` & `architecture.md`):** Whenever a new Use Case documentation file is added (or an existing one is renamed/repurposed), its reference and link **must** be added/updated in both:
   1. `.agents/use_cases/README.md` (the Use Cases catalog index).
   2. Section 5 of `.agents/architecture.md`.

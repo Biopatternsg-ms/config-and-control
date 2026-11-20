@@ -1,90 +1,89 @@
-# Caso de Uso: `ResumePipelineUseCase`
+# Use Case: `ResumePipelineUseCase`
 
-- **Clase:** `com.biopatternsg.application.usecase.ResumePipelineUseCase`
-- **Puerto de Entrada:** `com.biopatternsg.domain.port.in.ResumePipeline`
-- **Puertos de Salida:**
+- **Class:** `com.biopatternsg.application.usecase.ResumePipelineUseCase`
+- **Inbound Port:** `com.biopatternsg.domain.port.in.ResumePipeline`
+- **Outbound Ports:**
   - `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
   - `com.biopatternsg.domain.port.out.repositories.NetworkRepository`
-- **Servicios de Aplicación:**
+- **Application Services:**
   - `com.biopatternsg.application.services.PipelineStepOrchestrator`
-- **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
+- **Invoking Controller:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
-## 1. Problema de Negocio e Intención
-Proporcionar un mecanismo de auto-recuperación (*self-healing*) desatendido para pipelines biológicos que quedaron interrumpidos en estado `IN_PROGRESS` tras reinicios de contenedores, caídas imprevistas o redespliegues de servicios en el ecosistema BioPatternsG.
+## 1. Business Problem & Purpose
+Provides an unattended self-healing mechanism for biological pipelines that were interrupted in `IN_PROGRESS` status due to container restarts, unexpected crashes, or service redeployments in the BioPatternsG ecosystem.
 
-El caso de uso opera como un **orquestador liviano** (Principio II de la Constitución): coordina la recuperación por lote, la resolución de usuario por red y delega la ejecución de la reanudación a `PipelineStepOrchestrator.resumePipeline(...)`, manteniendo todas sus firmas con un máximo de 3 parámetros mediante el acumulador `PipelineResumptionBatch`.
-
----
-
-## 2. Flujo de Ejecución Paso a Paso
-
-1. **Determinación del Rango de Pasos Candidatos:**
-   - Si `microService == SEARCH_BIOLOGICAL_OBJECTS`: candidatos son pasos `[LAUNCH, TRANSCRIPTION_FACTOR, EXPERT_OBJECTS, SEARCH_LEVELS]`.
-   - Si `microService == PUBMED_INTEGRATION`: candidatos son pasos `[COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR, BUILD_KNOWLEDGE_BASE, GENERATE_ALIGNED_OBJECTS]`.
-2. **Consulta en Base de Datos:**
-   - Invoca `PipelineRepository.findInProgressBySteps(candidateSteps)` filtrando pipelines cuyo paso pertenezca al rango y esté en progreso.
-3. **Procesamiento Resiliente de Lote (`PipelineResumptionBatch`):**
-   - Para cada pipeline candidato, invoca `processPipeline(pipeline, microService, batch)` (3 parámetros):
-     - **Resolución de Usuario Propietario:** Consulta `NetworkRepository.findById(pipeline.getNetworkId())` para extraer el `userId`.
-       - Si la red no existe o `userId` está vacío, invoca `batch.recordFailure(pipelineId, "Cannot resolve userId...")`.
-     - **Disparo Delegado de Reanudación:** Invoca `pipelineStepOrchestrator.resumePipeline(pipeline, userId, microService)`.
-       - `PipelineStepOrchestrator` evalúa los pasos predecesores (en caso de PubMed) o detona la computación biológica.
-       - Si es exitoso, invoca `batch.recordSuccess(pipelineId)`.
-       - Si ocurre una excepción, la captura e invoca `batch.recordFailure(pipelineId, errorMsg)`.
-4. **Consolidación del Resumen:**
-   - Retorna `batch.toSummary(microService, candidates.size())` con los totales y detalle de errores, cumpliendo con el invariante `totalFound == resumedCount + failedCount`.
+The use case acts as a **lightweight orchestrator** (Constitution Principle II): it coordinates batch retrieval, user resolution per network, and delegates resumption execution to `PipelineStepOrchestrator`, keeping all method signatures within the 3-parameter limit.
 
 ---
 
-## 3. Diagrama de Flujo (Mermaid)
+## 2. Step-by-Step Execution Flow
+
+1. **Candidate Step Range Resolution:**
+   - If `microService == SEARCH_BIOLOGICAL_OBJECTS`: candidate steps are `[LAUNCH, TRANSCRIPTION_FACTOR, EXPERT_OBJECTS, SEARCH_LEVELS]`.
+   - If `microService == PUBMED_INTEGRATION`: candidate steps are `[COMBINATIONS, SEARCH_PUBMED_IDS, SEARCH_PUBTATOR, BUILD_KNOWLEDGE_BASE, GENERATE_ALIGNED_OBJECTS]`.
+2. **Database Query:**
+   - Invokes `PipelineRepository.findInProgressBySteps(candidateSteps)` to retrieve all pipelines currently in progress within those steps.
+3. **Resilient Batch Processing:**
+   - For each candidate pipeline:
+     - **Owner User Resolution:** Queries `NetworkRepository.findById(pipeline.getNetworkId())` to extract `userId`.
+       - If the network does not exist or `userId` is blank, records a failure for that pipeline (`"Cannot resolve userId..."`).
+     - **Delegated Resumption Trigger:** Dispatches the pipeline resumption to the target microservice (`SEARCH_BIOLOGICAL_OBJECTS` via `BiologicalObjectRepository.launchConsole` or `PUBMED_INTEGRATION` via `PipelineStepOrchestrator` using the predecessor step).
+       - On success, records the pipeline ID in `resumedPipelineIds`.
+       - On exception, catches the error, records the pipeline ID in `failedPipelineIds`, and stores the error message in `errors`.
+4. **Summary Consolidation:**
+   - Builds and returns `PipelineResumeSummary` with totals and per-pipeline error details, satisfying the invariant `totalFound == resumedCount + failedCount`.
+
+---
+
+## 3. Sequence Diagram (Mermaid)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Microservicio as Client Microservice / REST
+    actor Microservice as Client Microservice / REST
     participant Controller as PipelineController
     participant UseCase as ResumePipelineUseCase
     participant PipeRepo as PipelineRepository
     participant NetRepo as NetworkRepository
     participant Orchestrator as PipelineStepOrchestrator
 
-    Microservicio->>Controller: POST /config-and-control/pipelines/resume { microService }
+    Microservice->>Controller: POST /config-and-control/pipelines/resume { microService }
     Controller->>UseCase: execute(microService)
     
     UseCase->>PipeRepo: findInProgressBySteps(candidateSteps)
-    PipeRepo-->>UseCase: List<PipelineConfig> (candidatos en IN_PROGRESS)
+    PipeRepo-->>UseCase: List<PipelineConfig> (in-progress candidates)
     
-    loop Por cada pipeline candidato (usando PipelineResumptionBatch)
+    loop For each candidate pipeline
         UseCase->>NetRepo: findById(pipeline.networkId)
-        alt Red no encontrada o userId vacío
+        alt Network not found or empty userId
             NetRepo-->>UseCase: null / empty
-            UseCase->>UseCase: batch.recordFailure(pipelineId, error)
-        else Usuario válido
+            UseCase->>UseCase: recordFailure(pipelineId, error)
+        else Valid userId resolved
             NetRepo-->>UseCase: NetworkConfig (userId)
-            UseCase->>Orchestrator: resumePipeline(pipeline, userId, microService)
-            alt Reanudación exitosa en orquestador
+            UseCase->>Orchestrator: resumePipeline / orchestrate
+            alt Resumption succeeds
                 Orchestrator-->>UseCase: void
-                UseCase->>UseCase: batch.recordSuccess(pipelineId)
-            else Excepción capturada en reanudación
+                UseCase->>UseCase: recordSuccess(pipelineId)
+            else Exception caught during resumption
                 Orchestrator-->>UseCase: Exception
-                UseCase->>UseCase: batch.recordFailure(pipelineId, errorMsg)
+                UseCase->>UseCase: recordFailure(pipelineId, errorMsg)
             end
         end
     end
     
     UseCase-->>Controller: PipelineResumeSummary
-    Controller-->>Microservicio: 200 OK (PipelineResumeResponse)
+    Controller-->>Microservice: 200 OK (PipelineResumeResponse)
 ```
 
 ---
 
-## 4. Catálogo de Errores y Excepciones de Dominio
+## 4. Error Catalog & Domain Exceptions
 
-| Escenario de Error | Nivel | Manejo y Respuesta |
+| Error Scenario | Scope | Handling & Response |
 |---|---|---|
-| `microService` es nulo o ausente en el payload | Capa de Entrega / REST | Retorna `400 Bad Request` con mensaje descriptivo de validación. |
-| Red no encontrada para un pipeline candidato | Nivel de Ítem (Lote) | Se registra en el batch como fallo con motivo `"Cannot resolve userId for network: <id>"` sin abortar el resto del lote. |
-| Excepción de red / cliente HTTP en reanudación | Nivel de Ítem (Lote) | Se captura defensivamente; añade el ID a fallidos y el mensaje de excepción al mapa `errors`. |
-| Excepción de orquestación en predecesor | Nivel de Ítem (Lote) | Se captura defensivamente; añade el ID a fallidos y el motivo al mapa `errors`. |
+| `microService` is null or missing in request payload | Delivery / REST Layer | Returns `400 Bad Request` with validation message. |
+| Network not found for a candidate pipeline | Item Level (Batch) | Recorded as a failed item with reason `"Cannot resolve userId for network: <id>"` without aborting the batch. |
+| Network / HTTP client exception during resumption | Item Level (Batch) | Caught defensively; adds ID to `failedPipelineIds` and message to `errors` map. |
+| Predecessor step resolution exception | Item Level (Batch) | Caught defensively; adds ID to `failedPipelineIds` and reason to `errors` map. |

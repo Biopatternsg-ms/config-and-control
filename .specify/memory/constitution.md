@@ -38,8 +38,9 @@ This constitution establishes the mandatory architectural principles, design con
 
 ### IV. Mandatory Synchronous Use Case Documentation (NON-NEGOTIABLE)
 - **Documentation Synchronization Rule:**
-  - Whenever an existing Use Case is modified (signature, orchestration flow, rules, or inputs/outputs), its corresponding markdown documentation in `.agents/use_cases/<UseCaseName>.md` MUST be updated immediately in the same change set.
-  - Whenever a new Use Case is created, a dedicated documentation file MUST be created under `.agents/use_cases/<UseCaseName>.md` including:
+  - All documentation files in `.agents/use_cases/` (including `README.md` and every `<UseCaseName>.md` file) **MUST be written in English**.
+  - Whenever an existing Use Case is modified (signature, orchestration flow, rules, or inputs/outputs), its corresponding markdown documentation in `.agents/use_cases/<UseCaseName>.md` MUST be updated immediately in English in the same change set.
+  - Whenever a new Use Case is created, a dedicated documentation file MUST be created in English under `.agents/use_cases/<UseCaseName>.md` including:
     1. Business problem and intent.
     2. Inbound port and Outbound ports involved.
     3. Step-by-step execution flow.
