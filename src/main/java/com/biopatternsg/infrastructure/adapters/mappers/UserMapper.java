@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.mappers;
 
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.models.UserConfig;
 import com.biopatternsg.infrastructure.dtos.UserFiltersRequest;
 import com.biopatternsg.infrastructure.dtos.UserRequest;
@@ -102,5 +103,15 @@ public class UserMapper {
     public static List<UserConfig> keycloakToModelList(List<UserKeycloakResponse> identifiersList){
 
         return identifiersList.stream().map(UserMapper::keycloakToModel).toList();
+    }
+
+    public static ReportFormat<UserResponse> toReportResponse(ReportFormat<UserConfig> modelFormat) {
+        if (modelFormat == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<UserResponse> responseList = modelFormat.list() != null
+                ? modelFormat.list().stream().map(UserMapper::modelToResponse).toList()
+                : List.of();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 }

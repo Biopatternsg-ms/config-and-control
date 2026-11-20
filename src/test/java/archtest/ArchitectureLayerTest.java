@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 class ArchitectureLayerTest {
@@ -103,6 +104,24 @@ class ArchitectureLayerTest {
         ArchRuleDefinition.classes()
                 .that().resideInAPackage("..infrastructure.adapters.out..")
                 .should().haveSimpleNameEndingWith("Adapter")
+                .check(this.javaClasses);
+    }
+
+    @DisplayName("Controllers should not expose domain models in public method return types")
+    @Test
+    void controllerMethodsShouldNotReturnDomainModelsTest() {
+        ArchRuleDefinition.methods()
+                .that().areDeclaredInClassesThat().resideInAPackage(ROOT + ".infrastructure.adapters.in.restcontrollers..")
+                .and().arePublic()
+                .should().notHaveRawReturnType(
+                        resideInAPackage(ROOT + ".domain.models..")
+                                .and(com.tngtech.archunit.base.DescribedPredicate.not(
+                                        com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo(com.biopatternsg.domain.models.ReportFormat.class)
+                                ))
+                                .and(com.tngtech.archunit.base.DescribedPredicate.not(
+                                        com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo(com.biopatternsg.domain.models.ExperimentExecutionResponse.class)
+                                ))
+                )
                 .check(this.javaClasses);
     }
 

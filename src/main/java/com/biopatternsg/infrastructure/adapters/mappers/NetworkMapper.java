@@ -16,6 +16,7 @@
 package com.biopatternsg.infrastructure.adapters.mappers;
 
 import com.biopatternsg.domain.models.NetworkConfig;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.dtos.CreateNetworkRequest;
 import com.biopatternsg.infrastructure.dtos.FindNetworkRequest;
 import com.biopatternsg.infrastructure.dtos.NetworkResponse;
@@ -83,6 +84,16 @@ public class NetworkMapper {
     public static List<NetworkResponse> toNetworkResponseList(List<NetworkConfig> networkConfigList){
 
         return networkConfigList.stream().map(NetworkMapper::toNetworkResponse).toList();
+    }
+
+    public static ReportFormat<NetworkResponse> toReportResponse(ReportFormat<NetworkConfig> modelFormat) {
+        if (modelFormat == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<NetworkResponse> responseList = modelFormat.list() != null
+                ? modelFormat.list().stream().map(NetworkMapper::toNetworkResponse).toList()
+                : List.of();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 
     public static NetworkConfig requestToModel(CreateNetworkRequest createNetwork){

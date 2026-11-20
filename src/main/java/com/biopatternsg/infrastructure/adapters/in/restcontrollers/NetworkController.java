@@ -15,7 +15,6 @@
  */
 package com.biopatternsg.infrastructure.adapters.in.restcontrollers;
 
-import com.biopatternsg.domain.models.NetworkConfig;
 import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.domain.port.in.CreateNetwork;
 import com.biopatternsg.domain.port.in.FindNetwork;
@@ -61,7 +60,7 @@ public class NetworkController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = NetworkConfig.class,
+                    implementation = NetworkResponse.class,
                     description = "Created network configuration"
                 )
             )
@@ -69,8 +68,9 @@ public class NetworkController {
     })
     public Response create(@Valid CreateNetworkRequest newNetwork){
 
+        var config = createNetwork.execute(NetworkMapper.requestToModel(newNetwork));
         return Response.status(Response.Status.CREATED)
-                .entity(createNetwork.execute(NetworkMapper.requestToModel(newNetwork)))
+                .entity(NetworkMapper.toNetworkResponse(config))
                 .build();
     }
 
@@ -87,15 +87,16 @@ public class NetworkController {
                 mediaType = "application/json",
                 schema = @Schema(
                     type = SchemaType.OBJECT,
-                    implementation = NetworkConfig.class,
+                    implementation = NetworkResponse.class,
                     description = "Updated network configuration"
                 )
             )
         )
     })
-    public NetworkConfig update(@Valid UpdateNetworkRequest updateNetworkRequest){
+    public NetworkResponse update(@Valid UpdateNetworkRequest updateNetworkRequest){
 
-        return updateNetwork.execute(NetworkMapper.requestToModel(updateNetworkRequest));
+        var config = updateNetwork.execute(NetworkMapper.requestToModel(updateNetworkRequest));
+        return NetworkMapper.toNetworkResponse(config);
     }
 
     @GET
@@ -111,16 +112,16 @@ public class NetworkController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = NetworkConfig.class,
+                                    implementation = NetworkResponse.class,
                                     description = "Network information obtained"
                             )
                     )
             )
     })
     @Path("/{id}")
-    public NetworkConfig findList(@PathParam("id") String id){
+    public NetworkResponse findList(@PathParam("id") String id){
 
-        return findNetwork.byId(id);
+        return NetworkMapper.toNetworkResponse(findNetwork.byId(id));
     }
 
     @GET
@@ -136,7 +137,7 @@ public class NetworkController {
                             mediaType = "application/json",
                             schema = @Schema(
                                     type = SchemaType.OBJECT,
-                                    implementation = NetworkConfig.class,
+                                    implementation = ReportFormat.class,
                                     description = "User networks obtained"
                             )
                     )
@@ -146,7 +147,6 @@ public class NetworkController {
 
         var modelFormat = findNetwork.byFilters(NetworkMapper.requestToModel(networkFilters),
                 networkFilters.page(), networkFilters.size());
-        var responseList = modelFormat.list().stream().map(NetworkMapper::toNetworkResponse).toList();
-        return new ReportFormat<>(modelFormat.count(), responseList);
+        return NetworkMapper.toReportResponse(modelFormat);
     }
 }

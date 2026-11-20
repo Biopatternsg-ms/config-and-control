@@ -18,6 +18,7 @@ package com.biopatternsg.infrastructure.adapters.mappers;
 import com.biopatternsg.domain.models.PipelineResumeSummary;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.PipelineStatus;
+import com.biopatternsg.domain.models.ReportFormat;
 import com.biopatternsg.infrastructure.dtos.*;
 import com.biopatternsg.infrastructure.mongo_db.collections.PipelineCollection;
 import org.bson.types.ObjectId;
@@ -67,6 +68,40 @@ public class PipelineMapper {
                 .createdAt(pipelineConfig.getCreatedAt())
                 .status(getMostRecentStatus(pipelineConfig.getStatuses()))
                 .build();
+    }
+
+    public static PipelineDetailResponse configToDetailResponse(PipelineConfig pipelineConfig){
+        if(pipelineConfig == null){
+            return null;
+        }
+
+        return PipelineDetailResponse.builder()
+                .id(pipelineConfig.getId())
+                .name(pipelineConfig.getName())
+                .description(pipelineConfig.getDescription())
+                .networkId(pipelineConfig.getNetworkId())
+                .levels(pipelineConfig.getLevels())
+                .step(pipelineConfig.getStep())
+                .statuses(pipelineConfig.getStatuses() != null ? List.copyOf(pipelineConfig.getStatuses()) : List.of())
+                .status(getMostRecentStatus(pipelineConfig.getStatuses()))
+                .expertObjects(pipelineConfig.getExpertObjects() != null ? List.copyOf(pipelineConfig.getExpertObjects()) : List.of())
+                .alignedExpertObjects(pipelineConfig.getAlignedExpertObjects() != null ? List.copyOf(pipelineConfig.getAlignedExpertObjects()) : List.of())
+                .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
+                .useOnlyPrincipalName(pipelineConfig.isUseOnlyPrincipalName())
+                .createdAt(pipelineConfig.getCreatedAt())
+                .retMax(pipelineConfig.getRetMax())
+                .maxComplexes(pipelineConfig.getMaxComplexes())
+                .build();
+    }
+
+    public static ReportFormat<PipelineResponse> toReportResponse(ReportFormat<PipelineConfig> modelFormat) {
+        if (modelFormat == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<PipelineResponse> responseList = modelFormat.list() != null
+                ? modelFormat.list().stream().map(PipelineMapper::configToResponse).toList()
+                : List.of();
+        return new ReportFormat<>(modelFormat.count(), responseList);
     }
 
     private static PipelineStatus getMostRecentStatus(List<PipelineStatus> statuses) {
