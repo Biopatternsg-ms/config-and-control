@@ -113,12 +113,43 @@ return dataList.stream()
 
 ## 5. Static Mappers (`com.biopatternsg.infrastructure.adapters.mappers`)
 
-### 5.1. Stateless and Pure Static Methods
+### 5.1. Stateless Utility Classes and Pure Functions
 - Located in `com.biopatternsg.infrastructure.adapters.mappers.*`.
-- Pure static utility classes:
-  - Methods: `toModel(...)`, `toEntity(...)`, `toResponse(...)`, `toResponseList(...)`.
-  - No CDI injection (`@ApplicationScoped`) or mutable state.
-  - No reliance on runtime reflection or bytecode-generation mapping libraries.
+- **Class Definition**: Must be declared `public final` with a `private` no-argument constructor preventing instantiation.
+- **Pure Functions**:
+  - All methods must be `public static`, deterministic, and without side-effects.
+  - Zero mutable state or instance fields.
+  - No CDI injection (`@ApplicationScoped`, `@Singleton`, `@RequestScoped`).
+  - No reliance on runtime reflection or bytecode-generation mapping libraries (e.g., MapStruct runtime reflection or ModelMapper).
+- **Graceful Null Safety**: Every mapping method must safely handle `null` inputs, returning `null` or empty collections/envelopes (`ReportFormat<>(0L, List.of())`) without throwing `NullPointerException`.
+
+### 5.2. Standardized Method Naming Conventions (`<Source>To<Target>`)
+All mappers across all microservices must follow consistent `<source>To<Target>` nomenclature:
+
+1. **Request DTO → Domain Model**:
+   - `requestToModel(CreateXRequest request)`: Maps incoming creation DTOs to pure domain models.
+   - `requestToModel(UpdateXRequest request)` or `requestToUpdate(UpdateXRequest request)`: Maps update DTOs.
+   - `filtersToModel(XFiltersRequest request)`: Maps query parameter filter DTOs to domain filter models.
+2. **Database Document / Entity → Domain Model**:
+   - `collectionToModel(XCollection collection)`: Maps single MongoDB/relational entities to domain models.
+   - `collectionToModelList(List<XCollection> list)`: Maps lists of entities to lists of domain models.
+   - `toDomainReport(ReportFormat<XCollection> report)`: Maps paginated entity envelopes into domain report envelopes (`ReportFormat<XModel>`).
+3. **Domain Model → Database Document / Entity**:
+   - `modelToCollection(XModel model)`: Maps domain models into persistence entities.
+   - `modelToCollectionList(List<XModel> list)`: Maps lists of domain models into entity collections.
+4. **Domain Model → Delivery / Response DTO**:
+   - `modelToResponse(XModel model)`: Maps domain models into summary/standard response DTOs.
+   - `modelToResponseList(List<XModel> list)`: Maps lists of domain models into response DTO lists.
+   - `modelToDetailResponse(XModel model)` (or `configToDetailResponse`): Maps domain aggregates into full detailed configuration response DTOs for `GET /{id}` or `PUT` endpoints.
+   - `toReportResponse(ReportFormat<XModel> report)`: Maps paginated domain report envelopes into transport response report envelopes (`ReportFormat<XResponse>`).
+5. **External Client / Provider DTO → Domain Model**:
+   - `<provider>ToModel(ProviderResponse response)` (e.g., `keycloakToModel`, `pubmedToModel`): Maps external third-party DTOs to domain representations.
+   - `<provider>ToModelList(List<ProviderResponse> list)`: List conversion.
+6. **Webhook / Event Payload Extractors**:
+   - `extract<Intent>(EventNotification event)` (e.g., `KeycloakEventMapper.extractEmailVerificationTargetId`): Evaluates external events and returns `Optional<T>` target identifiers or command models.
+
+### 5.3. Backwards-Compatibility Aliases
+- In services undergoing progressive refactoring, existing contextual names (such as `toNetworkConfig`, `collectionToConfig`, `configToCollection`, `toNetworkResponse`) may be preserved as transparent delegating aliases to the canonical methods to avoid breaking existing callers or test suites during migration.
 
 ---
 

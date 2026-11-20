@@ -22,13 +22,17 @@ import com.biopatternsg.infrastructure.dtos.UserRequest;
 import com.biopatternsg.infrastructure.dtos.UserResponse;
 import com.biopatternsg.infrastructure.dtos.keycloak.UserKeycloakResponse;
 import com.biopatternsg.infrastructure.mongo_db.collections.UserCollection;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
-public class UserMapper {
+public final class UserMapper {
 
-    public static UserConfig requestToModel(UserRequest userRequest){
+    private UserMapper() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
 
+    public static UserConfig requestToModel(UserRequest userRequest) {
         if (userRequest == null) return null;
         return UserConfig.builder()
                 .username(userRequest.username())
@@ -38,8 +42,11 @@ public class UserMapper {
                 .build();
     }
 
-    public static UserResponse modelToResponse(UserConfig userConfig){
+    public static UserConfig requestToModel(UserFiltersRequest userFilters) {
+        return filtersToModel(userFilters);
+    }
 
+    public static UserResponse modelToResponse(UserConfig userConfig) {
         if (userConfig == null) return null;
         return UserResponse.builder()
                 .id(userConfig.getId())
@@ -52,33 +59,34 @@ public class UserMapper {
     }
 
     public static UserCollection modelToCollection(UserConfig userConfig) {
-
         if (userConfig == null) return null;
-        return UserCollection.builder()
+        var collection = UserCollection.builder()
                 .identityProviderId(userConfig.getIdentityProviderId())
                 .username(userConfig.getUsername())
                 .firstName(userConfig.getFirstName())
                 .lastName(userConfig.getLastName())
                 .enabled(userConfig.isEnabled())
                 .build();
+        if (userConfig.getId() != null && ObjectId.isValid(userConfig.getId())) {
+            collection.id = new ObjectId(userConfig.getId());
+        }
+        return collection;
     }
 
     public static UserConfig collectionToModel(UserCollection collection) {
-
         if (collection == null) return null;
         return UserConfig.builder()
-                .id(collection.id.toString())
+                .id(collection.id != null ? collection.id.toString() : null)
                 .identityProviderId(collection.getIdentityProviderId())
                 .username(collection.getUsername())
                 .firstName(collection.getFirstName())
                 .lastName(collection.getLastName())
                 .enabled(collection.isEnabled())
-                .createdAt(collection.id.getTimestamp())
+                .createdAt(collection.id != null ? collection.id.getTimestamp() : 0)
                 .build();
     }
 
-    public static UserConfig filtersToModel(UserFiltersRequest userFilters){
-
+    public static UserConfig filtersToModel(UserFiltersRequest userFilters) {
         if (userFilters == null) return null;
         return UserConfig.builder()
                 .username(userFilters.username())
@@ -88,8 +96,7 @@ public class UserMapper {
                 .build();
     }
 
-    public static UserConfig keycloakToModel(UserKeycloakResponse userKeycloakResponse){
-
+    public static UserConfig keycloakToModel(UserKeycloakResponse userKeycloakResponse) {
         if (userKeycloakResponse == null) return null;
         return UserConfig.builder()
                 .identityProviderId(userKeycloakResponse.id())
@@ -100,9 +107,35 @@ public class UserMapper {
                 .build();
     }
 
-    public static List<UserConfig> keycloakToModelList(List<UserKeycloakResponse> identifiersList){
-
+    public static List<UserConfig> keycloakToModelList(List<UserKeycloakResponse> identifiersList) {
+        if (identifiersList == null) {
+            return List.of();
+        }
         return identifiersList.stream().map(UserMapper::keycloakToModel).toList();
+    }
+
+    public static List<UserConfig> collectionToModelList(List<UserCollection> collectionList) {
+        if (collectionList == null) {
+            return List.of();
+        }
+        return collectionList.stream().map(UserMapper::collectionToModel).toList();
+    }
+
+    public static List<UserResponse> modelToResponseList(List<UserConfig> userConfigList) {
+        if (userConfigList == null) {
+            return List.of();
+        }
+        return userConfigList.stream().map(UserMapper::modelToResponse).toList();
+    }
+
+    public static ReportFormat<UserConfig> toDomainReport(ReportFormat<UserCollection> reportCollection) {
+        if (reportCollection == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<UserConfig> modelList = reportCollection.list() != null
+                ? reportCollection.list().stream().map(UserMapper::collectionToModel).toList()
+                : List.of();
+        return new ReportFormat<>(reportCollection.count(), modelList);
     }
 
     public static ReportFormat<UserResponse> toReportResponse(ReportFormat<UserConfig> modelFormat) {

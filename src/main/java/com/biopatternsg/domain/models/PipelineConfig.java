@@ -59,12 +59,16 @@ public class PipelineConfig {
                 .filter(ps -> ps.getStep() == step && ps.getStatus() == status)
                 .findFirst()
                 .ifPresentOrElse(
-                        ps -> {
-                            ps.setCreatedAt(new Date());
-                            if (metrics != null) ps.setMetrics(metrics);
-                        },
+                        ps -> updateExistingStatusMetrics(ps, metrics),
                         () -> this.statuses.add(new PipelineStatus(step, status, new Date(), metrics))
                 );
+    }
+
+    private void updateExistingStatusMetrics(PipelineStatus ps, Map<String, String> metrics) {
+        ps.setCreatedAt(new Date());
+        if (metrics != null) {
+            ps.setMetrics(metrics);
+        }
     }
 
     public void addStatus(Status status) {

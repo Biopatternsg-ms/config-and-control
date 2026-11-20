@@ -27,6 +27,7 @@ public final class KeycloakEventMapper {
     private static final String USERNAME_DETAIL = "username";
 
     private KeycloakEventMapper() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     public static Optional<String> extractEmailVerificationTargetId(KeycloakEventNotification event) {

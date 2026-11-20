@@ -134,12 +134,13 @@ public class UserController {
         log.info("Keycloak webhook event received: {}", event != null ? event.type() : "null");
 
         KeycloakEventMapper.extractEmailVerificationTargetId(event)
-                .ifPresent(targetId -> {
-                    log.info("Processing email verification event for identifier: {}", targetId);
-                    userManagement.processEmailVerification(targetId);
-                });
+                .ifPresent(this::dispatchEmailVerification);
 
         return Response.ok().build();
     }
 
+    private void dispatchEmailVerification(String targetId) {
+        log.info("Processing email verification event for identifier: {}", targetId);
+        userManagement.processEmailVerification(targetId);
+    }
 }

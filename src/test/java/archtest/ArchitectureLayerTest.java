@@ -125,4 +125,44 @@ class ArchitectureLayerTest {
                 .check(this.javaClasses);
     }
 
+    @DisplayName("Mappers should follow naming convention and reside in mappers package")
+    @Test
+    void staticMappersNamingAndLocationTest() {
+        ArchRuleDefinition.classes()
+                .that().resideInAPackage(ROOT + ".infrastructure.adapters.mappers..")
+                .should().haveSimpleNameEndingWith("Mapper")
+                .check(this.javaClasses);
+    }
+
+    @DisplayName("Mappers should be final utility classes with private constructors and static methods")
+    @Test
+    void staticMappersShouldBeUtilityClassesTest() {
+        ArchRuleDefinition.classes()
+                .that().resideInAPackage(ROOT + ".infrastructure.adapters.mappers..")
+                .should().haveModifier(com.tngtech.archunit.core.domain.JavaModifier.FINAL)
+                .check(this.javaClasses);
+
+        ArchRuleDefinition.constructors()
+                .that().areDeclaredInClassesThat().resideInAPackage(ROOT + ".infrastructure.adapters.mappers..")
+                .should().bePrivate()
+                .check(this.javaClasses);
+
+        ArchRuleDefinition.methods()
+                .that().areDeclaredInClassesThat().resideInAPackage(ROOT + ".infrastructure.adapters.mappers..")
+                .and().arePublic()
+                .should().beStatic()
+                .check(this.javaClasses);
+    }
+
+    @DisplayName("Mappers should not have CDI annotations")
+    @Test
+    void staticMappersShouldNotHaveCDIAnnotationsTest() {
+        ArchRuleDefinition.noClasses()
+                .that().resideInAPackage(ROOT + ".infrastructure.adapters.mappers..")
+                .should().beAnnotatedWith("jakarta.enterprise.context.ApplicationScoped")
+                .orShould().beAnnotatedWith("jakarta.inject.Singleton")
+                .orShould().beAnnotatedWith("jakarta.enterprise.context.RequestScoped")
+                .check(this.javaClasses);
+    }
+
 }

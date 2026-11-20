@@ -15,6 +15,7 @@
  */
 package com.biopatternsg.infrastructure.adapters.mappers;
 
+import com.biopatternsg.domain.models.pipeline_config.ExpertObjectConfig;
 import com.biopatternsg.domain.models.PipelineResumeSummary;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.models.PipelineStatus;
@@ -27,16 +28,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public class PipelineMapper {
+public final class PipelineMapper {
 
-    public static PipelineConfig collectionToConfig(PipelineCollection pipelineCollection){
+    private PipelineMapper() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
 
-        if(pipelineCollection == null){
+    public static PipelineConfig collectionToModel(PipelineCollection pipelineCollection) {
+        if (pipelineCollection == null) {
             return null;
         }
 
         return PipelineConfig.builder()
-                .id(pipelineCollection.id.toString())
+                .id(pipelineCollection.id != null ? pipelineCollection.id.toString() : null)
                 .name(pipelineCollection.getName())
                 .networkId(pipelineCollection.getNetworkId())
                 .description(pipelineCollection.getDescription())
@@ -49,13 +53,12 @@ public class PipelineMapper {
                 .alignedExpertObjects(pipelineCollection.getAlignedExpertObjects())
                 .transcriptionFactorConfig(pipelineCollection.getTranscriptionFactorConfig())
                 .useOnlyPrincipalName(pipelineCollection.getUseOnlyPrincipalName() != null ? pipelineCollection.getUseOnlyPrincipalName() : true)
-                .createdAt(pipelineCollection.id.getTimestamp())
+                .createdAt(pipelineCollection.id != null ? pipelineCollection.id.getTimestamp() : 0)
                 .build();
     }
 
-    public static PipelineResponse configToResponse(PipelineConfig pipelineConfig){
-
-        if(pipelineConfig == null){
+    public static PipelineResponse modelToResponse(PipelineConfig pipelineConfig) {
+        if (pipelineConfig == null) {
             return null;
         }
 
@@ -70,8 +73,8 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineDetailResponse configToDetailResponse(PipelineConfig pipelineConfig){
-        if(pipelineConfig == null){
+    public static PipelineDetailResponse modelToDetailResponse(PipelineConfig pipelineConfig) {
+        if (pipelineConfig == null) {
             return null;
         }
 
@@ -94,30 +97,8 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static ReportFormat<PipelineResponse> toReportResponse(ReportFormat<PipelineConfig> modelFormat) {
-        if (modelFormat == null) {
-            return new ReportFormat<>(0L, List.of());
-        }
-        List<PipelineResponse> responseList = modelFormat.list() != null
-                ? modelFormat.list().stream().map(PipelineMapper::configToResponse).toList()
-                : List.of();
-        return new ReportFormat<>(modelFormat.count(), responseList);
-    }
-
-    private static PipelineStatus getMostRecentStatus(List<PipelineStatus> statuses) {
-        if (statuses == null || statuses.isEmpty()) {
-            return null;
-        }
-        return statuses.stream()
-                .filter(Objects::nonNull)
-                .filter(status -> status.getCreatedAt() != null)
-                .max(Comparator.comparing(PipelineStatus::getCreatedAt))
-                .orElse(null);
-    }
-
-    public static PipelineCollection configToCollection(PipelineConfig pipelineConfig){
-
-        if(pipelineConfig == null){
+    public static PipelineCollection modelToCollection(PipelineConfig pipelineConfig) {
+        if (pipelineConfig == null) {
             return null;
         }
 
@@ -136,25 +117,81 @@ public class PipelineMapper {
                 .transcriptionFactorConfig(pipelineConfig.getTranscriptionFactorConfig())
                 .build();
 
-        if(pipelineConfig.getId() != null && ObjectId.isValid(pipelineConfig.getId())){
+        if (pipelineConfig.getId() != null && ObjectId.isValid(pipelineConfig.getId())) {
             pipelineCollection.id = new ObjectId(pipelineConfig.getId());
         }
 
         return pipelineCollection;
     }
 
-    public static List<PipelineConfig> collectionToConfigList(List<PipelineCollection> pipelineCollectionList){
-
-        return pipelineCollectionList.stream().map(PipelineMapper::collectionToConfig).toList();
+    public static List<PipelineConfig> collectionToModelList(List<PipelineCollection> collectionList) {
+        if (collectionList == null) {
+            return List.of();
+        }
+        return collectionList.stream().map(PipelineMapper::collectionToModel).toList();
     }
 
-    public static List<PipelineResponse> collectionToResponseList(List<PipelineConfig> pipelineCollectionList){
-
-        return pipelineCollectionList.stream().map(PipelineMapper::configToResponse).toList();
+    public static List<PipelineResponse> modelToResponseList(List<PipelineConfig> list) {
+        if (list == null) {
+            return List.of();
+        }
+        return list.stream().map(PipelineMapper::modelToResponse).toList();
     }
 
-    public static PipelineConfig requestToCreate(CreatePipelineRequest createPipeline){
+    public static ExpertObjectConfig symbolToExpertObject(String symbol) {
+        if (symbol == null) {
+            return null;
+        }
+        ExpertObjectConfig config = new ExpertObjectConfig();
+        config.setSymbol(symbol);
+        return config;
+    }
 
+    public static List<ExpertObjectConfig> symbolsToExpertObjects(List<String> symbols) {
+        if (symbols == null || symbols.isEmpty()) {
+            return List.of();
+        }
+        return symbols.stream()
+                .filter(Objects::nonNull)
+                .map(PipelineMapper::symbolToExpertObject)
+                .toList();
+    }
+
+    public static ReportFormat<PipelineConfig> toDomainReport(ReportFormat<PipelineCollection> reportCollection) {
+        if (reportCollection == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<PipelineConfig> modelList = reportCollection.list() != null
+                ? reportCollection.list().stream().map(PipelineMapper::collectionToModel).toList()
+                : List.of();
+        return new ReportFormat<>(reportCollection.count(), modelList);
+    }
+
+    public static ReportFormat<PipelineResponse> toReportResponse(ReportFormat<PipelineConfig> modelFormat) {
+        if (modelFormat == null) {
+            return new ReportFormat<>(0L, List.of());
+        }
+        List<PipelineResponse> responseList = modelFormat.list() != null
+                ? modelFormat.list().stream().map(PipelineMapper::modelToResponse).toList()
+                : List.of();
+        return new ReportFormat<>(modelFormat.count(), responseList);
+    }
+
+    private static PipelineStatus getMostRecentStatus(List<PipelineStatus> statuses) {
+        if (statuses == null || statuses.isEmpty()) {
+            return null;
+        }
+        return statuses.stream()
+                .filter(Objects::nonNull)
+                .filter(status -> status.getCreatedAt() != null)
+                .max(Comparator.comparing(PipelineStatus::getCreatedAt))
+                .orElse(null);
+    }
+
+    public static PipelineConfig requestToCreate(CreatePipelineRequest createPipeline) {
+        if (createPipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .name(createPipeline.name())
                 .description(createPipeline.description())
@@ -162,8 +199,14 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(UpdatePipelineDescriptionRequest updatePipeline){
+    public static PipelineConfig requestToModel(CreatePipelineRequest createPipeline) {
+        return requestToCreate(createPipeline);
+    }
 
+    public static PipelineConfig requestToUpdate(UpdatePipelineDescriptionRequest updatePipeline) {
+        if (updatePipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .name(updatePipeline.name())
@@ -171,32 +214,40 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(UpdatePipelineTranscriptionFactorRequest updatePipeline){
-
+    public static PipelineConfig requestToUpdate(UpdatePipelineTranscriptionFactorRequest updatePipeline) {
+        if (updatePipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .transcriptionFactorConfig(updatePipeline.transcriptionFactorConfig())
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(UpdatePipelineExpertObjectsRequest updatePipeline){
-
+    public static PipelineConfig requestToUpdate(UpdatePipelineExpertObjectsRequest updatePipeline) {
+        if (updatePipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .expertObjects(updatePipeline.expertObjects())
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(UpdateAlignedExpertObjectsRequest updatePipeline){
-
+    public static PipelineConfig requestToUpdate(UpdateAlignedExpertObjectsRequest updatePipeline) {
+        if (updatePipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .alignedExpertObjects(updatePipeline.alignedExpertObjects())
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(UpdatePipelineSearchConfigRequest updatePipeline){
-
+    public static PipelineConfig requestToUpdate(UpdatePipelineSearchConfigRequest updatePipeline) {
+        if (updatePipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(updatePipeline.id())
                 .levels(updatePipeline.levels())
@@ -206,8 +257,10 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineConfig requestToUpdate(FindPipelineRequest findPipeline){
-
+    public static PipelineConfig requestToUpdate(FindPipelineRequest findPipeline) {
+        if (findPipeline == null) {
+            return null;
+        }
         return PipelineConfig.builder()
                 .id(findPipeline.id())
                 .networkId(findPipeline.networkId())
@@ -216,8 +269,14 @@ public class PipelineMapper {
                 .build();
     }
 
-    public static PipelineStatus requestToStatus(PipelineStepRequest pipelineStepRequest){
+    public static PipelineConfig requestToModel(FindPipelineRequest findPipeline) {
+        return requestToUpdate(findPipeline);
+    }
 
+    public static PipelineStatus requestToStatus(PipelineStepRequest pipelineStepRequest) {
+        if (pipelineStepRequest == null) {
+            return null;
+        }
         return PipelineStatus.builder()
                 .step(pipelineStepRequest.step())
                 .status(pipelineStepRequest.status())
@@ -238,5 +297,30 @@ public class PipelineMapper {
                 summary.getFailedPipelineIds(),
                 summary.getErrors()
         );
+    }
+
+    // Backward-compatibility delegating aliases
+    public static PipelineConfig collectionToConfig(PipelineCollection pipelineCollection) {
+        return collectionToModel(pipelineCollection);
+    }
+
+    public static PipelineResponse configToResponse(PipelineConfig pipelineConfig) {
+        return modelToResponse(pipelineConfig);
+    }
+
+    public static PipelineDetailResponse configToDetailResponse(PipelineConfig pipelineConfig) {
+        return modelToDetailResponse(pipelineConfig);
+    }
+
+    public static PipelineCollection configToCollection(PipelineConfig pipelineConfig) {
+        return modelToCollection(pipelineConfig);
+    }
+
+    public static List<PipelineConfig> collectionToConfigList(List<PipelineCollection> pipelineCollectionList) {
+        return collectionToModelList(pipelineCollectionList);
+    }
+
+    public static List<PipelineResponse> collectionToResponseList(List<PipelineConfig> pipelineCollectionList) {
+        return modelToResponseList(pipelineCollectionList);
     }
 }
