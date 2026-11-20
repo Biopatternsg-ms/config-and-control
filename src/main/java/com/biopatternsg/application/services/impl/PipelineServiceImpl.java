@@ -20,11 +20,10 @@ import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
+import com.biopatternsg.domain.models.PipelineStatus;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -34,18 +33,21 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Override
     public PipelineConfig updateStep(String id, PipelineSteps step, Status status) {
-        return updateStep(id, step, status, null);
+        return updateStep(id, PipelineStatus.builder()
+                .step(step)
+                .status(status)
+                .build());
     }
 
     @Override
-    public PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics) {
+    public PipelineConfig updateStep(String id, PipelineStatus statusUpdate) {
         var pipelineConfig = pipelineRepository.findById(id);
         if (pipelineConfig == null) {
             throw new UnprocessableEntityException("The pipeline don't exists");
         }
 
-        pipelineConfig.setStep(step);
-        pipelineConfig.addStatusForStep(step, status, metrics);
+        pipelineConfig.setStep(statusUpdate.getStep());
+        pipelineConfig.addStatusForStep(statusUpdate.getStep(), statusUpdate.getStatus(), statusUpdate.getMetrics());
         return pipelineRepository.save(pipelineConfig);
     }
 }

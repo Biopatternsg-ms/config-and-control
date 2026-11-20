@@ -3,12 +3,13 @@
 - **Clase:** `com.biopatternsg.application.usecase.GetPipelineExecutionUseCase`
 - **Puerto de Entrada:** `com.biopatternsg.domain.port.in.GetPipelineExecution`
 - **Puerto de Salida:** `com.biopatternsg.domain.port.out.repositories.PipelineRepository`
+- **Servicios de Aplicación Inyectados:** `com.biopatternsg.application.services.PipelineExecutionService`
 - **Controlador Invocador:** `com.biopatternsg.infrastructure.adapters.in.restcontrollers.PipelineController`
 
 ---
 
 ## 1. Propósito
-Reconstruye una vista consolidada y detallada de la ejecución de un experimento/pipeline (`ExperimentExecutionResponse`). Calcula métricas de progreso global, tiempos de ejecución por paso, duraciones totales, estado de cada fase, artefactos procesados y métricas detalladas para la visualización en la interfaz de usuario.
+Actúa como un **orquestador liviano** (Principio II de la Constitución) que coordina la consulta del estado de ejecución de un experimento/pipeline. Valida la existencia del pipeline a través del repositorio de persistencia y delega la agregación de métricas, cronología, duraciones y mapeo de iconos/descripciones UI al servicio especializado `PipelineExecutionService`.
 
 ---
 
@@ -16,13 +17,8 @@ Reconstruye una vista consolidada y detallada de la ejecución de un experimento
 
 1. Recupera la entidad `PipelineConfig` mediante `PipelineRepository.findById(pipelineId)`.
 2. Si no existe, lanza `UnprocessableEntityException("The pipeline don't exists")`.
-3. Itera sobre todos los pasos ordenados de `PipelineSteps`:
-   - Agrupa los estados históricos registrados para cada paso.
-   - Determina el estado actual del paso (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `FAILED`).
-   - Calcula marcas de tiempo (inicio, finalización, duración transcurrida en segundos).
-   - Extrae métricas específicas del paso (ej. número de factores de transcripción alineados, objetos expertos, búsquedas completadas).
-4. Calcula el progreso porcentual global del pipeline.
-5. Construye y retorna el DTO compuesto `ExperimentExecutionResponse`.
+3. Delega la construcción del informe métrico y cronológico a `PipelineExecutionService.buildExecutionReport(pipelineConfig)`.
+4. Retorna el objeto `ExperimentExecutionResponse` construido por el servicio.
 
 ---
 
@@ -35,6 +31,7 @@ sequenceDiagram
     participant Controller as PipelineController
     participant UseCase as GetPipelineExecutionUseCase
     participant Repo as PipelineRepository
+    participant Service as PipelineExecutionService
 
     Frontend->>Controller: GET /api/pipeline/{id}/execution
     Controller->>UseCase: execute(pipelineId)
@@ -44,12 +41,19 @@ sequenceDiagram
         UseCase-->>Controller: throw UnprocessableEntityException
         Controller-->>Frontend: 422 Unprocessable Entity
     else Pipeline encontrado
-        Repo-->>UseCase: PipelineConfig (con lista de statuses y métricas)
-        UseCase->>UseCase: iterate PipelineSteps.values()
-        UseCase->>UseCase: compute step durations, logs, artifacts & metrics
-        UseCase->>UseCase: compute global progress percentage
-        UseCase->>UseCase: build ExperimentExecutionResponse
+        Repo-->>UseCase: PipelineConfig (con statuses y configuración)
+        UseCase->>Service: buildExecutionReport(pipelineConfig)
+        Service->>Service: iterate PipelineSteps.values()
+        Service->>Service: calculate step durations & phase metrics
+        Service->>Service: resolve Lucide icons & descriptive labels
+        Service-->>UseCase: ExperimentExecutionResponse
         UseCase-->>Controller: ExperimentExecutionResponse
         Controller-->>Frontend: 200 OK (Consolidated Execution State)
     end
 ```
+
+---
+
+## 4. Casos de Error
+
+- **Pipeline Inexistente:** Se lanza `UnprocessableEntityException` con mensaje `"The pipeline don't exists"` si el repositorio retorna `null`.

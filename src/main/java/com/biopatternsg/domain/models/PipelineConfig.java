@@ -70,4 +70,33 @@ public class PipelineConfig {
     public void addStatus(Status status) {
         addStatusForStep(this.step, status, null);
     }
+
+    public boolean isConfigComplete() {
+        return this.name != null && !this.name.trim().isEmpty() &&
+                this.description != null && !this.description.trim().isEmpty() &&
+                this.levels != null && this.levels > 0 &&
+                this.retMax > 0 &&
+                this.maxComplexes != null && this.maxComplexes > 0;
+    }
+
+    public void applyConfigCompletionIfEligible() {
+        if (isConfigComplete()) {
+            addStatusForStep(PipelineSteps.CONFIG, Status.COMPLETED, null);
+        }
+    }
+
+    public void applyAlignedObjectsConfirmation(List<String> objects) {
+        this.alignedExpertObjects = objects;
+        this.step = PipelineSteps.UPDATE_ALIGNED_OBJECTS;
+
+        Map<String, String> metrics = new java.util.LinkedHashMap<>();
+        if (objects != null && !objects.isEmpty()) {
+            metrics.put("totalAlignedObjects", String.valueOf(objects.size()));
+            String symbols = String.join(", ", objects);
+            metrics.put("alignedSymbols", symbols);
+        }
+        metrics.put("statusMessage", "Manual alignment confirmed by expert");
+
+        addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED, metrics);
+    }
 }

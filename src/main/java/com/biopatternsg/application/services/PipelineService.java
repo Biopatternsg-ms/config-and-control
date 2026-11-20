@@ -18,12 +18,11 @@ package com.biopatternsg.application.services;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.models.PipelineConfig;
-
-import java.util.Map;
+import com.biopatternsg.domain.models.PipelineStatus;
 
 public interface PipelineService {
 
     PipelineConfig updateStep(String id, PipelineSteps step, Status status);
 
-    PipelineConfig updateStep(String id, PipelineSteps step, Status status, Map<String, String> metrics);
+    PipelineConfig updateStep(String id, PipelineStatus statusUpdate);
 }

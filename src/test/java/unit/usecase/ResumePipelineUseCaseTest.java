@@ -127,8 +127,10 @@ class ResumePipelineUseCaseTest {
     static class FakePipelineStepOrchestrator implements PipelineStepOrchestrator {
         Map<String, PipelineSteps> orchestratedSteps = new HashMap<>();
         Set<String> idsToFail = new HashSet<>();
+        FakeBiologicalObjectRepository biologicalObjectRepository;
 
-        FakePipelineStepOrchestrator() {
+        FakePipelineStepOrchestrator(FakeBiologicalObjectRepository biologicalObjectRepository) {
+            this.biologicalObjectRepository = biologicalObjectRepository;
         }
 
         @Override
@@ -137,6 +139,36 @@ class ResumePipelineUseCaseTest {
                 throw new RuntimeException("PubMed orchestrator step execution failure");
             }
             orchestratedSteps.put(pipelineConfig.getId(), step);
+        }
+
+        @Override
+        public void resumePipeline(PipelineConfig pipeline, String userId, MicroService microService) {
+            if (idsToFail.contains(pipeline.getId())) {
+                throw new RuntimeException("PubMed orchestrator step execution failure");
+            }
+            if (microService == MicroService.SEARCH_BIOLOGICAL_OBJECTS) {
+                biologicalObjectRepository.launchConsole(pipeline, userId);
+            } else {
+                PipelineSteps previousStep = resolvePreviousStep(pipeline.getStep());
+                if (previousStep == null) {
+                    throw new IllegalStateException("Cannot determine predecessor step for step: " + pipeline.getStep());
+                }
+                orchestrate(pipeline, previousStep);
+            }
+        }
+
+        private PipelineSteps resolvePreviousStep(PipelineSteps currentStep) {
+            if (currentStep == null) {
+                return null;
+            }
+            return switch (currentStep) {
+                case COMBINATIONS -> PipelineSteps.SEARCH_LEVELS;
+                case SEARCH_PUBMED_IDS -> PipelineSteps.COMBINATIONS;
+                case SEARCH_PUBTATOR -> PipelineSteps.SEARCH_PUBMED_IDS;
+                case BUILD_KNOWLEDGE_BASE -> PipelineSteps.SEARCH_PUBTATOR;
+                case GENERATE_ALIGNED_OBJECTS -> PipelineSteps.BUILD_KNOWLEDGE_BASE;
+                default -> null;
+            };
         }
     }
 
@@ -151,12 +183,11 @@ class ResumePipelineUseCaseTest {
         pipelineRepository = new FakePipelineRepository();
         networkRepository = new FakeNetworkRepository();
         biologicalObjectRepository = new FakeBiologicalObjectRepository();
-        pipelineStepOrchestrator = new FakePipelineStepOrchestrator();
+        pipelineStepOrchestrator = new FakePipelineStepOrchestrator(biologicalObjectRepository);
 
         useCase = new ResumePipelineUseCase(
                 pipelineRepository,
                 networkRepository,
-                biologicalObjectRepository,
                 pipelineStepOrchestrator
         );
     }

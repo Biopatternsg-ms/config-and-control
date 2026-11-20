@@ -15,9 +15,11 @@
  */
 package unit.usecase;
 
+import com.biopatternsg.application.services.impl.PipelineExecutionServiceImpl;
 import com.biopatternsg.application.usecase.GetPipelineExecutionUseCase;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
+import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.*;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,12 +67,21 @@ class GetPipelineExecutionUseCaseTest {
     }
 
     private FakePipelineRepository repository;
+    private PipelineExecutionServiceImpl executionService;
     private GetPipelineExecutionUseCase useCase;
 
     @BeforeEach
     void setUp() {
         repository = new FakePipelineRepository();
-        useCase = new GetPipelineExecutionUseCase(repository);
+        executionService = new PipelineExecutionServiceImpl();
+        useCase = new GetPipelineExecutionUseCase(repository, executionService);
+    }
+
+    @Test
+    @DisplayName("execute should throw UnprocessableEntityException when pipeline does not exist")
+    void execute_pipelineNotFound_throwsException() {
+        repository.configToReturn = null;
+        assertThrows(UnprocessableEntityException.class, () -> useCase.execute("non-existent"));
     }
 
     @Test

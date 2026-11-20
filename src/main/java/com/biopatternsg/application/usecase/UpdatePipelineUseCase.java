@@ -81,18 +81,7 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
     }
 
     private void updateAlignedExpertObjects(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
-        pipelineCurrent.setAlignedExpertObjects(pipelineRequest.getAlignedExpertObjects());
-        pipelineCurrent.setStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS);
-
-        Map<String, String> metrics = new LinkedHashMap<>();
-        if (pipelineRequest.getAlignedExpertObjects() != null && !pipelineRequest.getAlignedExpertObjects().isEmpty()) {
-            metrics.put("totalAlignedObjects", String.valueOf(pipelineRequest.getAlignedExpertObjects().size()));
-            String symbols = String.join(", ", pipelineRequest.getAlignedExpertObjects());
-            metrics.put("alignedSymbols", symbols);
-        }
-        metrics.put("statusMessage", "Manual alignment confirmed by expert");
-
-        pipelineCurrent.addStatusForStep(PipelineSteps.UPDATE_ALIGNED_OBJECTS, Status.COMPLETED, metrics);
+        pipelineCurrent.applyAlignedObjectsConfirmation(pipelineRequest.getAlignedExpertObjects());
     }
 
     private void updateSearchConfig(PipelineConfig pipelineRequest, PipelineConfig pipelineCurrent){
@@ -100,15 +89,6 @@ public class UpdatePipelineUseCase implements UpdatePipeline {
         pipelineCurrent.setRetMax(pipelineRequest.getRetMax());
         pipelineCurrent.setMaxComplexes(pipelineRequest.getMaxComplexes());
         pipelineCurrent.setUseOnlyPrincipalName(pipelineRequest.isUseOnlyPrincipalName());
-
-        // CONFIG status transitions to COMPLETED only when step 1 (name, description) and step 4 (levels, retMax, maxComplexes) fields are complete
-        if (pipelineCurrent.getName() != null && !pipelineCurrent.getName().trim().isEmpty() &&
-            pipelineCurrent.getDescription() != null && !pipelineCurrent.getDescription().trim().isEmpty() &&
-            pipelineCurrent.getLevels() != null && pipelineCurrent.getLevels() > 0 &&
-            pipelineCurrent.getRetMax() > 0 &&
-            pipelineCurrent.getMaxComplexes() != null && pipelineCurrent.getMaxComplexes() > 0) {
-            
-            pipelineCurrent.addStatus(Status.COMPLETED);
-        }
+        pipelineCurrent.applyConfigCompletionIfEligible();
     }
 }

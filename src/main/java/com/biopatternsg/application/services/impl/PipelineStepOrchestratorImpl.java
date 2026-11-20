@@ -130,4 +130,31 @@ public class PipelineStepOrchestratorImpl implements PipelineStepOrchestrator {
             }
         }
     }
+
+    @Override
+    public void resumePipeline(PipelineConfig pipeline, String userId, com.biopatternsg.domain.enums.MicroService microService) {
+        if (microService == com.biopatternsg.domain.enums.MicroService.SEARCH_BIOLOGICAL_OBJECTS) {
+            biologicalObjectRepository.launchConsole(pipeline, userId);
+        } else {
+            PipelineSteps previousStep = resolvePreviousStep(pipeline.getStep());
+            if (previousStep == null) {
+                throw new IllegalStateException("Cannot determine predecessor step for step: " + pipeline.getStep());
+            }
+            orchestrate(pipeline, previousStep);
+        }
+    }
+
+    private PipelineSteps resolvePreviousStep(PipelineSteps currentStep) {
+        if (currentStep == null) {
+            return null;
+        }
+        return switch (currentStep) {
+            case COMBINATIONS -> PipelineSteps.SEARCH_LEVELS;
+            case SEARCH_PUBMED_IDS -> PipelineSteps.COMBINATIONS;
+            case SEARCH_PUBTATOR -> PipelineSteps.SEARCH_PUBMED_IDS;
+            case BUILD_KNOWLEDGE_BASE -> PipelineSteps.SEARCH_PUBTATOR;
+            case GENERATE_ALIGNED_OBJECTS -> PipelineSteps.BUILD_KNOWLEDGE_BASE;
+            default -> null;
+        };
+    }
 }
