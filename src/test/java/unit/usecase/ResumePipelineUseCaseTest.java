@@ -124,12 +124,11 @@ class ResumePipelineUseCaseTest {
         }
     }
 
-    static class FakePipelineStepOrchestrator extends PipelineStepOrchestrator {
+    static class FakePipelineStepOrchestrator implements PipelineStepOrchestrator {
         Map<String, PipelineSteps> orchestratedSteps = new HashMap<>();
         Set<String> idsToFail = new HashSet<>();
 
         FakePipelineStepOrchestrator() {
-            super(null, null, null, null);
         }
 
         @Override

@@ -16,7 +16,6 @@
 package com.biopatternsg.infrastructure.adapters.out.repositories;
 
 import com.biopatternsg.domain.models.PipelineConfig;
-import com.biopatternsg.domain.services.PipelineService;
 import com.biopatternsg.domain.port.out.repositories.BiologicalObjectRepository;
 import com.biopatternsg.infrastructure.clients.BiologicalObjectHttpClient;
 import com.biopatternsg.infrastructure.dtos.LaunchPipelineInternalRequest;
@@ -38,8 +37,6 @@ public class BiologicalObjectAdapter implements BiologicalObjectRepository {
     @Inject
     @RestClient
     private BiologicalObjectHttpClient biologicalObjectHttpClient;
-    @Inject
-    private PipelineService pipelineService;
 
     @Override
     @Retry

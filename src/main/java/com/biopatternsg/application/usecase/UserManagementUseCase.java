@@ -38,11 +38,7 @@ public class UserManagementUseCase implements UserManagement {
     @Override
     public void register(UserConfig userConfig) {
 
-        var response = keycloakRepository.register(userConfig);
-        java.net.URI location = response.getLocation();
-        String path = location.getPath();
-        String userId = path.substring(path.lastIndexOf('/') + 1);
-
+        String userId = keycloakRepository.register(userConfig);
         userConfig.setIdentityProviderId(userId);
         userRepository.create(userConfig);
 

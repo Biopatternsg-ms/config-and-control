@@ -19,8 +19,7 @@ Orquesta el ciclo de vida completo de los usuarios en la plataforma, manteniendo
 ## 2. Operaciones Principales
 
 1. **`register(UserConfig userConfig)`:**
-   - Registra al usuario en Keycloak (`KeycloakRepository.register`).
-   - Extrae el ID generado por Keycloak desde la cabecera `Location`.
+   - Registra al usuario en Keycloak a través del puerto desacoplado (`KeycloakRepository.register`), el cual encapsula la respuesta HTTP y retorna directamente el `identityProviderId` (`String`).
    - Asigna `identityProviderId` y persiste el perfil en MongoDB (`UserRepository.create`).
    - Dispara el correo de verificación inicial a través de Keycloak (`VERIFY_EMAIL`).
 2. **`processEmailVerification(String keycloakId)`:**
@@ -54,8 +53,8 @@ sequenceDiagram
     UseCase->>KeycloakRepo: register(userConfig)
     KeycloakRepo->>Keycloak: POST /admin/realms/{realm}/users
     Keycloak-->>KeycloakRepo: 201 Created (Header Location: .../users/{userId})
-    KeycloakRepo-->>UseCase: Response with Location
-    UseCase->>UseCase: extract identityProviderId (userId)
+    KeycloakRepo->>KeycloakRepo: extract identityProviderId (userId)
+    KeycloakRepo-->>UseCase: userId (String)
     UseCase->>UserRepo: create(userConfig con identityProviderId)
     UserRepo-->>UseCase: void
     UseCase->>KeycloakRepo: sendEmail(userId, ["VERIFY_EMAIL"])

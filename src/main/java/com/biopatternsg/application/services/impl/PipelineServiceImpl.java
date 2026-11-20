@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.biopatternsg.domain.services;
+package com.biopatternsg.application.services.impl;
 
+import com.biopatternsg.application.services.PipelineService;
 import com.biopatternsg.domain.enums.PipelineSteps;
 import com.biopatternsg.domain.enums.Status;
 import com.biopatternsg.domain.exceptions.UnprocessableEntityException;
 import com.biopatternsg.domain.models.PipelineConfig;
 import com.biopatternsg.domain.port.out.repositories.PipelineRepository;
-import com.biopatternsg.domain.services.PipelineService;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 
