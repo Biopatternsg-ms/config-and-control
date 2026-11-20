@@ -165,8 +165,9 @@ Configuradas en `application.properties`:
 
 ## 8. Guía de Intervención y Estándares de Código
 
-Para el conjunto completo de reglas mandatorias de codificación, clean code y estándares de diseño, consulte el documento:
-👉 [**`.agents/rules.md`**](rules.md)
+Para el conjunto completo de reglas mandatorias de arquitectura y estándares de lenguaje Java, consulte los documentos:
+- 👉 [**`.agents/architecture-rules.md`**](architecture-rules.md) — Reglas de Arquitectura Hexagonal, límites de capas, casos de uso, servicios y documentación.
+- 👉 [**`.agents/java-rules.md`**](java-rules.md) — Reglas de Java 21, Clean Code, lambdas, límite de parámetros y mappers estáticos.
 
 ### Resumen Rápido para Nuevas Funcionalidades:
 1. **Nuevo Caso de Uso:**

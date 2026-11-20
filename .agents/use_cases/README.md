@@ -42,7 +42,7 @@ Este directorio contiene la documentación técnica y funcional detallada de tod
 
 ## Regla de Mantenimiento y Sincronización
 
-De acuerdo con [`.agents/rules.md`](../rules.md) (Sección 1.4) y la Constitución del proyecto ([`.specify/memory/constitution.md`](../../.specify/memory/constitution.md) — Principio IV):
+De acuerdo con [`.agents/architecture-rules.md`](../architecture-rules.md) (Sección 2.3) y la Constitución del proyecto ([`.specify/memory/constitution.md`](../../.specify/memory/constitution.md) — Principio IV):
 
 1. **Creación de un Caso de Uso:** Siempre que se cree un nuevo caso de uso en `com.biopatternsg.application.usecase`, se **DEBE** crear su archivo `<NombreUseCase>.md` en este directorio y **registrar su referencia en las tablas de este `README.md`** (además de `.agents/architecture.md`).
 2. **Modificación de un Caso de Uso:** Siempre que cambie el flujo, contratos o reglas de negocio de un caso de uso existente, se **DEBE** actualizar su archivo `<NombreUseCase>.md` y su descripción en este `README.md` en caso de que su responsabilidad haya cambiado.
